@@ -34,9 +34,6 @@
           <a href="{{ tile_link }}" class="cat-tile">
             <span class="cat-tile__top">
               <span class="cat-tile__title">{{ block.settings.title | escape }}</span>
-              {%- if c != blank -%}
-                <span class="cat-tile__count">{% if c_count < 10 %}0{% endif %}{{ c_count }}<span class="visually-hidden"> {{ c_count | pluralize: 'product', 'products' }}</span></span>
-              {%- endif -%}
             </span>
             {%- if block.settings.subtitle != blank -%}
               <span class="cat-tile__sub">{{ block.settings.subtitle | escape }}</span>
