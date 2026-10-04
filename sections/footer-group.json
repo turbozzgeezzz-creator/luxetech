@@ -3,7 +3,7 @@
   "name": "Footer group",
   "sections": {
     "footer": {
-      "type": "footer",
+      "type": "site-footer",
       "settings": {
         "show_payment_icons": true,
         "show_policies": true,
