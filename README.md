@@ -46,21 +46,40 @@ All colors are editable in Theme settings > Colors. Upload a logo in Theme setti
 
 ## Homepage
 
-Built for a short range shown with confidence, not a placeholder for a bigger catalogue. Every number on it is counted from the store.
-
 | Section | File | What it does |
 |---|---|---|
-| Range hero | `sections/range-hero.liquid` | Heading, live product/category counts and the **range sheet**: every product on one spec-style panel with number, photo, short name, category, price and stock dot. |
-| Category tiles | `sections/category-grid.liquid` | Live product count and up to three real product photos per category. Subtitles describe what each collection actually holds. |
-| Full range grid | `sections/range-grid.liquid` | Every product, numbered, with a large lead tile (pick one in the editor) and a closing tile that fills the last row exactly. |
-| On sale now | `sections/product-rail.liquid` | Hidden until a product has a compare-at price. |
-| Brand story | `sections/brand-story.liquid` | Why the range is short, with numbered principles. |
-| After you order | `sections/process-steps.liquid` | Checkout to doorstep timeline. |
-| Before you buy | `sections/help-desk.liquid` | Real questions with short answers, linking to FAQ, Shipping and Returns, plus a contact card. |
+| Promo bento | `sections/promo-bento.liquid` | Rotating main banner plus five promo tiles (tiles 1-2 left column, 3-5 under the banner). Each uses a built-in illustration unless an image is uploaded. Tick *Opens welcome-offer popup* to make a slide or tile open the email popup. |
+| Scrolling ticker | `sections/marquee.liquid` | Short promises, one per line. Pauses on hover. |
+| Department showcase | `sections/category-showcase.liquid` | Large illustrated card per category with real product photos. |
+| Product rail | `sections/product-rail.liquid` | Shop the latest. |
+| Deals and bundles | `sections/deals-hub.liquid` | Welcome offer tile, two-product pair builder (*Add both*), and sale items or newest arrivals. The pair's offer note only shows when filled in, so no saving is promised unless a real discount exists. |
+| Recently viewed | `sections/recently-viewed.liquid` | Recently viewed and Recommended for you, from the visitor's own browsing (stored on their device). Hidden until there is something to show. |
+| Brand story, After you order, Before you buy | `brand-story`, `process-steps`, `help-desk` | Why shop with us, checkout-to-door timeline, real questions linking to the full answers. |
+| Blog posts | `sections/blog-teaser.liquid` | Latest guides; articles without an image get a matching illustration from their tags (audio, charging, kitchen, wearables). |
+| Newsletter | `sections/newsletter.liquid` | Welcome-offer signup band. |
 
-The copy in the brand story, timeline and questions only restates what the About, Shipping, Returns and FAQ pages already promise. If a policy changes, update both.
+Other pages use `sections/page-hero.liquid` (illustrated banner); collection pages get an illustrated header matched to the collection handle.
 
-**Short product names:** the range sheet uses the product metafield `custom.short_title` (single line text) when it's filled in, and otherwise cuts the title at the first comma and caps it at six words. Supplier titles are long keyword lists, so filling in short titles is the quickest way to tidy the range sheet.
+## Welcome offer (10% off)
+
+Theme settings > **Welcome offer** holds the code (default `WELCOME10`) and the one-line offer. After signing up in the popup, footer or newsletter band, subscribers see the code with Copy and Apply buttons.
+**Create the same code in Shopify admin > Discounts** (10% off, one use per customer, ideally limited to first orders), otherwise subscribers are shown a code that doesn't work.
+
+## Experience features (`assets/experience.js`)
+
+Scroll reveals and staggered tiles (off for visitors who prefer reduced motion), the promo carousel, recently viewed and recommendations, a *Welcome back* modal for returning visitors with browsing history, multi-item add to cart (Complete the set, pair builder), dated dispatch estimates on product pages, and links that open the welcome-offer popup.
+
+## Mega menu
+
+Category blocks in the header build their dropdown automatically from the collection in their link: product links, product tiles (topped up with other products when a category is small) and an illustrated promo tile. Pick a menu on a block to use your own links instead.
+
+## Illustrations
+
+`assets/art-*.svg` are original illustrations made for this theme (earbuds, wireless charging, coffee and blender, smartwatch, hair dryer, price tag, boxes, phone and charger, devices on stage). They're used wherever a slot has no uploaded image.
+
+## Shopify sync limits worth knowing
+
+Shopify's GitHub sync silently rejects a section file whose schema breaks its server rules, and keeps the previous version live. Theme Check doesn't catch all of them. Two that bit this theme: section, block and preset **names must be 25 characters or fewer**, and select option labels should stay short. After a push, check the live HTML for `Liquid error` or for the change itself.
 
 ## Placeholder images
 
