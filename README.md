@@ -21,37 +21,56 @@ Changes made in the theme editor are committed back to `main` by Shopify (mostly
 
 The zip has `layout/`, `templates/`, `sections/`, `snippets/`, `assets/`, `config/` and `locales/` at its root.
 
-## Design system: "signal"
+## Design system: Tech.LuxeDealers
 
-The look is industrial-design rather than web-template: stone and white surfaces, graphite text, hairline borders, near-square corners and no drop shadows.
-Signal orange is the only brand color, and it's spent on purpose:
-- primary buttons (Add to cart, Checkout, Subscribe)
-- links and sale prices
-- Sale badges
-- the indicator dot
+Everything is derived from the logo (`assets/logo-tech-luxedealers.png`, with a white-ink version for dark backgrounds):
+near-black ink, one electric violet, heavy slanted expanded lettering, the full stop after "TECH" and the speed-lines price tag.
 
-The dot is the store's signature mark. It appears after the wordmark, before section titles and in the hero kicker, and it's the same shape as the stock-status dots.
+- **Violet is spent on purpose:** primary buttons, links, sale prices and the signal dot. Nothing else is violet except the newsletter band.
+- **The dot** ends every section heading (like the logo's "TECH.") and is the same shape as the stock-status dots and the timeline stops.
+- **Speed lines** (three right-aligned streaks from the logo's tag) mark eyebrow labels and decorate the newsletter band and the range grid's closing tile.
+- **Type:** Archivo at expanded widths for headings, slanted and heavy for the hero heading, big figures and prices; JetBrains Mono for catalogue numbers (01, 02...), labels and data. Body text is Archivo at normal width.
+- **Photos:** product photos are multiply-blended onto the panel color so supplier shots with white backgrounds sit in the grid as one set.
 
 | Token | Default | Used for |
 |---|---|---|
-| Background | `#F5F5F2` | Page (stone) |
+| Background | `#F2F3F5` | Page (cool paper) |
 | Surface | `#FFFFFF` | Cards, header, panels |
-| Panels | `#ECEDE8` | Product image backgrounds, bands, hero |
-| Graphite | `#1D1E1B` | Text, utility bar, newsletter band, footer, secondary buttons |
-| Signal orange | `#C9441B` | Primary actions, links, sale prices, indicator dot |
-| Signal tint | `#FBE8DF` | Save X% labels, highlight chips |
-| In stock / Low stock / Error | `#2E7D32` / `#946200` / `#A3221A` | Stock lines and form errors only |
+| Panels | `#E7E9ED` | Product image backgrounds, bands |
+| Ink | `#0B1220` | Text, utility bar, hero, footer, dark tiles |
+| Brand violet | `#7D03FC` | Primary actions, links, sale prices, signal dot (white text on it is 6.4:1) |
+| Violet tint | `#EFE6FF` | Save X% labels, highlight chips |
+| In stock / Low stock / Error | `#1E7A3C` / `#8F5B00` / `#B42318` | Stock lines and form errors only |
 
-Type: **Bricolage Grotesque** for headings and prices, **Instrument Sans** for body text (both from Google Fonts).
-All colors are editable in Theme settings > Colors.
+All colors are editable in Theme settings > Colors. Upload a logo in Theme settings > Logo to replace the bundled one.
+
+## Homepage
+
+Built for a short range shown with confidence, not a placeholder for a bigger catalogue. Every number on it is counted from the store.
+
+| Section | File | What it does |
+|---|---|---|
+| Range hero | `sections/range-hero.liquid` | Heading, live product/category counts and the **range sheet**: every product on one spec-style panel with number, photo, short name, category, price and stock dot. |
+| Category tiles | `sections/category-grid.liquid` | Live product count and up to three real product photos per category. Subtitles describe what each collection actually holds. |
+| Full range grid | `sections/range-grid.liquid` | Every product, numbered, with a large lead tile (pick one in the editor) and a closing tile that fills the last row exactly. |
+| On sale now | `sections/product-rail.liquid` | Hidden until a product has a compare-at price. |
+| Brand story | `sections/brand-story.liquid` | Why the range is short, with numbered principles. |
+| After you order | `sections/process-steps.liquid` | Checkout to doorstep timeline. |
+| Before you buy | `sections/help-desk.liquid` | Real questions with short answers, linking to FAQ, Shipping and Returns, plus a contact card. |
+
+The copy in the brand story, timeline and questions only restates what the About, Shipping, Returns and FAQ pages already promise. If a policy changes, update both.
+
+**Short product names:** the range sheet uses the product metafield `custom.short_title` (single line text) when it's filled in, and otherwise cuts the title at the first comma and caps it at six words. Supplier titles are long keyword lists, so filling in short titles is the quickest way to tidy the range sheet.
 
 ## Placeholder images
 
-Until real photos are added, every image slot shows line-art drawn in the theme's own colors, never a grey box or broken image. This covers hero slides, promo banners, mega menu promo tiles, product cards and galleries for products without photos, cart lines, collection and blog tiles, and search suggestions.
+Until real photos are added, image slots without a photo show an editorial plate drawn in the theme's colors: engineering-paper dot grid, a solid device silhouette in ink (earbuds case, charger, watch or phone, picked per slot so neighbours differ), the violet signal dot as the device's status light, the logo's speed lines and tag, and a `FIG.` caption. Plates switch to a light-on-ink version inside dark bands.
+
+They cover hero slides, promo banners, mega menu promo tiles, products without media, cart lines, collection and blog tiles, and search suggestions.
 
 The art disappears automatically once a photo exists:
 - **Hero, promo banners and mega menu tiles:** upload a photo in the theme editor image picker.
-- **Category tiles:** use an icon by default; upload an image in the block to replace it.
+- **Category tiles:** show real product photos from the collection; upload an image in the block to override.
 - **Products, collections and articles:** add images in Shopify admin.
 
 No code changes are needed.
@@ -138,7 +157,7 @@ The demo links in the default homepage, header and slides point to `/collections
   The Shopify Product Reviews app and most review apps write these. Products without them show no stars.
 - **Stock lines** use real inventory. *Low stock, only N left* shows when tracked quantity is at or below the threshold (5 by default).
   *Backordered* shows when a variant is out of stock but set to continue selling. Variants with untracked inventory show as in stock.
-- **New badge** is based on the product's publish date (last 30 days by default; set it to 0 to turn the badge off).
+- **New badge** is based on the product's publish date. It's off by default (0 days) because the whole range is new, so every card would say New; set a number of days in Theme settings > Stock and badges to turn it on.
 - **Payment icons** come from Shopify's enabled payment methods (`payment_type_svg_tag`).
 - **Product rails** hide themselves on the live store when they have no matching products. The *On sale now* rail only shows products with a compare-at price, so it stays hidden until you mark something down.
 - **No "X people bought this", visitor counters or countdown timers.** The store has no such data, so nothing is shown.
