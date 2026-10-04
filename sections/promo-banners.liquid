@@ -11,11 +11,13 @@
               {%- if block.settings.text != blank -%}<span class="promo__text">{{ block.settings.text | escape }}</span>{%- endif -%}
               <span class="promo__cta">{{ block.settings.link_label | escape }}</span>
             </span>
-            {%- if block.settings.image != blank -%}
-              <span class="promo__media">
+            <span class="promo__media">
+              {%- if block.settings.image != blank -%}
                 {{ block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,450,600', sizes: '(min-width: 990px) 280px, 45vw', alt: block.settings.image.alt, class: 'promo__img' }}
-              </span>
-            {%- endif -%}
+              {%- else -%}
+                {% render 'placeholder-art', type: 'product', class: 'promo__img' %}
+              {%- endif -%}
+            </span>
           </a>
         </li>
       {%- endfor -%}
@@ -35,7 +37,7 @@
       "name": "Banner",
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Product image", "info": "Cut-out product shots on a transparent background look best." },
-        { "type": "color", "id": "background", "label": "Background", "default": "#E8EEFD" },
+        { "type": "color", "id": "background", "label": "Background", "default": "#ECEDE8" },
         { "type": "select", "id": "text_tone", "label": "Text color", "options": [
           { "value": "dark", "label": "Dark" },
           { "value": "light", "label": "Light" }
@@ -53,7 +55,7 @@
       "name": "Promo banners",
       "blocks": [
         { "type": "banner" },
-        { "type": "banner", "settings": { "background": "#F4F6F9", "text_tone": "dark", "heading": "Second banner heading", "link_label": "Shop now" } }
+        { "type": "banner", "settings": { "background": "#1D1E1B", "text_tone": "light", "heading": "Second banner heading", "link_label": "Shop now" } }
       ]
     }
   ]

@@ -12,7 +12,7 @@
           "type": "slide",
           "settings": {
             "layout": "split",
-            "background": "#EEF2F8",
+            "background": "#ECEDE8",
             "text_tone": "dark",
             "kicker": "Welcome to LuxeTech",
             "heading": "Everyday tech, without the guesswork",
@@ -27,8 +27,8 @@
           "type": "slide",
           "settings": {
             "layout": "split",
-            "background": "#F4F6F9",
-            "text_tone": "dark",
+            "background": "#1D1E1B",
+            "text_tone": "light",
             "kicker": "On sale",
             "heading": "Marked-down tech, all in one place",
             "text": "<p>Every product with a reduced price, with the original price shown so you can see exactly what you save.</p>",
@@ -40,7 +40,7 @@
           "type": "slide",
           "settings": {
             "layout": "split",
-            "background": "#E8EEFD",
+            "background": "#E5E3DD",
             "text_tone": "dark",
             "kicker": "Need a hand?",
             "heading": "Questions before you buy?",
@@ -70,7 +70,6 @@
             "title": "Audio",
             "subtitle": "Headphones and speakers",
             "icon": "headphones",
-            "color": "#1D4ED8",
             "link": "/collections/audio"
           }
         },
@@ -80,7 +79,6 @@
             "title": "Charging",
             "subtitle": "Chargers, cables, power banks",
             "icon": "plug",
-            "color": "#1D4ED8",
             "link": "/collections/charging"
           }
         },
@@ -90,7 +88,6 @@
             "title": "Smart home",
             "subtitle": "Plugs, cameras, lighting",
             "icon": "home-device",
-            "color": "#1D4ED8",
             "link": "/collections/smart-home"
           }
         },
@@ -100,7 +97,6 @@
             "title": "Accessories",
             "subtitle": "Cases, mounts, stands",
             "icon": "case",
-            "color": "#1D4ED8",
             "link": "/collections/accessories"
           }
         }
@@ -185,7 +181,7 @@
         "p1": {
           "type": "banner",
           "settings": {
-            "background": "#E8EEFD",
+            "background": "#ECEDE8",
             "text_tone": "dark",
             "kicker": "",
             "heading": "New arrivals",
@@ -197,8 +193,8 @@
         "p2": {
           "type": "banner",
           "settings": {
-            "background": "#F4F6F9",
-            "text_tone": "dark",
+            "background": "#1D1E1B",
+            "text_tone": "light",
             "kicker": "",
             "heading": "Not sure what fits?",
             "text": "Tell us your device and we'll point you to the right charger, cable or accessory.",

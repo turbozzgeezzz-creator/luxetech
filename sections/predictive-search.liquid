@@ -26,6 +26,8 @@
                 <span class="predictive__thumb">
                   {%- if p.featured_media -%}
                     {{ p.featured_media.preview_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 56, height: 56 }}
+                  {%- else -%}
+                    {% render 'placeholder-art', type: 'product' %}
                   {%- endif -%}
                 </span>
                 <span class="predictive__info">

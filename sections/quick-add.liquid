@@ -9,7 +9,7 @@
       {%- assign qa_alt = qa_media.alt | default: product.title -%}
       {{ qa_media.preview_image | image_url: width: 700 | image_tag: loading: 'eager', widths: '350,500,700', sizes: '(min-width: 750px) 340px, 90vw', alt: qa_alt, class: 'quick-add__img' }}
     {%- else -%}
-      {{ 'product-1' | placeholder_svg_tag: 'quick-add__img placeholder-svg' }}
+      {% render 'placeholder-art', type: 'product', class: 'quick-add__img' %}
     {%- endif -%}
     <script type="application/json" data-media-json>
       {

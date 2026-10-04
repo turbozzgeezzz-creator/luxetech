@@ -4,7 +4,7 @@
 {%- endcomment -%}
 <article class="card card--placeholder">
   <div class="card__media ratio ratio--{{ settings.card_image_ratio }}">
-    {{ 'product-' | append: index | placeholder_svg_tag: 'card__img placeholder-svg' }}
+    <span class="card__media-link">{% render 'placeholder-art', type: 'product', class: 'card__img card__img--art' %}</span>
   </div>
   <div class="card__body">
     <p class="card__label">Brand</p>

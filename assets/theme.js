@@ -1196,9 +1196,23 @@
       }
       if (!this.shouldShow()) return;
       var delay = parseInt(this.dataset.delay, 10) || 9000;
-      this.timer = setTimeout(() => this.openWhenIdle(), delay);
+      var canExit = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      if (this.dataset.trigger === 'exit' && canExit) {
+        /* Exit intent: the pointer leaves through the top of the window. Armed after 3s so it can't fire on arrival. */
+        this.onLeave = (e) => {
+          if (e.relatedTarget || e.clientY > 0) return;
+          document.removeEventListener('mouseout', this.onLeave);
+          this.openWhenIdle();
+        };
+        this.timer = setTimeout(() => document.addEventListener('mouseout', this.onLeave), 3000);
+      } else {
+        this.timer = setTimeout(() => this.openWhenIdle(), delay);
+      }
     }
-    disconnectedCallback() { clearTimeout(this.timer); }
+    disconnectedCallback() {
+      clearTimeout(this.timer);
+      if (this.onLeave) document.removeEventListener('mouseout', this.onLeave);
+    }
     shouldShow() {
       var raw = storageGet(window.localStorage, POPUP_KEY);
       if (!raw) return true;

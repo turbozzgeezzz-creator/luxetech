@@ -61,8 +61,8 @@
                   class: 'slide__img'
                 }}
               {%- endif -%}
-            {%- elsif request.design_mode -%}
-              {{ 'lifestyle-1' | placeholder_svg_tag: 'slide__img placeholder-svg' }}
+            {%- else -%}
+              {% render 'placeholder-art', type: 'hero', uid: block.id, class: 'slide__img slide__img--art' %}
             {%- endif -%}
           </div>
           <div class="slide__content container">
@@ -139,7 +139,7 @@
         ], "default": "split" },
         { "type": "image_picker", "id": "image", "label": "Image", "info": "Split layout: a cut-out product shot works best. Full-width: 2400 x 900px." },
         { "type": "image_picker", "id": "image_mobile", "label": "Mobile image (full-width layout only)" },
-        { "type": "color", "id": "background", "label": "Background color", "default": "#EEF2F8" },
+        { "type": "color", "id": "background", "label": "Background color", "default": "#ECEDE8" },
         { "type": "select", "id": "text_tone", "label": "Text color", "options": [
           { "value": "light", "label": "Light (for dark backgrounds)" },
           { "value": "dark", "label": "Dark (for light backgrounds)" }
@@ -159,7 +159,7 @@
       "name": "Hero slideshow",
       "blocks": [
         { "type": "slide" },
-        { "type": "slide", "settings": { "background": "#F4F6F9", "heading": "Second slide heading", "button_label": "Shop now" } }
+        { "type": "slide", "settings": { "background": "#E5E3DD", "heading": "Second slide heading", "button_label": "Shop now" } }
       ]
     }
   ]

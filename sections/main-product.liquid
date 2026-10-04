@@ -99,7 +99,7 @@
           </dialog>
         {%- else -%}
           <div class="gallery__main gallery__main--empty">
-            {{ 'product-1' | placeholder_svg_tag: 'gallery__img placeholder-svg' }}
+            {% render 'placeholder-art', type: 'product', class: 'gallery__img' %}
           </div>
         {%- endif -%}
       </media-gallery>

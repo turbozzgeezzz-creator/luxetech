@@ -124,6 +124,8 @@
                             class: 'mega-promo__img'
                           }}
                         </span>
+                      {%- else -%}
+                        <span class="mega-promo__media mega-promo__media--art">{% render 'placeholder-art', type: 'product' %}</span>
                       {%- endif -%}
                       <span class="mega-promo__body">
                         {%- if block.settings.promo_heading != blank -%}<span class="mega-promo__heading">{{ block.settings.promo_heading | escape }}</span>{%- endif -%}

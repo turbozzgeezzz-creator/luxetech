@@ -1,28 +1,60 @@
-# LuxeTech theme v2 (tech.luxedealers.com)
+# LuxeTech theme (tech.luxedealers.com)
 
 A custom Shopify Online Store 2.0 theme for a consumer electronics store. It replaces the
 v1 theme: same LuxeTech name and category set, with a new design and most of the code rewritten.
 
-## Install
+## Connect to Shopify (recommended)
 
-1. Preferred: connect this repo in Shopify (see "Connect to Shopify" below). For a manual upload, run `sh package.sh` to build `dist/luxetech-theme.zip`.
+This repo has the theme folders at its root, so Shopify can sync it directly:
+1. In Shopify admin, go to **Online Store > Themes > Add theme > Connect from GitHub**.
+2. Authorize GitHub, then pick the `turbozzgeezzz-creator` account, the `luxetech` repo and the `main` branch.
+3. The theme appears in your theme library. Preview it, then **Publish** when ready.
+
+Every push to `main` updates that theme automatically.
+Changes made in the theme editor are committed back to `main` by Shopify (mostly `config/settings_data.json` and `templates/*.json`). Pull before editing locally.
+
+## Install by upload (alternative)
+
+1. Run `sh package.sh`. It builds `dist/luxetech-theme.zip` (git-ignored).
 2. In Shopify admin, go to **Online Store > Themes > Add theme > Upload zip file** and pick that zip.
 3. Click **Customize** to preview the theme before you publish it.
 
 The zip has `layout/`, `templates/`, `sections/`, `snippets/`, `assets/`, `config/` and `locales/` at its root.
 
-## Design system
+## Design system: "signal"
+
+The look is industrial-design rather than web-template: stone and white surfaces, graphite text, hairline borders, near-square corners and no drop shadows.
+Signal orange is the only brand color, and it's spent on purpose:
+- primary buttons (Add to cart, Checkout, Subscribe)
+- links and sale prices
+- Sale badges
+- the indicator dot
+
+The dot is the store's signature mark. It appears after the wordmark, before section titles and in the hero kicker, and it's the same shape as the stock-status dots.
 
 | Token | Default | Used for |
 |---|---|---|
-| Background / Surface | `#FFFFFF` | Page, cards, panels |
-| Subtle | `#F4F6F9` | Utility bar, deals band, hero, newsletter band |
-| Text | `#1B2433` | Body text and the footer |
-| Brand blue | `#1D4ED8` | Buttons, links, sale prices, Sale badges, focus rings |
-| Brand tint | `#E8EEFD` | Save X% labels, highlight chips |
-| In stock / Low stock / Error | `#1A7F37` / `#B45309` / `#C42B2B` | Stock lines and form errors only |
+| Background | `#F5F5F2` | Page (stone) |
+| Surface | `#FFFFFF` | Cards, header, panels |
+| Panels | `#ECEDE8` | Product image backgrounds, bands, hero |
+| Graphite | `#1D1E1B` | Text, utility bar, newsletter band, footer, secondary buttons |
+| Signal orange | `#C9441B` | Primary actions, links, sale prices, indicator dot |
+| Signal tint | `#FBE8DF` | Save X% labels, highlight chips |
+| In stock / Low stock / Error | `#2E7D32` / `#946200` / `#A3221A` | Stock lines and form errors only |
 
-Every color can be changed in **Theme settings > Colors**. Headings and prices use Archivo, and body text uses Public Sans.
+Type: **Bricolage Grotesque** for headings and prices, **Instrument Sans** for body text (both from Google Fonts).
+All colors are editable in Theme settings > Colors.
+
+## Placeholder images
+
+Until real photos are added, every image slot shows line-art drawn in the theme's own colors, never a grey box or broken image. This covers hero slides, promo banners, mega menu promo tiles, product cards and galleries for products without photos, cart lines, collection and blog tiles, and search suggestions.
+
+The art disappears automatically once a photo exists:
+- **Hero, promo banners and mega menu tiles:** upload a photo in the theme editor image picker.
+- **Category tiles:** use an icon by default; upload an image in the block to replace it.
+- **Products, collections and articles:** add images in Shopify admin.
+
+No code changes are needed.
 
 ## Pages to create (2 minutes each)
 
@@ -53,7 +85,7 @@ They also appear in the trust row, utility bar and product page trust row, which
 ## Email popup
 
 **Theme editor > Email popup** (it's at the bottom of every page).
-- **When it shows:** once per visitor, 9 seconds after landing. The delay is configurable from 3 to 30 seconds.
+- **When it shows:** once per visitor, 9 seconds after landing by default. The delay is configurable from 3 to 30 seconds. You can switch it to exit intent: on desktop it opens when the pointer leaves through the top of the window, and on phones it falls back to the delay.
 - **When it doesn't:** it never opens over an open cart drawer or dialog. It's hidden on account pages and the password page, and for logged-in customers who already accept marketing.
 - **After closing or signing up:** it isn't shown again. You can set it to reappear after N days for people who closed it.
 - **Signup:** uses the same Shopify customer form as the footer, tagged `newsletter, popup`.

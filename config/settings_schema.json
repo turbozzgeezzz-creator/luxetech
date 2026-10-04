@@ -39,7 +39,7 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "A calm retail palette: white and light grey surfaces, slate text, and one brand blue for buttons, links, sale prices and key highlights. Stock colors carry meaning on every product card, so keep them distinguishable."
+        "content": "The LuxeTech signal palette: stone and white surfaces, graphite text, and one signal orange reserved for primary actions, links, sale prices and the indicator dot. Stock colors carry meaning on every product card, so keep them distinguishable from the brand color."
       },
       {
         "type": "header",
@@ -49,37 +49,37 @@
         "type": "color",
         "id": "color_background",
         "label": "Page background",
-        "default": "#FFFFFF"
+        "default": "#F5F5F2"
       },
       {
         "type": "color",
         "id": "color_subtle",
-        "label": "Subtle background (bands, utility bar)",
-        "default": "#F4F6F9"
+        "label": "Panels (image backgrounds, bands)",
+        "default": "#ECEDE8"
       },
       {
         "type": "color",
         "id": "color_surface",
-        "label": "Surface (cards, panels)",
+        "label": "Surface (cards, header)",
         "default": "#FFFFFF"
       },
       {
         "type": "color",
         "id": "color_ink",
-        "label": "Text and footer",
-        "default": "#1B2433"
+        "label": "Graphite (text, footer)",
+        "default": "#1D1E1B"
       },
       {
         "type": "color",
         "id": "color_muted",
         "label": "Secondary text",
-        "default": "#5E6878"
+        "default": "#62655E"
       },
       {
         "type": "color",
         "id": "color_border",
-        "label": "Borders",
-        "default": "#E2E6EC"
+        "label": "Hairlines",
+        "default": "#D8D9D3"
       },
       {
         "type": "header",
@@ -88,14 +88,14 @@
       {
         "type": "color",
         "id": "color_primary",
-        "label": "Brand color (buttons, links, sale prices)",
-        "default": "#1D4ED8"
+        "label": "Signal orange (actions, links, sale prices)",
+        "default": "#C9441B"
       },
       {
         "type": "color",
         "id": "color_accent",
-        "label": "Brand tint (highlight chips, save labels)",
-        "default": "#E8EEFD"
+        "label": "Signal tint (save labels, highlight chips)",
+        "default": "#FBE8DF"
       },
       {
         "type": "header",
@@ -105,19 +105,19 @@
         "type": "color",
         "id": "color_success",
         "label": "In stock",
-        "default": "#1A7F37"
+        "default": "#2E7D32"
       },
       {
         "type": "color",
         "id": "color_warning",
         "label": "Low stock",
-        "default": "#B45309"
+        "default": "#946200"
       },
       {
         "type": "color",
         "id": "color_error",
         "label": "Errors",
-        "default": "#C42B2B"
+        "default": "#A3221A"
       }
     ]
   },

@@ -10,7 +10,7 @@
     <ul class="cat-grid cat-grid--{{ section.settings.columns }}" role="list">
       {%- for block in section.blocks -%}
         <li {{ block.shopify_attributes }}>
-          <a href="{{ block.settings.link | default: routes.collections_url }}" class="cat-tile" style="--cat: {{ block.settings.color }};">
+          <a href="{{ block.settings.link | default: routes.collections_url }}" class="cat-tile">
             <span class="cat-tile__icon">
               {%- if block.settings.image != blank -%}
                 {{ block.settings.image | image_url: width: 160 | image_tag: loading: 'lazy', widths: '80,160', sizes: '80px', alt: '', class: 'cat-tile__img' }}
@@ -54,8 +54,7 @@
         { "type": "text", "id": "subtitle", "label": "Subtitle" },
         { "type": "url", "id": "link", "label": "Link" },
         { "type": "select", "id": "icon", "label": "Icon", "options": [{"value": "headphones", "label": "Headphones"}, {"value": "earbuds", "label": "Earbuds"}, {"value": "speaker", "label": "Speaker"}, {"value": "plug", "label": "Charger"}, {"value": "battery", "label": "Battery"}, {"value": "cable", "label": "Cable"}, {"value": "bolt", "label": "Power"}, {"value": "home-device", "label": "Smart home"}, {"value": "camera", "label": "Camera"}, {"value": "bulb", "label": "Smart lighting"}, {"value": "watch", "label": "Watch"}, {"value": "smartphone", "label": "Smartphone"}, {"value": "tablet", "label": "Tablet"}, {"value": "laptop", "label": "Laptop"}, {"value": "monitor", "label": "Monitor"}, {"value": "tv", "label": "TV"}, {"value": "gamepad", "label": "Gamepad"}, {"value": "keyboard", "label": "Keyboard"}, {"value": "case", "label": "Phone case"}, {"value": "drone", "label": "Drone"}, {"value": "router", "label": "Networking"}, {"value": "tag", "label": "Deals tag"}, {"value": "percent", "label": "Percent"}, {"value": "gift", "label": "Gift"}, {"value": "sparkle", "label": "New arrivals"}, {"value": "box", "label": "Bundle"}, {"value": "grid", "label": "All categories"}], "default": "headphones" },
-        { "type": "image_picker", "id": "image", "label": "Image (replaces icon)", "info": "Optional small cut-out product shot." },
-        { "type": "color", "id": "color", "label": "Icon color", "default": "#1D4ED8" }
+        { "type": "image_picker", "id": "image", "label": "Image (replaces icon)", "info": "Optional small cut-out product shot." }
       ]
     }
   ],
@@ -63,10 +62,10 @@
     {
       "name": "Category tiles",
       "blocks": [
-        { "type": "category", "settings": { "title": "Audio", "subtitle": "Headphones and speakers", "icon": "headphones", "color": "#1D4ED8" } },
-        { "type": "category", "settings": { "title": "Charging", "subtitle": "Chargers, cables, power banks", "icon": "plug", "color": "#1D4ED8" } },
-        { "type": "category", "settings": { "title": "Smart home", "subtitle": "Plugs, cameras, lighting", "icon": "home-device", "color": "#1D4ED8" } },
-        { "type": "category", "settings": { "title": "Accessories", "subtitle": "Cases, mounts, stands", "icon": "case", "color": "#1D4ED8" } }
+        { "type": "category", "settings": { "title": "Audio", "subtitle": "Headphones and speakers", "icon": "headphones" } },
+        { "type": "category", "settings": { "title": "Charging", "subtitle": "Chargers, cables, power banks", "icon": "plug" } },
+        { "type": "category", "settings": { "title": "Smart home", "subtitle": "Plugs, cameras, lighting", "icon": "home-device" } },
+        { "type": "category", "settings": { "title": "Accessories", "subtitle": "Cases, mounts, stands", "icon": "case" } }
       ]
     }
   ]

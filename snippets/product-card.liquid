@@ -75,7 +75,7 @@
           }}
         {%- endif -%}
       {%- else -%}
-        {{ 'product-1' | placeholder_svg_tag: 'card__img placeholder-svg' }}
+        {% render 'placeholder-art', type: 'product', class: 'card__img card__img--art' %}
       {%- endif -%}
     </a>
 

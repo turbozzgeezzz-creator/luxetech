@@ -1,0 +1,45 @@
+{%- comment -%}
+  Finished-looking stand-in artwork for image slots that don't have a photo yet
+  (product cards, product gallery, hero slides, banners, collection and article
+  tiles). Drawn inline with the theme's color tokens so it follows the palette.
+  Decorative only. Every slot that uses it has an image picker or uses the
+  product's own media, so uploading a photo replaces it without code changes.
+
+  Params:
+  - type: 'product' (square device still life) or 'hero' (wider composition)
+  - uid: unique string when type is 'hero' (used for pattern ids)
+  - class: extra classes
+{%- endcomment -%}
+{%- assign art_uid = uid | default: 'x' | handle -%}
+{%- if type == 'hero' -%}
+  <svg class="placeholder-art placeholder-art--hero {{ class }}" viewBox="0 0 600 480" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern id="Grille-{{ art_uid }}" width="14" height="14" patternUnits="userSpaceOnUse">
+        <circle cx="7" cy="7" r="2.6" class="pa-grille"/>
+      </pattern>
+    </defs>
+    <ellipse cx="310" cy="404" rx="250" ry="14" class="pa-shadow"/>
+    <rect x="70" y="120" width="134" height="262" rx="22" class="pa-body"/>
+    <rect x="84" y="138" width="106" height="210" rx="10" class="pa-screen"/>
+    <rect x="114" y="360" width="46" height="5" rx="2.5" class="pa-ink"/>
+    <circle cx="390" cy="236" r="160" class="pa-body"/>
+    <circle cx="390" cy="236" r="124" fill="url(#Grille-{{ art_uid }})"/>
+    <circle cx="390" cy="236" r="124" class="pa-ring"/>
+    <circle cx="390" cy="236" r="34" class="pa-body"/>
+    <circle cx="390" cy="98" r="7" class="pa-dot"/>
+    <path d="M160 382 C 190 432, 260 430, 280 404" class="pa-cable"/>
+    <rect x="232" y="306" width="96" height="86" rx="34" class="pa-body"/>
+    <path d="M232 336 H328" class="pa-seam"/>
+    <circle cx="280" cy="366" r="5" class="pa-dot"/>
+  </svg>
+{%- else -%}
+  <svg class="placeholder-art placeholder-art--product {{ class }}" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+    <ellipse cx="206" cy="318" rx="128" ry="10" class="pa-shadow"/>
+    <rect x="118" y="78" width="118" height="228" rx="20" class="pa-body"/>
+    <rect x="131" y="94" width="92" height="182" rx="9" class="pa-screen"/>
+    <rect x="160" y="288" width="34" height="5" rx="2.5" class="pa-ink"/>
+    <rect x="212" y="214" width="104" height="94" rx="38" class="pa-body"/>
+    <path d="M212 246 H316" class="pa-seam"/>
+    <circle cx="264" cy="280" r="5.5" class="pa-dot"/>
+  </svg>
+{%- endif -%}
