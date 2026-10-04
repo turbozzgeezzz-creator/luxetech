@@ -167,7 +167,7 @@
   "settings": [
     { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true, "info": "Pulled automatically from your Shopify payment settings." },
     { "type": "checkbox", "id": "show_policies", "label": "Show policy links", "default": true },
-    { "type": "textarea", "id": "small_print", "label": "Small print", "default": "Prices and stock levels can change without notice. Product images are for illustration and may differ slightly from the item supplied." },
+    { "type": "text", "id": "small_print", "label": "Small print", "default": "Prices and stock levels can change without notice. Product images are for illustration and may differ slightly from the item supplied." },
     { "type": "text", "id": "wordmark", "label": "Large wordmark", "default": "TECH.LUXEDEALERS" }
   ],
   "blocks": [
@@ -189,10 +189,10 @@
         { "type": "text", "id": "heading", "label": "Heading", "default": "Shop" },
         { "type": "link_list", "id": "menu", "label": "Menu" },
         { "type": "select", "id": "fallback", "label": "Links to show if no menu is chosen", "options": [
-          { "value": "shop", "label": "Shop (categories)" },
-          { "value": "help", "label": "Help (contact, shipping, returns, policies)" },
+          { "value": "shop", "label": "Shop" },
+          { "value": "help", "label": "Help" },
           { "value": "account", "label": "My account" },
-          { "value": "company", "label": "About (about, blog, offers)" }
+          { "value": "company", "label": "About" }
         ], "default": "shop" }
       ]
     },

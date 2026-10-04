@@ -112,7 +112,7 @@
                 {% render 'icon', name: 'chevron-down', class: 'icon--xs mega-nav__chevron' %}
               </button>
               <div class="mega-panel" id="{{ panel_id }}" hidden>
-                {%- if panel_links.size == 0 and auto_c != blank -%}
+                {%- if panel_links == blank and auto_c != blank -%}
                   {% render 'mega-auto-panel', block: block, c: auto_c, all_blocks: section.blocks %}
                 {%- else -%}
                 <div class="mega-panel__inner container">
