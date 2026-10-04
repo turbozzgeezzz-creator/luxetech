@@ -1,0 +1,148 @@
+{%- comment -%}
+  Deals, bundles and offers:
+  1. Welcome offer: opens the email popup, which shows the discount code set in
+     the Email popup section (the code must exist in Shopify admin > Discounts).
+  2. Pair builder: two products with tick boxes and one "Add both" button.
+     The offer note only shows when filled in, so no saving is promised unless a
+     real discount exists.
+  3. Sale items when any product has a compare-at price, otherwise the newest
+     arrivals.
+{%- endcomment -%}
+{%- liquid
+  assign pair_a = section.settings.product_1
+  assign pair_b = section.settings.product_2
+  if pair_a == blank or pair_b == blank
+    for p in collections.all.products limit: 20
+      unless p.available
+        continue
+      endunless
+      if pair_a == blank and p.id != pair_b.id
+        assign pair_a = p
+      elsif pair_b == blank and p.id != pair_a.id
+        assign pair_b = p
+      endif
+      if pair_a != blank and pair_b != blank
+        break
+      endif
+    endfor
+  endif
+
+  assign sale_count = 0
+  for p in collections.all.products limit: 50
+    if p.compare_at_price_max > p.price_min
+      assign sale_count = sale_count | plus: 1
+    endif
+  endfor
+  assign newest = collections.all.products | sort: 'created_at' | reverse
+-%}
+<section class="section deals" id="deals" aria-labelledby="Heading-{{ section.id }}">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="eyebrow eyebrow--muted">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+        <h2 class="section-head__title" id="Heading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+      </div>
+    </div>
+    <div class="deals__grid" data-stagger>
+      <a href="#" class="deal-offer bento-tone--grape" data-open-popup>
+        <img src="{{ 'art-deals.svg' | asset_url }}" alt="" class="bento-art" width="800" height="600" loading="lazy">
+        <span class="deal-offer__copy">
+          <span class="bento-kicker">{{ section.settings.offer_kicker | escape }}</span>
+          <span class="deal-offer__big">{{ section.settings.offer_heading | escape }}</span>
+          <span class="deal-offer__text">{{ section.settings.offer_text | escape }}</span>
+          <span class="btn btn--white">{{ section.settings.offer_button | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</span>
+          {%- if section.settings.offer_fine != blank -%}<span class="deal-offer__fine">{{ section.settings.offer_fine | escape }}</span>{%- endif -%}
+        </span>
+      </a>
+
+      {%- if pair_a != blank and pair_b != blank -%}
+        <div class="deal-pair" data-bundle>
+          <p class="bento-kicker">{{ section.settings.pair_kicker | escape }}</p>
+          <h3 class="deal-pair__title">{{ section.settings.pair_heading | escape }}</h3>
+          <ul class="deal-pair__items" role="list">
+            {%- for item in (1..2) -%}
+              {%- liquid
+                if forloop.first
+                  assign p = pair_a
+                else
+                  assign p = pair_b
+                endif
+                assign v = p.selected_or_first_available_variant
+              -%}
+              <li class="deal-pair__card" data-bundle-card>
+                <label class="pair__check"><input type="checkbox" value="{{ v.id }}" data-price="{{ v.price }}" data-bundle-item checked><span class="visually-hidden">Include {{ p.title | escape }}</span></label>
+                <a href="{{ p.url }}" class="deal-pair__media">
+                  {%- if p.featured_media -%}{{ p.featured_media.preview_image | image_url: width: 300 | image_tag: loading: 'lazy', widths: '150,300', sizes: '110px', alt: '' }}{%- endif -%}
+                </a>
+                <a href="{{ p.url }}" class="deal-pair__name">{% render 'product-short-title', product: p, words: 6 %}</a>
+                <span class="deal-pair__price">{{ v.price | money }}</span>
+              </li>
+              {%- if forloop.first -%}<li class="deal-pair__plus" aria-hidden="true">+</li>{%- endif -%}
+            {%- endfor -%}
+          </ul>
+          <div class="deal-pair__foot">
+            <div>
+              <span class="deal-pair__label">Together</span>
+              <span class="deal-pair__total" data-bundle-total>{{ pair_a.selected_or_first_available_variant.price | plus: pair_b.selected_or_first_available_variant.price | money }}</span>
+              {%- if section.settings.pair_note != blank -%}<span class="deal-pair__note">{{ section.settings.pair_note | escape }}</span>{%- endif -%}
+            </div>
+            <button type="button" class="btn btn--primary" data-bundle-add>{% render 'icon', name: 'cart', class: 'icon--sm' %} Add both</button>
+          </div>
+          <p class="form-error" data-bundle-error role="alert" hidden></p>
+        </div>
+      {%- endif -%}
+
+      <div class="deal-list">
+        {%- if sale_count > 0 -%}
+          <p class="bento-kicker">On sale now</p>
+          <h3 class="deal-list__title">Marked down</h3>
+          <ul class="deal-list__items" role="list">
+            {%- assign shown = 0 -%}
+            {%- for p in collections.all.products limit: 50 -%}
+              {%- if p.compare_at_price_max > p.price_min and shown < 3 -%}
+                {%- assign shown = shown | plus: 1 -%}
+                {% render 'deal-row', product: p %}
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        {%- else -%}
+          <p class="bento-kicker">{{ section.settings.fresh_kicker | escape }}</p>
+          <h3 class="deal-list__title">{{ section.settings.fresh_heading | escape }}</h3>
+          <ul class="deal-list__items" role="list">
+            {%- for p in newest limit: 3 -%}
+              {% render 'deal-row', product: p %}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+        <a href="{{ routes.all_products_collection_url }}?sort_by=created-descending" class="deal-list__all">See what's new {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Deals and bundles",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small line above heading", "default": "Offers" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Deals, bundles and offers" },
+    { "type": "header", "content": "Welcome offer" },
+    { "type": "text", "id": "offer_kicker", "label": "Small line", "default": "New here?" },
+    { "type": "text", "id": "offer_heading", "label": "Heading", "default": "10% off your first order" },
+    { "type": "text", "id": "offer_text", "label": "Text", "default": "Join our email list and your code appears straight away." },
+    { "type": "text", "id": "offer_button", "label": "Button", "default": "Get my code" },
+    { "type": "text", "id": "offer_fine", "label": "Fine print", "default": "New subscribers only. One use per customer." },
+    { "type": "header", "content": "Pair builder" },
+    { "type": "text", "id": "pair_kicker", "label": "Small line", "default": "Better together" },
+    { "type": "text", "id": "pair_heading", "label": "Heading", "default": "Pair it up in one click" },
+    { "type": "product", "id": "product_1", "label": "First product" },
+    { "type": "product", "id": "product_2", "label": "Second product" },
+    { "type": "text", "id": "pair_note", "label": "Offer note", "info": "Only fill this in if a real offer exists, e.g. an automatic discount for buying both." },
+    { "type": "header", "content": "Third column" },
+    { "type": "paragraph", "content": "Shows products with a compare-at price when there are any, otherwise the newest arrivals." },
+    { "type": "text", "id": "fresh_kicker", "label": "Small line", "default": "Just landed" },
+    { "type": "text", "id": "fresh_heading", "label": "Heading", "default": "Fresh in" }
+  ],
+  "presets": [{ "name": "Deals and bundles" }]
+}
+{% endschema %}

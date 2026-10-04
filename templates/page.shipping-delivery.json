@@ -2,7 +2,9 @@
   "sections": {
     "main": {
       "type": "main-page",
-      "settings": {}
+      "settings": {
+        "show_title": false
+      }
     },
     "summary": {
       "type": "trust-band",
@@ -14,7 +16,7 @@
           "type": "item",
           "settings": {
             "icon": "box",
-            "title": "Dispatched in 1-2 business days",
+            "title": "Dispatched in 3-4 business days",
             "text": "For in-stock items, from when your order is placed."
           }
         },
@@ -29,7 +31,7 @@
         "i3": {
           "type": "item",
           "settings": {
-            "icon": "tag",
+            "icon": "lock",
             "title": "Prices at checkout",
             "text": "Options and costs for your address are shown before you pay."
           }
@@ -37,7 +39,7 @@
         "i4": {
           "type": "item",
           "settings": {
-            "icon": "mail",
+            "icon": "chat",
             "title": "Email updates",
             "text": "We email you when your order ships."
           }
@@ -54,14 +56,27 @@
       "type": "rich-text",
       "settings": {
         "heading": "How shipping works",
-        "text": "<h3>Processing</h3><p>We pack and dispatch in-stock orders within 1-2 business days. Orders placed on weekends or public holidays are processed on the next business day. If an item is backordered, its product page says so before you buy, and we ship it as soon as it arrives.</p><h3>Delivery times and costs</h3><p>Delivery time depends on your location and the shipping method you choose. The available methods, prices and estimated delivery times for your address are shown at checkout.</p><h3>Tracking</h3><p>As soon as your order ships we send a confirmation email with your tracking number. You can also check the status from the link in your order confirmation email or from your account.</p><h3>Problems with delivery</h3><p>If your tracking hasn't updated for several days, or your parcel arrives damaged, contact us with your order number and we'll sort it out with the carrier.</p>",
+        "text": "<h3>Processing</h3><p>We pack and dispatch in-stock orders within 3-4 business days. Orders placed on weekends or public holidays are processed on the next business day. If an item is backordered, its product page says so before you buy, and we ship it as soon as it arrives.</p><h3>Delivery times and costs</h3><p>Delivery time depends on your location and the shipping method you choose. The available methods, prices and estimated delivery times for your address are shown at checkout.</p><h3>Tracking</h3><p>As soon as your order ships we send a confirmation email with your tracking number. You can also check the status from the link in your order confirmation email or from your account.</p><h3>Problems with delivery</h3><p>If your tracking hasn't updated for several days, or your parcel arrives damaged, contact us with your order number and we'll sort it out with the carrier.</p>",
         "align": "left",
         "button_label": "Track my order",
+        "button_link": "/pages/track-order"
+      }
+    },
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "tone": "violet",
+        "art": "art-bundle",
+        "kicker": "Delivery",
+        "text": "<p>Every order is dispatched within 3-4 business days and ships with tracking.</p>",
+        "heading": "Shipping and delivery",
+        "button_label": "Track an order",
         "button_link": "/pages/track-order"
       }
     }
   },
   "order": [
+    "hero",
     "main",
     "summary",
     "details"

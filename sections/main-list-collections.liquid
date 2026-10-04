@@ -15,7 +15,7 @@
               {%- endif -%}
             </span>
             <span class="collection-tile__title">{{ c.title | escape }}</span>
-            <span class="collection-tile__count">{{ c.products_count }} {{ c.products_count | pluralize: 'product', 'products' }}</span>
+            <span class="collection-tile__count">Shop now {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
           </a>
         </li>
       {%- endfor -%}

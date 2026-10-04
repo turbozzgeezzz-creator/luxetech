@@ -1,11 +1,26 @@
 {
   "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "tone": "violet",
+        "art": "art-guide",
+        "kicker": "From the tech desk",
+        "heading": "Guides and news",
+        "text": "<p>Buying guides, how-tos and care tips from our team, so you get more from your tech.</p>",
+        "button_label": "Shop the range",
+        "button_link": "/collections/all"
+      }
+    },
     "main": {
       "type": "main-blog",
-      "settings": {}
+      "settings": {
+        "show_title": false
+      }
     }
   },
   "order": [
+    "hero",
     "main"
   ]
 }

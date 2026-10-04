@@ -1,0 +1,37 @@
+{%- comment -%}
+  Latest articles from a blog. Articles without a featured image get an
+  illustration matched to their tags (audio, charging, kitchen, wearables).
+{%- endcomment -%}
+{%- assign blog = section.settings.blog | default: blogs.news -%}
+{%- if blog.articles_count > 0 -%}
+<section class="section blog-teaser" aria-labelledby="Heading-{{ section.id }}">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="eyebrow eyebrow--muted">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+        <h2 class="section-head__title" id="Heading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+      </div>
+      <a href="{{ blog.url }}" class="section-head__link">{{ section.settings.link_label | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</a>
+    </div>
+    <ul class="post-grid" role="list" data-stagger>
+      {%- for article in blog.articles limit: section.settings.limit -%}
+        <li>{% render 'article-card-v2', article: article, lead: forloop.first %}</li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Blog posts",
+  "settings": [
+    { "type": "blog", "id": "blog", "label": "Blog" },
+    { "type": "text", "id": "eyebrow", "label": "Small line above heading", "default": "Guides and news" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "From the tech desk" },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "All articles" },
+    { "type": "range", "id": "limit", "label": "Articles", "min": 2, "max": 6, "step": 1, "default": 3 }
+  ],
+  "presets": [{ "name": "Blog posts" }]
+}
+{% endschema %}

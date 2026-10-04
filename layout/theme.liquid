@@ -44,10 +44,12 @@
           predictiveSearch: {{ routes.predictive_search_url | json }},
           recommendations: {{ routes.product_recommendations_url | json }}
         },
-        cartType: {{ settings.cart_type | json }}
+        cartType: {{ settings.cart_type | json }},
+        moneyFormat: {{ shop.money_format | json }}
       };
     </script>
     <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'experience.js' | asset_url }}" defer="defer"></script>
 
     {{ content_for_header }}
   </head>
@@ -65,6 +67,7 @@
 
     {% section 'cart-drawer' %}
     {% section 'newsletter-popup' %}
+    {% render 'welcome-back' %}
     {% render 'quick-add-modal' %}
 
     <div class="visually-hidden" aria-live="polite" role="status" id="A11yStatus"></div>

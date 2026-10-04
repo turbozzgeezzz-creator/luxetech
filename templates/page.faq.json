@@ -2,7 +2,9 @@
   "sections": {
     "main": {
       "type": "main-page",
-      "settings": {}
+      "settings": {
+        "show_title": false
+      }
     },
     "orders": {
       "type": "faq",
@@ -58,7 +60,7 @@
           "type": "question",
           "settings": {
             "question": "When will my order ship?",
-            "answer": "<p>Orders for in-stock items leave our warehouse within 1-2 business days. Each product page shows its current stock status before you buy.</p>"
+            "answer": "<p>Orders for in-stock items are dispatched within 3-4 business days. Each product page shows its current stock status before you buy.</p>"
           }
         },
         "q2": {
@@ -85,7 +87,7 @@
     "returns": {
       "type": "faq",
       "settings": {
-        "heading": "Returns and warranty",
+        "heading": "Returns and faulty items",
         "open_first": false
       },
       "blocks": {
@@ -93,14 +95,14 @@
           "type": "question",
           "settings": {
             "question": "What is your return policy?",
-            "answer": "<p>You can return unused items in their original packaging within 30 days of delivery. See <a href=\"/pages/returns-warranty\">Returns and warranty</a> for the full details.</p>"
+            "answer": "<p>You can return unused items in their original packaging within 30 days of delivery. See <a href=\"/pages/returns-warranty\">Returns and refunds</a> for the full details.</p>"
           }
         },
         "q2": {
           "type": "question",
           "settings": {
             "question": "My item is faulty. What should I do?",
-            "answer": "<p>Contact us with your order number and a short description, photo or video of the fault. Products are covered by a 12-month warranty against defects, and we'll arrange a repair, replacement or refund.</p>"
+            "answer": "<p>Contact us with your order number and a short description, photo or video of the fault. We'll assess it and arrange a repair, replacement or refund.</p>"
           }
         },
         "q3": {
@@ -116,9 +118,22 @@
         "q2",
         "q3"
       ]
+    },
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "tone": "ink",
+        "art": "art-guide",
+        "kicker": "Help centre",
+        "text": "<p>Orders, delivery, returns and compatibility, answered. Can't find what you need? Ask us directly.</p>",
+        "heading": "Frequently asked questions",
+        "button_label": "Contact us",
+        "button_link": "/pages/contact"
+      }
     }
   },
   "order": [
+    "hero",
     "main",
     "orders",
     "shipping",

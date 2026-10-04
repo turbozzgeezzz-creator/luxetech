@@ -1,11 +1,22 @@
 {
   "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "tone": "ink",
+        "art": "art-guide",
+        "kicker": "Tech.LuxeDealers"
+      }
+    },
     "main": {
       "type": "main-page",
-      "settings": {}
+      "settings": {
+        "show_title": false
+      }
     }
   },
   "order": [
+    "hero",
     "main"
   ]
 }

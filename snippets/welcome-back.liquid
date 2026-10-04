@@ -1,0 +1,18 @@
+{%- comment -%}
+  "Welcome back" modal for returning visitors (30+ minutes since the last visit)
+  who looked at products before. Filled in by assets/experience.js from the
+  visitor's own browsing history; nothing is stored on the server.
+{%- endcomment -%}
+<welcome-back>
+  <dialog class="modal welcome" aria-labelledby="WelcomeBackTitle">
+    <button type="button" class="modal__close" data-welcome-close aria-label="Close">{% render 'icon', name: 'close' %}</button>
+    <div class="welcome__head">
+      <p class="eyebrow">Welcome back</p>
+      <h2 class="welcome__title" id="WelcomeBackTitle">Pick up where you left off</h2>
+    </div>
+    <ul class="welcome__track" role="list" data-track></ul>
+    <div class="welcome__foot">
+      <a href="{{ routes.all_products_collection_url }}" class="link-btn">Browse everything</a>
+    </div>
+  </dialog>
+</welcome-back>

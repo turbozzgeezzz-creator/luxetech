@@ -1,129 +1,244 @@
 {
   "sections": {
-    "hero": {
-      "type": "range-hero",
+    "bento": {
+      "type": "promo-bento",
       "settings": {
-        "tone": "ink",
-        "eyebrow": "The range",
-        "show_counts": true,
-        "heading": "Small range. Straight answers.",
-        "text": "<p>We keep a deliberately short list of everyday tech and show you everything up front: live stock, the full price and how fast it ships.</p>",
-        "button_label": "Browse all [count] products",
-        "button_link": "/collections/all",
-        "button_label_2": "How delivery works",
-        "button_link_2": "/pages/shipping-delivery",
-        "fact_value": "1-2 days",
-        "fact_label": "To dispatch",
-        "sheet_title": "Range sheet",
-        "rows": 12
-      }
-    },
-    "categories": {
-      "type": "category-grid",
-      "settings": {
-        "eyebrow": "Four categories",
-        "heading": "Shop by category",
-        "link_label": "All categories",
-        "columns": "4"
+        "label": "Featured offers and categories",
+        "autoplay": true,
+        "speed": 6
       },
       "blocks": {
-        "a": {
-          "type": "category",
+        "s1": {
+          "type": "slide",
           "settings": {
-            "title": "Audio",
-            "subtitle": "Wireless earbuds",
-            "icon": "earbuds",
-            "link": "/collections/audio"
+            "tone": "violet",
+            "art": "art-hero",
+            "kicker": "New season tech",
+            "heading": "Upgrade your everyday tech",
+            "text": "Audio, charging, smart kitchen and wearables, chosen by people who use them every day.",
+            "button_label": "Shop now",
+            "link": "/collections/all",
+            "button_label_2": "Explore guides",
+            "link_2": "/blogs/news"
           }
         },
-        "b": {
-          "type": "category",
+        "s2": {
+          "type": "slide",
           "settings": {
-            "title": "Charging",
-            "subtitle": "Wireless charging and USB-C",
-            "icon": "plug",
+            "tone": "grape",
+            "art": "art-deals",
+            "kicker": "Welcome offer",
+            "heading": "10% off your first order",
+            "text": "Join the list and your code appears instantly. New subscribers only.",
+            "button_label": "Get my code",
+            "open_offer": true
+          }
+        },
+        "s3": {
+          "type": "slide",
+          "settings": {
+            "tone": "ink",
+            "art": "art-charging",
+            "kicker": "Charging",
+            "heading": "Power up, cable-free",
+            "text": "Fast magnetic wireless charging for phones, earbuds and more.",
+            "button_label": "Shop charging",
             "link": "/collections/charging"
           }
         },
-        "c": {
-          "type": "category",
+        "t1": {
+          "type": "tile",
           "settings": {
-            "title": "Smart home",
-            "subtitle": "Coffee, blending and desserts",
-            "icon": "home-device",
+            "tone": "violet",
+            "art": "art-audio",
+            "kicker": "Audio",
+            "heading": "Sound that goes everywhere",
+            "text": "Wireless earbuds with charging case.",
+            "button_label": "Shop audio",
+            "link": "/collections/audio"
+          }
+        },
+        "t2": {
+          "type": "tile",
+          "settings": {
+            "tone": "ink",
+            "art": "art-home",
+            "kicker": "Smart kitchen",
+            "heading": "Café at home",
+            "button_label": "Shop now",
             "link": "/collections/smart-home"
           }
         },
-        "d": {
-          "type": "category",
+        "t3": {
+          "type": "tile",
           "settings": {
-            "title": "Accessories",
-            "subtitle": "Hair care, wearables and cooling",
-            "icon": "watch",
+            "tone": "grape",
+            "art": "art-accessories",
+            "kicker": "Wearables",
+            "heading": "Track every move",
+            "button_label": "Shop accessories",
             "link": "/collections/accessories"
+          }
+        },
+        "t4": {
+          "type": "tile",
+          "settings": {
+            "tone": "violet",
+            "art": "art-dryer",
+            "kicker": "Hair care",
+            "heading": "Salon tools, home price",
+            "button_label": "Shop now",
+            "link": "/collections/accessories"
+          }
+        },
+        "t5": {
+          "type": "tile",
+          "settings": {
+            "tone": "light",
+            "art": "art-bundle",
+            "kicker": "Shipping",
+            "heading": "Dispatched in 3-4 business days",
+            "button_label": "How delivery works",
+            "link": "/pages/shipping-delivery"
           }
         }
       },
       "block_order": [
-        "a",
-        "b",
-        "c",
-        "d"
+        "s1",
+        "s2",
+        "s3",
+        "t1",
+        "t2",
+        "t3",
+        "t4",
+        "t5"
       ]
     },
-    "range": {
-      "type": "range-grid",
+    "ticker": {
+      "type": "marquee",
       "settings": {
-        "eyebrow": "Everything we stock",
-        "heading": "The full range",
-        "subheading": "[count] products, numbered and in one place. Nothing hidden behind filters or pages.",
-        "limit": 24,
-        "close_heading": "Looking for something specific?",
-        "close_text": "Tell us the device you need it to work with and we'll tell you honestly whether anything here fits.",
-        "close_link_label": "Ask our team",
-        "close_link": "/pages/contact"
+        "tone": "ink",
+        "items": "Dispatched in 3-4 business days\nTracked delivery on every order\n10% off your first order\nSecure, encrypted checkout\nReal people answer your questions\n30-day change-of-mind returns"
+      }
+    },
+    "departments": {
+      "type": "category-showcase",
+      "settings": {
+        "eyebrow": "Departments",
+        "heading": "Shop by department",
+        "subheading": "Four departments we know inside out, so every product earns its place.",
+        "link_label": "All departments",
+        "link": "/collections",
+        "show_products": true
+      },
+      "blocks": {
+        "d1": {
+          "type": "department",
+          "settings": {
+            "title": "Audio",
+            "kicker": "Listen",
+            "tagline": "Wireless earbuds and true-wireless sound",
+            "link": "/collections/audio",
+            "tone": "violet",
+            "art": "art-audio"
+          }
+        },
+        "d2": {
+          "type": "department",
+          "settings": {
+            "title": "Charging",
+            "kicker": "Power",
+            "tagline": "Magnetic wireless pads and USB-C",
+            "link": "/collections/charging",
+            "tone": "ink",
+            "art": "art-charging"
+          }
+        },
+        "d3": {
+          "type": "department",
+          "settings": {
+            "title": "Smart home",
+            "kicker": "Kitchen",
+            "tagline": "Espresso, blending and desserts",
+            "link": "/collections/smart-home",
+            "tone": "violet",
+            "art": "art-home"
+          }
+        },
+        "d4": {
+          "type": "department",
+          "settings": {
+            "title": "Accessories",
+            "kicker": "Lifestyle",
+            "tagline": "Smartwatches, hair care and cooling",
+            "link": "/collections/accessories",
+            "tone": "grape",
+            "art": "art-accessories"
+          }
+        }
+      },
+      "block_order": [
+        "d1",
+        "d2",
+        "d3",
+        "d4"
+      ]
+    },
+    "latest": {
+      "type": "product-rail",
+      "settings": {
+        "heading": "Shop the latest",
+        "subheading": "Fresh picks across every department.",
+        "style": "default",
+        "source": "all",
+        "limit": 12,
+        "link_label": "Shop everything"
       }
     },
     "deals": {
-      "type": "product-rail",
+      "type": "deals-hub",
       "settings": {
-        "heading": "On sale now",
-        "subheading": "Reduced prices, with the original price shown on every item.",
-        "style": "deals",
-        "source": "sale",
-        "limit": 10,
-        "link_label": "All sale items"
+        "eyebrow": "Offers",
+        "heading": "Deals, bundles and offers"
+      }
+    },
+    "viewed": {
+      "type": "recently-viewed",
+      "settings": {
+        "heading": "Recently viewed",
+        "show_recommended": true,
+        "recommended_heading": "Recommended for you"
       }
     },
     "story": {
       "type": "brand-story",
       "settings": {
-        "eyebrow": "Why the list is short",
-        "heading": "Chosen, not listed",
-        "statement": "<p>Most tech stores list everything a supplier offers. We'd rather keep a short range of things people use every day, and be straight about each one.</p>",
-        "link_label": "More about us",
+        "eyebrow": "Why shop with us",
+        "heading": "Tech, chosen by people who know it",
+        "statement": "<p>We focus on the gear that earns a daily place in your life: audio, charging, smart kitchen and wearables. Every product is picked by our team, and we'll give you a straight answer on any of them.</p>",
+        "link_label": "About us",
         "link": "/pages/about-us"
       },
       "blocks": {
         "p1": {
           "type": "principle",
           "settings": {
-            "title": "A short range on purpose",
-            "text": "Charging, audio, small appliances and wearables. If we wouldn't use it ourselves, it doesn't go on the list."
+            "title": "Specialists, not a warehouse",
+            "text": "We stick to the departments we know well, so we can tell you what fits your device and what doesn't."
           }
         },
         "p2": {
           "type": "principle",
           "settings": {
-            "title": "Stock you can see",
-            "text": "Stock levels come from our inventory and update as orders come in, so in stock means we can send it."
+            "title": "Real people, real answers",
+            "text": "Questions go to a person on our team, not a bot. We aim to reply within one business day."
           }
         },
         "p3": {
           "type": "principle",
           "settings": {
-            "title": "The full price, up front",
-            "text": "Delivery options and costs for your address are shown at checkout before you pay. No account needed to order."
+            "title": "Clear prices, secure checkout",
+            "text": "Delivery options and costs are shown before you pay, and checkout is encrypted end to end."
           }
         }
       },
@@ -138,23 +253,23 @@
       "settings": {
         "eyebrow": "How we work",
         "heading": "After you order",
-        "subheading": "What happens between checkout and your door, and what's covered after."
+        "subheading": "What happens between checkout and your door."
       },
       "blocks": {
         "s1": {
           "type": "step",
           "settings": {
             "when": "Checkout",
-            "title": "Order from live stock",
-            "text": "Every product page shows its current stock before you buy, and backorders are marked."
+            "title": "Order with confidence",
+            "text": "Live stock on every product page, and a secure, encrypted checkout."
           }
         },
         "s2": {
           "type": "step",
           "settings": {
-            "when": "1-2 business days",
+            "when": "3-4 business days",
             "title": "Packed and dispatched",
-            "text": "In-stock orders leave within 1-2 business days. Weekend orders go out the next business day.",
+            "text": "We pack your order and send it on its way within 3-4 business days.",
             "link_label": "Shipping details",
             "link": "/pages/shipping-delivery"
           }
@@ -164,7 +279,7 @@
           "settings": {
             "when": "On dispatch",
             "title": "Tracking by email",
-            "text": "We email a tracking number when your order ships.",
+            "text": "Your tracking number lands in your inbox as soon as it ships.",
             "link_label": "Track an order",
             "link": "/pages/track-order"
           }
@@ -173,9 +288,9 @@
           "type": "step",
           "settings": {
             "when": "After delivery",
-            "title": "Covered",
-            "text": "30 days to return unused items, and a 12-month warranty against defects from normal use.",
-            "link_label": "Returns and warranty",
+            "title": "Looked after",
+            "text": "30-day change-of-mind returns on unused items, and faulty items put right.",
+            "link_label": "Returns and refunds",
             "link": "/pages/returns-warranty"
           }
         }
@@ -187,12 +302,21 @@
         "s4"
       ]
     },
+    "guides": {
+      "type": "blog-teaser",
+      "settings": {
+        "eyebrow": "Guides and news",
+        "heading": "From the tech desk",
+        "link_label": "All guides",
+        "limit": 3
+      }
+    },
     "help": {
       "type": "help-desk",
       "settings": {
         "eyebrow": "Help desk",
         "heading": "Before you buy",
-        "link_label": "All questions",
+        "link_label": "All FAQs",
         "link": "/pages/faq"
       },
       "blocks": {
@@ -208,8 +332,8 @@
         "q2": {
           "type": "question",
           "settings": {
-            "question": "How much is shipping?",
-            "answer": "Delivery options and prices for your address are shown at checkout, before you pay.",
+            "question": "When will my order ship?",
+            "answer": "Orders are dispatched within 3-4 business days, with tracking emailed as soon as they leave.",
             "link_label": "Shipping and delivery",
             "link": "/pages/shipping-delivery"
           }
@@ -218,8 +342,8 @@
           "type": "question",
           "settings": {
             "question": "What if it arrives faulty?",
-            "answer": "Send your order number and a photo or video of the fault. We'll arrange a repair, replacement or refund under the 12-month warranty.",
-            "link_label": "Returns and warranty",
+            "answer": "Send your order number and a photo or video of the problem and we'll arrange a repair, replacement or refund.",
+            "link_label": "Returns and refunds",
             "link": "/pages/returns-warranty"
           }
         },
@@ -227,7 +351,7 @@
           "type": "contact",
           "settings": {
             "heading": "Still not sure?",
-            "text": "Questions go to a real person on our team, not a bot. Include the device you're using and we'll check compatibility.",
+            "text": "Questions go to a real person on our team. Tell us the device you're using and we'll check compatibility.",
             "link_label": "Ask a person",
             "link": "/pages/contact"
           }
@@ -243,19 +367,22 @@
     "newsletter": {
       "type": "newsletter",
       "settings": {
-        "heading": "Restocks and new additions, first",
-        "text": "<p>One short email when something new joins the range or comes back in stock. Subscriber offers when we run them.</p>",
-        "fine_print": "Unsubscribe any time. We never share your email."
+        "heading": "Get 10% off your first order",
+        "text": "<p>Join the list for your welcome code, plus restocks, new arrivals and subscriber-only deals.</p>",
+        "fine_print": "New subscribers only. Unsubscribe any time. We never share your email."
       }
     }
   },
   "order": [
-    "hero",
-    "categories",
-    "range",
+    "bento",
+    "ticker",
+    "departments",
+    "latest",
     "deals",
+    "viewed",
     "story",
     "process",
+    "guides",
     "help",
     "newsletter"
   ]

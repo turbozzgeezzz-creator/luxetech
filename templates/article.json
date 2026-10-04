@@ -3,9 +3,31 @@
     "main": {
       "type": "main-article",
       "settings": {}
+    },
+    "shop": {
+      "type": "product-rail",
+      "settings": {
+        "heading": "Shop the range",
+        "subheading": "",
+        "style": "default",
+        "source": "all",
+        "limit": 10,
+        "link_label": "Shop everything"
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Get 10% off your first order",
+        "text": "<p>Plus new guides, restocks and subscriber-only deals.</p>",
+        "button_label": "Get my code",
+        "fine_print": "New subscribers only. Unsubscribe any time."
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "shop",
+    "newsletter"
   ]
 }

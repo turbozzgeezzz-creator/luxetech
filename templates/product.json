@@ -20,7 +20,7 @@
           "type": "custom",
           "settings": {
             "title": "Shipping and returns",
-            "content": "<p>Orders ship with tracking. Unused items can be returned within 30 days for a full refund. Every product carries a 12-month warranty against defects.</p>"
+            "content": "<p><strong>Dispatch:</strong> orders are dispatched within 3-4 business days, with a tracking number emailed when they ship.</p><p><strong>Returns:</strong> changed your mind? Unused items in their original packaging can be returned within 30 days.</p><p><strong>Faulty items:</strong> if something arrives faulty or develops a fault, contact us with your order number and we'll arrange a repair, replacement or refund.</p>"
           }
         }
       },
@@ -37,10 +37,18 @@
         "intent": "related",
         "limit": 8
       }
+    },
+    "viewed": {
+      "type": "recently-viewed",
+      "settings": {
+        "heading": "Recently viewed",
+        "show_recommended": false
+      }
     }
   },
   "order": [
     "main",
-    "related"
+    "related",
+    "viewed"
   ]
 }

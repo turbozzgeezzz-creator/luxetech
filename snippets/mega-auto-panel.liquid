@@ -1,0 +1,76 @@
+{%- comment -%}
+  Automatic mega menu panel for a category block that has no menu set up.
+  Built from the block's collection: quick links, product tiles and an
+  illustrated promo tile (or the block's promo image when one is uploaded).
+  Params: block (header mega block), c (collection), all_blocks (section.blocks)
+{%- endcomment -%}
+{%- liquid
+  assign key = block.settings.title | handle
+  case key
+    when 'audio'
+      assign art = 'art-audio'
+      assign tone = 'violet'
+    when 'charging'
+      assign art = 'art-charging'
+      assign tone = 'ink'
+    when 'smart-home', 'kitchen', 'home'
+      assign art = 'art-home'
+      assign tone = 'violet'
+    when 'accessories', 'wearables'
+      assign art = 'art-accessories'
+      assign tone = 'grape'
+    else
+      assign art = 'art-hero'
+      assign tone = 'violet'
+  endcase
+-%}
+<div class="mega-auto container">
+  <div class="mega-auto__links">
+    <p class="mega-auto__label">{{ block.settings.title | escape }}</p>
+    <a href="{{ block.settings.link | default: c.url }}" class="mega-auto__all">Shop all {{ block.settings.title | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</a>
+    <ul class="mega-auto__list" role="list">
+      {%- for p in c.products limit: 6 -%}
+        <li><a href="{{ p.url }}">{% render 'product-short-title', product: p, words: 5 %}</a></li>
+      {%- endfor -%}
+    </ul>
+    <p class="mega-auto__label mega-auto__label--spaced">More departments</p>
+    <ul class="mega-auto__list mega-auto__list--chips" role="list">
+      {%- for b in all_blocks -%}
+        {%- if b.type == 'mega' and b.id != block.id -%}
+          <li><a href="{{ b.settings.link }}">{{ b.settings.title | escape }}</a></li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  <ul class="mega-auto__products" role="list">
+    {%- for p in c.products limit: 4 -%}
+      <li>
+        <a href="{{ p.url }}" class="mega-product">
+          <span class="mega-product__media">
+            {%- if p.featured_media -%}
+              {{ p.featured_media.preview_image | image_url: width: 400 | image_tag: loading: 'lazy', widths: '200,300,400', sizes: '180px', alt: '' }}
+            {%- else -%}
+              {% render 'placeholder-art', type: 'product', uid: p.id %}
+            {%- endif -%}
+          </span>
+          <span class="mega-product__name">{% render 'product-short-title', product: p, words: 6 %}</span>
+          <span class="mega-product__price">{% if p.price_varies %}<small>From </small>{% endif %}{{ p.price_min | money }}</span>
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  <a href="{{ block.settings.promo_link | default: block.settings.link | default: c.url }}" class="mega-auto__promo bento-tone--{{ tone }}">
+    {%- if block.settings.promo_image != blank -%}
+      {{ block.settings.promo_image | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320,480,640', sizes: '300px', alt: '', class: 'bento-art' }}
+    {%- else -%}
+      <img src="{{ art | append: '.svg' | asset_url }}" alt="" class="bento-art" width="600" height="600" loading="lazy">
+    {%- endif -%}
+    <span class="mega-auto__promo-copy">
+      <span class="bento-kicker">{{ block.settings.promo_text | default: 'Hand-picked' | escape }}</span>
+      <span class="mega-auto__promo-heading">{{ block.settings.promo_heading | default: block.settings.title | escape }}</span>
+      <span class="mega-auto__promo-cta">{{ block.settings.promo_link_label | default: 'Shop now' | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
+    </span>
+  </a>
+</div>

@@ -8,23 +8,23 @@
         "m1": {
           "type": "message",
           "settings": {
-            "text": "Tracked shipping on every order",
-            "icon": "truck"
+            "text": "10% off your first order",
+            "icon": "percent"
           }
         },
         "m2": {
           "type": "message",
           "settings": {
-            "text": "30-day returns",
-            "icon": "repeat",
-            "link": "/pages/returns-warranty"
+            "text": "Dispatched in 3-4 business days",
+            "icon": "truck",
+            "link": "/pages/shipping-delivery"
           }
         },
         "m3": {
           "type": "message",
           "settings": {
-            "text": "12-month warranty",
-            "icon": "shield",
+            "text": "30-day change-of-mind returns",
+            "icon": "repeat",
             "link": "/pages/returns-warranty"
           }
         }
@@ -82,6 +82,23 @@
             "icon": "sparkle",
             "link": "/collections/all?sort_by=created-descending"
           }
+        },
+        "c6": {
+          "type": "link",
+          "settings": {
+            "title": "Deals",
+            "icon": "tag",
+            "link": "/#deals",
+            "highlight": true
+          }
+        },
+        "c7": {
+          "type": "link",
+          "settings": {
+            "title": "Guides",
+            "icon": "sparkle",
+            "link": "/blogs/news"
+          }
         }
       },
       "block_order": [
@@ -89,7 +106,9 @@
         "c2",
         "c3",
         "c4",
-        "c5"
+        "c5",
+        "c7",
+        "c6"
       ]
     }
   },

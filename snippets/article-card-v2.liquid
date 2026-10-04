@@ -1,0 +1,38 @@
+{%- comment -%}
+  Article card. Params: article, lead (true for a larger first card).
+  Falls back to a tag-matched illustration when the article has no image.
+{%- endcomment -%}
+{%- liquid
+  assign tags = article.tags | join: ' ' | downcase
+  assign art = 'art-guide'
+  if tags contains 'audio' or tags contains 'earbud'
+    assign art = 'art-audio'
+  elsif tags contains 'charg'
+    assign art = 'art-charging'
+  elsif tags contains 'kitchen' or tags contains 'coffee' or tags contains 'home'
+    assign art = 'art-home'
+  elsif tags contains 'wear' or tags contains 'watch'
+    assign art = 'art-accessories'
+  endif
+  assign words = article.content | strip_html | split: ' ' | size
+  assign minutes = words | divided_by: 200 | at_least: 1
+-%}
+<a href="{{ article.url }}" class="post{% if lead %} post--lead{% endif %}">
+  <span class="post__media">
+    {%- if article.image -%}
+      {%- assign post_alt = article.image.alt | default: article.title -%}
+      {{ article.image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '400,600,900', sizes: '(min-width: 990px) 33vw, 100vw', alt: post_alt }}
+    {%- else -%}
+      <img src="{{ art | append: '.svg' | asset_url }}" alt="" width="600" height="600" loading="lazy">
+    {%- endif -%}
+  </span>
+  <span class="post__body">
+    <span class="post__meta">
+      {%- if article.tags.size > 0 -%}<span class="post__tag">{{ article.tags.first | escape }}</span>{%- endif -%}
+      <span>{{ minutes }} min read</span>
+    </span>
+    <span class="post__title">{{ article.title | escape }}</span>
+    <span class="post__excerpt">{{ article.excerpt_or_content | strip_html | truncatewords: 22 }}</span>
+    <span class="post__more">Read the guide {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
+  </span>
+</a>

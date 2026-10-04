@@ -33,7 +33,7 @@
     </button>
   {%- endif -%}
   <p class="toolbar__count" id="ProductCount-{{ section_id }}" role="status" data-facet-swap>
-    {{ count }} {{ count | pluralize: 'product', 'products' }}
+    {%- if active_count > 0 -%}{{ count }} {{ count | pluralize: 'result', 'results' }}{%- endif -%}
   </p>
   {%- if sort_options.size > 0 -%}
     <div class="toolbar__sort">

@@ -1,0 +1,33 @@
+{%- comment -%}
+  Scrolling ticker of short promises. One item per line in the editor.
+  Pauses on hover and stops moving for visitors who prefer reduced motion.
+{%- endcomment -%}
+{%- assign items = section.settings.items | newline_to_br | split: '<br />' -%}
+<div class="marquee marquee--{{ section.settings.tone }}" role="region" aria-label="Store highlights">
+  <div class="marquee__track">
+    {%- for pass in (1..2) -%}
+      <ul class="marquee__group" role="list"{% if forloop.last %} aria-hidden="true"{% endif %}>
+        {%- for item in items -%}
+          {%- assign text = item | strip -%}
+          {%- if text != blank -%}<li class="marquee__item">{{ text | escape }}</li>{%- endif -%}
+        {%- endfor -%}
+      </ul>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Scrolling ticker",
+  "tag": "div",
+  "class": "section-marquee",
+  "settings": [
+    { "type": "textarea", "id": "items", "label": "Items", "default": "Dispatched in 3-4 business days\nTracked delivery on every order\n10% off your first order\nSecure, encrypted checkout\nReal people answer your questions\n30-day change-of-mind returns", "info": "One per line." },
+    { "type": "select", "id": "tone", "label": "Color", "options": [
+      { "value": "ink", "label": "Ink" },
+      { "value": "violet", "label": "Violet" }
+    ], "default": "ink" }
+  ],
+  "presets": [{ "name": "Scrolling ticker" }]
+}
+{% endschema %}

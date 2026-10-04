@@ -1,0 +1,17 @@
+{%- comment -%} Compact product row for the Deals section. Params: product {%- endcomment -%}
+<li class="deal-row">
+  <a href="{{ product.url }}" class="deal-row__link">
+    <span class="deal-row__media">
+      {%- if product.featured_media -%}
+        {{ product.featured_media.preview_image | image_url: width: 160 | image_tag: loading: 'lazy', widths: '80,160', sizes: '64px', alt: '' }}
+      {%- else -%}
+        {% render 'placeholder-art', type: 'product', uid: product.id %}
+      {%- endif -%}
+    </span>
+    <span class="deal-row__name">{% render 'product-short-title', product: product, words: 6 %}</span>
+    <span class="deal-row__price">
+      {%- if product.compare_at_price_max > product.price_min -%}<s>{{ product.compare_at_price_max | money }}</s>{%- endif -%}
+      {{ product.price_min | money }}
+    </span>
+  </a>
+</li>

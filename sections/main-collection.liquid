@@ -11,18 +11,47 @@
     </ol>
   </nav>
 
-  <header class="collection-hero{% if section.settings.show_image and collection.image %} collection-hero--image{% endif %}">
-    <div class="collection-hero__copy">
-      <h1 class="collection-hero__title">{{ collection.title | escape }}</h1>
-      {%- if section.settings.show_description and collection.description != blank -%}
-        <div class="collection-hero__desc rte">{{ collection.description }}</div>
+  {%- liquid
+    case collection.handle
+      when 'audio'
+        assign c_art = 'art-audio'
+        assign c_tone = 'violet'
+        assign c_line = 'Wireless sound, sorted. Earbuds that pair fast and go everywhere.'
+      when 'charging'
+        assign c_art = 'art-charging'
+        assign c_tone = 'ink'
+        assign c_line = 'Fast, cable-free charging for your phone, earbuds and more.'
+      when 'smart-home'
+        assign c_art = 'art-home'
+        assign c_tone = 'violet'
+        assign c_line = 'Café-style coffee, smoothies and desserts, made at home.'
+      when 'accessories'
+        assign c_art = 'art-accessories'
+        assign c_tone = 'grape'
+        assign c_line = 'Smartwatches, hair care and personal cooling for every day.'
+      else
+        assign c_art = 'art-hero'
+        assign c_tone = 'violet'
+        assign c_line = 'Hand-picked audio, charging, smart kitchen and wearable tech.'
+    endcase
+  -%}
+  <header class="collection-banner bento-tone--{{ c_tone }}">
+    <div class="collection-banner__art">
+      {%- if section.settings.show_image and collection.image -%}
+        {{ collection.image | image_url: width: 1600 | image_tag: loading: 'eager', widths: '600,1000,1600', sizes: '100vw', class: 'bento-art', alt: '' }}
+      {%- else -%}
+        <img src="{{ c_art | append: '.svg' | asset_url }}" alt="" class="bento-art" width="1200" height="600" loading="eager">
       {%- endif -%}
     </div>
-    {%- if section.settings.show_image and collection.image -%}
-      <div class="collection-hero__media">
-        {{ collection.image | image_url: width: 600 | image_tag: loading: 'eager', widths: '300,450,600', sizes: '(min-width: 750px) 280px, 40vw', class: 'collection-hero__img' }}
-      </div>
-    {%- endif -%}
+    <div class="collection-banner__copy">
+      <p class="bento-kicker">Shop</p>
+      <h1 class="collection-banner__title">{{ collection.title | escape }}</h1>
+      {%- if section.settings.show_description and collection.description != blank -%}
+        <div class="collection-banner__desc rte">{{ collection.description }}</div>
+      {%- else -%}
+        <p class="collection-banner__desc">{{ c_line }}</p>
+      {%- endif -%}
+    </div>
   </header>
 
   {%- paginate collection.products by per_page -%}

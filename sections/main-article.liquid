@@ -1,4 +1,19 @@
 <article class="container container--narrow page article">
+  {%- liquid
+    assign tags = article.tags | join: ' ' | downcase
+    assign art = 'art-guide'
+    if tags contains 'audio' or tags contains 'earbud'
+      assign art = 'art-audio'
+    elsif tags contains 'charg'
+      assign art = 'art-charging'
+    elsif tags contains 'kitchen' or tags contains 'coffee' or tags contains 'home'
+      assign art = 'art-home'
+    elsif tags contains 'wear' or tags contains 'watch'
+      assign art = 'art-accessories'
+    endif
+    assign words = article.content | strip_html | split: ' ' | size
+    assign minutes = words | divided_by: 200 | at_least: 1
+  -%}
   <nav class="breadcrumb" aria-label="Breadcrumb">
     <ol role="list">
       <li><a href="{{ routes.root_url }}">Home</a></li>
@@ -9,13 +24,16 @@
   <h1 class="page-title">{{ article.title | escape }}</h1>
   <p class="article__meta">
     <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'date' }}</time>
-    {%- if article.author != blank %}, by {{ article.author | escape }}{% endif -%}
+    {%- if article.author != blank %} · {{ article.author | escape }}{% endif -%}
+    · {{ minutes }} min read
   </p>
-  {%- if article.image -%}
-    <div class="article__image">
+  <div class="article__image{% unless article.image %} article__image--art{% endunless %}">
+    {%- if article.image -%}
       {{ article.image | image_url: width: 1400 | image_tag: loading: 'eager', widths: '600,900,1200,1400', sizes: '(min-width: 990px) 820px, 100vw' }}
-    </div>
-  {%- endif -%}
+    {%- else -%}
+      <img src="{{ art | append: '.svg' | asset_url }}" alt="" width="600" height="600" loading="eager">
+    {%- endif -%}
+  </div>
   <div class="rte">{{ article.content }}</div>
   <p class="article__back"><a href="{{ blog.url }}" class="link-btn">{% render 'icon', name: 'chevron-left', class: 'icon--xs' %} Back to {{ blog.title | escape }}</a></p>
 </article>

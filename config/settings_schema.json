@@ -240,7 +240,7 @@
         "type": "text",
         "id": "stock_shipping_note",
         "label": "Shipping note after in stock",
-        "default": "ships in 1-2 business days",
+        "default": "dispatched in 3-4 business days",
         "info": "Example: ships today. Leave empty to show only the in stock message."
       },
       {
@@ -260,6 +260,27 @@
         "unit": "d",
         "default": 0,
         "info": "0 turns the New badge off. Worth leaving off while the whole range is new, or every card says New."
+      }
+    ]
+  },
+  {
+    "name": "Welcome offer",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "New subscribers see this code after signing up in the popup, the footer or the newsletter band. Create the same code first in Shopify admin > Discounts, or customers will be shown a code that doesn't work."
+      },
+      {
+        "type": "text",
+        "id": "welcome_code",
+        "label": "Discount code",
+        "default": "WELCOME10"
+      },
+      {
+        "type": "text",
+        "id": "welcome_label",
+        "label": "Offer in one line",
+        "default": "10% off your first order"
       }
     ]
   },

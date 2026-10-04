@@ -95,6 +95,14 @@
             if panel_links.size > 0
               assign has_panel = true
             endif
+            assign auto_c = nil
+            if block.type == 'mega' and has_panel == false and block.settings.link contains '/collections/'
+              assign auto_handle = block.settings.link | split: '/collections/' | last | split: '?' | first | split: '/' | first
+              assign auto_c = collections[auto_handle]
+              if auto_c.products_count > 0
+                assign has_panel = true
+              endif
+            endif
           -%}
           <li class="mega-nav__item{% if block.type == 'link' and block.settings.highlight %} mega-nav__item--highlight{% endif %}" {{ block.shopify_attributes }}>
             {%- if has_panel -%}
@@ -104,6 +112,9 @@
                 {% render 'icon', name: 'chevron-down', class: 'icon--xs mega-nav__chevron' %}
               </button>
               <div class="mega-panel" id="{{ panel_id }}" hidden>
+                {%- if panel_links.size == 0 and auto_c != blank -%}
+                  {% render 'mega-auto-panel', block: block, c: auto_c, all_blocks: section.blocks %}
+                {%- else -%}
                 <div class="mega-panel__inner container">
                   <div class="mega-panel__links">
                     <a href="{{ block.settings.link | default: panel_links.first.url }}" class="mega-panel__all">
@@ -135,6 +146,7 @@
                     </a>
                   {%- endif -%}
                 </div>
+                {%- endif -%}
               </div>
             {%- else -%}
               <a href="{{ block.settings.link | default: routes.all_products_collection_url }}" class="mega-nav__top"{% if block.settings.color != blank %} style="--cat: {{ block.settings.color }};"{% endif %}>
@@ -210,6 +222,14 @@
             if panel_links.size > 0
               assign has_panel = true
             endif
+            assign auto_c = nil
+            if block.type == 'mega' and has_panel == false and block.settings.link contains '/collections/'
+              assign auto_handle = block.settings.link | split: '/collections/' | last | split: '?' | first | split: '/' | first
+              assign auto_c = collections[auto_handle]
+              if auto_c.products_count > 0
+                assign has_panel = true
+              endif
+            endif
             -%}
             <li>
               {%- if has_panel -%}
@@ -223,7 +243,21 @@
                     {%- if block.settings.link != blank -%}
                       <a href="{{ block.settings.link }}" class="drawer-tree__link drawer-tree__link--all">Shop all {{ block.settings.title | escape }}</a>
                     {%- endif -%}
-                    {% render 'menu-drawer-links', links: panel_links %}
+                    {%- if panel_links.size > 0 -%}
+                      {% render 'menu-drawer-links', links: panel_links %}
+                    {%- elsif auto_c != blank -%}
+                      <ul class="drawer-products" role="list">
+                        {%- for p in auto_c.products limit: 6 -%}
+                          <li>
+                            <a href="{{ p.url }}" class="drawer-product">
+                              <span class="drawer-product__media">{%- if p.featured_media -%}{{ p.featured_media.preview_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 48, height: 48 }}{%- endif -%}</span>
+                              <span class="drawer-product__name">{% render 'product-short-title', product: p, words: 5 %}</span>
+                              <span class="drawer-product__price">{{ p.price_min | money }}</span>
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
                   </div>
                 </details>
               {%- else -%}

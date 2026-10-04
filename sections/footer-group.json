@@ -6,13 +6,35 @@
       "type": "footer",
       "settings": {
         "show_payment_icons": true,
-        "show_policies": true
+        "show_policies": true,
+        "wordmark": "TECH.LUXEDEALERS"
       },
       "blocks": {
         "about": {
           "type": "about",
           "settings": {
             "show_logo": false
+          }
+        },
+        "help": {
+          "type": "links",
+          "settings": {
+            "heading": "Help",
+            "fallback": "help"
+          }
+        },
+        "account": {
+          "type": "links",
+          "settings": {
+            "heading": "My account",
+            "fallback": "account"
+          }
+        },
+        "company": {
+          "type": "links",
+          "settings": {
+            "heading": "About us",
+            "fallback": "company"
           }
         },
         "shop": {
@@ -22,20 +44,6 @@
             "fallback": "shop"
           }
         },
-        "help": {
-          "type": "links",
-          "settings": {
-            "heading": "Help and support",
-            "fallback": "help"
-          }
-        },
-        "company": {
-          "type": "links",
-          "settings": {
-            "heading": "Company",
-            "fallback": "company"
-          }
-        },
         "news": {
           "type": "newsletter",
           "settings": {}
@@ -43,9 +51,10 @@
       },
       "block_order": [
         "about",
-        "shop",
         "help",
+        "account",
         "company",
+        "shop",
         "news"
       ]
     }

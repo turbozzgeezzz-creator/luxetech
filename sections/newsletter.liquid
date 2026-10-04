@@ -1,14 +1,15 @@
-<section class="section">
+<section class="section" id="newsletter">
   <div class="container">
     <div class="newsletter-band">
       <div class="newsletter-band__copy">
+        <p class="newsletter-band__badge">{{ settings.welcome_label | escape }}</p>
         <h2 class="newsletter-band__title">{{ section.settings.heading | escape }}</h2>
         {%- if section.settings.text != blank -%}
           <div class="newsletter-band__text">{{ section.settings.text }}</div>
         {%- endif -%}
       </div>
       <div class="newsletter-band__form">
-        {% render 'newsletter-form', id: section.id, button_label: section.settings.button_label %}
+        {% render 'newsletter-form', id: section.id, button_label: section.settings.button_label, discount_code: settings.welcome_code, tags: 'newsletter,homepage' %}
         <p class="newsletter-band__fine">{{ section.settings.fine_print | escape }}</p>
       </div>
     </div>

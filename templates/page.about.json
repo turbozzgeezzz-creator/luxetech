@@ -1,45 +1,165 @@
 {
   "sections": {
-    "main": {
-      "type": "main-page",
-      "settings": {}
-    },
-    "intro": {
-      "type": "rich-text",
+    "hero": {
+      "type": "page-hero",
       "settings": {
-        "heading": "Tech that earns its place on your desk",
-        "text": "<p>Tech.LuxeDealers is the electronics store from Luxe Dealers. We keep a deliberately focused range of everyday tech: the chargers, audio, smart home devices and accessories people actually use every day.</p><p>Rather than listing everything a supplier offers, we choose products we'd be happy to use ourselves, and we tell you plainly what's in stock, what it costs and what to expect after you buy.</p>",
-        "align": "left"
+        "tone": "violet",
+        "art": "art-hero",
+        "kicker": "About us",
+        "text": "<p>We're the tech side of Luxe Dealers: a specialist store for the audio, charging, smart kitchen and wearable gear that earns a place in your day. Every product is picked by our team, and every question gets a straight answer.</p>",
+        "heading": "Everyday tech, chosen by people who use it",
+        "button_label": "Shop the range",
+        "button_link": "/collections/all",
+        "button_label_2": "Get in touch",
+        "button_link_2": "/pages/contact"
       }
     },
-    "values": {
+    "ticker": {
+      "type": "marquee",
+      "settings": {
+        "tone": "violet",
+        "items": "Audio\nCharging\nSmart kitchen\nWearables\nHair care\nTracked delivery\nReal people support"
+      }
+    },
+    "story": {
+      "type": "brand-story",
+      "settings": {
+        "eyebrow": "Our story",
+        "heading": "Specialists, not a warehouse",
+        "statement": "<p>Most tech stores list everything a supplier offers and leave you to sort it out. We do the opposite: we focus on a few departments, get to know every product in them, and only list what we'd happily use ourselves.</p>",
+        "link_label": "Shop the departments",
+        "link": "/collections"
+      },
+      "blocks": {
+        "p1": {
+          "type": "principle",
+          "settings": {
+            "title": "We pick, then we list",
+            "text": "Products earn their place by being genuinely useful every day. If it doesn't, it doesn't go on the site."
+          }
+        },
+        "p2": {
+          "type": "principle",
+          "settings": {
+            "title": "Straight answers",
+            "text": "Ask us about compatibility, plugs, voltage or anything else, and a person on our team will reply, usually within one business day."
+          }
+        },
+        "p3": {
+          "type": "principle",
+          "settings": {
+            "title": "No surprises at checkout",
+            "text": "Prices and delivery options are shown before you pay, and checkout is secure and encrypted."
+          }
+        },
+        "p4": {
+          "type": "principle",
+          "settings": {
+            "title": "Looked after after you buy",
+            "text": "30-day change-of-mind returns on unused items, and faulty items repaired, replaced or refunded."
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ]
+    },
+    "departments": {
+      "type": "category-showcase",
+      "settings": {
+        "eyebrow": "What we know best",
+        "heading": "Our departments",
+        "subheading": "Four areas we specialise in, each one curated by our team.",
+        "link_label": "Shop everything",
+        "link": "/collections/all",
+        "show_products": true
+      },
+      "blocks": {
+        "d1": {
+          "type": "department",
+          "settings": {
+            "title": "Audio",
+            "kicker": "Listen",
+            "tagline": "Wireless earbuds and true-wireless sound",
+            "link": "/collections/audio",
+            "tone": "violet",
+            "art": "art-audio"
+          }
+        },
+        "d2": {
+          "type": "department",
+          "settings": {
+            "title": "Charging",
+            "kicker": "Power",
+            "tagline": "Magnetic wireless pads and USB-C",
+            "link": "/collections/charging",
+            "tone": "ink",
+            "art": "art-charging"
+          }
+        },
+        "d3": {
+          "type": "department",
+          "settings": {
+            "title": "Smart home",
+            "kicker": "Kitchen",
+            "tagline": "Espresso, blending and desserts",
+            "link": "/collections/smart-home",
+            "tone": "violet",
+            "art": "art-home"
+          }
+        },
+        "d4": {
+          "type": "department",
+          "settings": {
+            "title": "Accessories",
+            "kicker": "Lifestyle",
+            "tagline": "Smartwatches, hair care and cooling",
+            "link": "/collections/accessories",
+            "tone": "grape",
+            "art": "art-accessories"
+          }
+        }
+      },
+      "block_order": [
+        "d1",
+        "d2",
+        "d3",
+        "d4"
+      ]
+    },
+    "why": {
       "type": "trust-band",
       "settings": {
-        "label": "What you can expect from us"
+        "label": "Why shop with us"
       },
       "blocks": {
         "i1": {
           "type": "item",
           "settings": {
-            "icon": "check-circle",
-            "title": "Honest listings",
-            "text": "Real stock levels, clear specs and the full price up front."
+            "icon": "truck",
+            "title": "Dispatched in 3-4 days",
+            "text": "Tracked delivery on every order.",
+            "link": "/pages/shipping-delivery"
           }
         },
         "i2": {
           "type": "item",
           "settings": {
             "icon": "repeat",
-            "title": "Easy returns",
-            "text": "Changed your mind? Send unused items back within 30 days."
+            "title": "30-day returns",
+            "text": "Change of mind on unused items.",
+            "link": "/pages/returns-warranty"
           }
         },
         "i3": {
           "type": "item",
           "settings": {
             "icon": "shield",
-            "title": "12-month warranty",
-            "text": "If something fails from normal use, we'll put it right."
+            "title": "Faulty items put right",
+            "text": "Repair, replacement or refund."
           }
         },
         "i4": {
@@ -47,7 +167,8 @@
           "settings": {
             "icon": "headset",
             "title": "People, not bots",
-            "text": "Questions go to a real person on our team."
+            "text": "Real answers from our team.",
+            "link": "/pages/contact"
           }
         }
       },
@@ -58,21 +179,141 @@
         "i4"
       ]
     },
-    "help": {
-      "type": "rich-text",
+    "process": {
+      "type": "process-steps",
       "settings": {
-        "heading": "Got a question?",
-        "text": "<p>Whether you're checking compatibility before you buy or need help with an order, we're happy to help.</p>",
-        "align": "left",
-        "button_label": "Contact us",
-        "button_link": "/pages/contact"
+        "eyebrow": "How we work",
+        "heading": "From checkout to your door",
+        "subheading": "Every order follows the same four steps."
+      },
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "when": "Checkout",
+            "title": "Order with confidence",
+            "text": "Live stock on every product page, and a secure, encrypted checkout."
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "when": "3-4 business days",
+            "title": "Packed and dispatched",
+            "text": "We pack your order carefully and send it on its way within 3-4 business days.",
+            "link_label": "Shipping details",
+            "link": "/pages/shipping-delivery"
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "when": "On dispatch",
+            "title": "Tracking by email",
+            "text": "Your tracking number lands in your inbox as soon as it ships.",
+            "link_label": "Track an order",
+            "link": "/pages/track-order"
+          }
+        },
+        "s4": {
+          "type": "step",
+          "settings": {
+            "when": "After delivery",
+            "title": "Looked after",
+            "text": "30-day returns on unused items, and faulty items put right.",
+            "link_label": "Returns and refunds",
+            "link": "/pages/returns-warranty"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ]
+    },
+    "guides": {
+      "type": "blog-teaser",
+      "settings": {
+        "eyebrow": "From our team",
+        "heading": "Guides from the tech desk",
+        "link_label": "All guides",
+        "limit": 3
+      }
+    },
+    "help": {
+      "type": "help-desk",
+      "settings": {
+        "eyebrow": "Questions?",
+        "heading": "We're here to help",
+        "link_label": "All FAQs",
+        "link": "/pages/faq"
+      },
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "Will it work with my device?",
+            "answer": "Tell us the device and we'll check compatibility before you order.",
+            "link_label": "Ask us",
+            "link": "/pages/contact"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "When will my order ship?",
+            "answer": "Orders are dispatched within 3-4 business days, with tracking emailed when they leave.",
+            "link_label": "Shipping and delivery",
+            "link": "/pages/shipping-delivery"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Can I return something?",
+            "answer": "Unused items in their original packaging can be returned within 30 days.",
+            "link_label": "Returns and refunds",
+            "link": "/pages/returns-warranty"
+          }
+        },
+        "c1": {
+          "type": "contact",
+          "settings": {
+            "heading": "Talk to a person",
+            "text": "Questions go straight to our team. We aim to reply within one business day.",
+            "link_label": "Contact us",
+            "link": "/pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "c1"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Get 10% off your first order",
+        "text": "<p>Join the list for your welcome code, plus restocks, new arrivals and subscriber-only deals.</p>",
+        "button_label": "Get my code",
+        "fine_print": "New subscribers only. Unsubscribe any time. We never share your email."
       }
     }
   },
   "order": [
-    "main",
-    "intro",
-    "values",
-    "help"
+    "hero",
+    "ticker",
+    "story",
+    "departments",
+    "why",
+    "process",
+    "guides",
+    "help",
+    "newsletter"
   ]
 }

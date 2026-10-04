@@ -2,12 +2,14 @@
   "sections": {
     "main": {
       "type": "main-page",
-      "settings": {}
+      "settings": {
+        "show_title": false
+      }
     },
     "summary": {
       "type": "trust-band",
       "settings": {
-        "label": "Returns and warranty at a glance"
+        "label": "Returns and refunds at a glance"
       },
       "blocks": {
         "i1": {
@@ -22,8 +24,8 @@
           "type": "item",
           "settings": {
             "icon": "shield",
-            "title": "12-month warranty",
-            "text": "Covers defects from normal use."
+            "title": "Faulty items put right",
+            "text": "Repair, replacement or refund."
           }
         },
         "i3": {
@@ -61,15 +63,28 @@
     "warranty": {
       "type": "rich-text",
       "settings": {
-        "heading": "Warranty and faulty items",
-        "text": "<p>Every product we sell is covered by a 12-month warranty against defects in materials and workmanship from normal use. The warranty doesn't cover accidental damage, misuse, liquid damage or normal wear.</p><p>If something stops working, contact us with your order number and a short description, photo or video of the problem. We'll arrange a repair, replacement or refund. If an item arrives damaged or faulty, contact us within 7 days of delivery and we'll cover the return shipping.</p><p>This policy is in addition to your rights under consumer law, which are not affected.</p>",
+        "heading": "Faulty or damaged items",
+        "text": "<p>If an item arrives damaged, stops working or isn't what you ordered, contact us with your order number and a short description, photo or video of the problem. We'll assess it and arrange a repair, replacement or refund, and we cover the return shipping for faulty items.</p><p>Damage caused by accidents, misuse, liquid or normal wear and tear isn't a fault.</p><p>Nothing in this policy limits your rights under the Australian Consumer Law. Our goods come with guarantees that cannot be excluded under the Australian Consumer Law. You are entitled to a replacement or refund for a major failure and compensation for any other reasonably foreseeable loss or damage. You are also entitled to have the goods repaired or replaced if the goods fail to be of acceptable quality and the failure does not amount to a major failure.</p>",
         "align": "left",
         "button_label": "Contact us",
+        "button_link": "/pages/contact"
+      }
+    },
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "tone": "grape",
+        "art": "art-deals",
+        "kicker": "Returns",
+        "text": "<p>30-day change-of-mind returns on unused items, and faulty items repaired, replaced or refunded.</p>",
+        "heading": "Returns and refunds",
+        "button_label": "Start a return",
         "button_link": "/pages/contact"
       }
     }
   },
   "order": [
+    "hero",
     "main",
     "summary",
     "returns",

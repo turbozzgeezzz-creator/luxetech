@@ -1,0 +1,43 @@
+{%- comment -%}
+  Recently viewed and Recommended for you. Both rows are filled in the browser by
+  assets/experience.js from the visitor's own history (stored on their device),
+  and each row stays hidden until it has something to show.
+{%- endcomment -%}
+<div class="section viewed-section">
+  <div class="container">
+    {%- if section.settings.show_recommended -%}
+      <recommended-for-you class="viewed-row" hidden>
+        <div class="section-head">
+          <div>
+            <p class="eyebrow eyebrow--muted">Picked for you</p>
+            <h2 class="section-head__title">{{ section.settings.recommended_heading | escape }}</h2>
+            <p class="section-head__sub">Because you looked at <span data-seed></span></p>
+          </div>
+        </div>
+        <ul class="rail__track viewed-track" role="list" data-track></ul>
+      </recommended-for-you>
+    {%- endif -%}
+    <recently-viewed class="viewed-row" data-limit="10"{% if product %} data-exclude="{{ product.handle }}"{% endif %} hidden>
+      <div class="section-head">
+        <div>
+          <p class="eyebrow eyebrow--muted">Your history</p>
+          <h2 class="section-head__title">{{ section.settings.heading | escape }}</h2>
+        </div>
+        <button type="button" class="link-btn" data-clear-viewed>Clear history</button>
+      </div>
+      <ul class="rail__track viewed-track" role="list" data-track></ul>
+    </recently-viewed>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Recently viewed",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Recently viewed" },
+    { "type": "checkbox", "id": "show_recommended", "label": "Show Recommended for you", "default": true },
+    { "type": "text", "id": "recommended_heading", "label": "Recommended heading", "default": "Recommended for you" }
+  ],
+  "presets": [{ "name": "Recently viewed" }]
+}
+{% endschema %}

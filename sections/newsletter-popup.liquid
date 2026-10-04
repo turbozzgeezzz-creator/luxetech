@@ -17,7 +17,7 @@
   if customer and customer.accepts_marketing
     assign suppress = true
   endif
-  assign code = section.settings.discount_code | strip
+  assign code = section.settings.discount_code | default: settings.welcome_code | strip
   assign has_code = false
   if code != blank
     assign has_code = true
@@ -72,7 +72,7 @@
     { "type": "checkbox", "id": "preview", "label": "Show in the theme editor", "default": false, "info": "Turn on to preview and edit the popup here. It opens immediately while previewing." },
     { "type": "image_picker", "id": "image", "label": "Image" },
     { "type": "header", "content": "Offer (only shown when a discount code is set)" },
-    { "type": "text", "id": "discount_code", "label": "Discount code", "info": "Create the code first in Shopify admin > Discounts, then type the exact code here. While this is empty, the popup shows the plain signup copy below and promises no discount." },
+    { "type": "text", "id": "discount_code", "label": "Discount code", "info": "Leave empty to use the code in Theme settings > Welcome offer. The code must exist in Shopify admin > Discounts." },
     { "type": "text", "id": "offer_kicker", "label": "Small line above heading", "default": "Welcome offer" },
     { "type": "text", "id": "offer_heading", "label": "Offer heading", "default": "Take 10% off your first order" },
     { "type": "richtext", "id": "offer_text", "label": "Offer text", "default": "<p>Join our email list and we'll show your code straight away. One use per customer.</p>", "info": "Make sure this matches the discount you created (amount, minimum spend, expiry)." },

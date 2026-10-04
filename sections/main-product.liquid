@@ -136,8 +136,118 @@
             {%- endif -%}
           </ul>
         {%- endif -%}
+
+        {%- if section.settings.show_dispatch -%}
+          <div class="dispatch-card">
+            <span class="dispatch-card__icon">{% render 'icon', name: 'truck' %}</span>
+            <div class="dispatch-card__body">
+              <p class="dispatch-card__title">{{ section.settings.dispatch_label | escape }}</p>
+              <p class="dispatch-card__text">
+                <span data-dispatch-estimate data-min="{{ section.settings.dispatch_min }}" data-max="{{ section.settings.dispatch_max }}" hidden>Estimated dispatch <strong data-dispatch-dates></strong>. </span>
+                Tracked delivery, with your tracking number emailed when it ships.
+              </p>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if shop.enabled_payment_types.size > 0 -%}
+          <div class="pdp-pay">
+            <span class="pdp-pay__label">{% render 'icon', name: 'lock', class: 'icon--xs' %} Pay securely with</span>
+            <ul class="payment-icons__list" role="list">
+              {%- for type in shop.enabled_payment_types -%}<li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>{%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
       </div>
     </div>
+
+    {%- if section.settings.show_bundle -%}
+      {%- liquid
+        assign pool = product.collections.first
+        if pool == blank or pool.products_count < 2
+          assign pool = collections.all
+        endif
+        assign picks = ''
+        assign pick_count = 0
+        for p in pool.products limit: 12
+          if p.id == product.id or p.available == false
+            continue
+          endif
+          assign picks = picks | append: p.handle | append: ','
+          assign pick_count = pick_count | plus: 1
+          if pick_count >= 2
+            break
+          endif
+        endfor
+        if pick_count < 2 and pool.id != collections.all.id
+          for p in collections.all.products limit: 12
+            if p.id == product.id or p.available == false or picks contains p.handle
+              continue
+            endif
+            assign picks = picks | append: p.handle | append: ','
+            assign pick_count = pick_count | plus: 1
+            if pick_count >= 2
+              break
+            endif
+          endfor
+        endif
+        assign pick_handles = picks | split: ','
+      -%}
+      {%- if pick_count > 0 and product.available -%}
+        <section class="pair" data-bundle aria-labelledby="PairHeading-{{ section.id }}">
+          <div class="pair__head">
+            <p class="eyebrow">Complete the set</p>
+            <h2 class="pair__title" id="PairHeading-{{ section.id }}">{{ section.settings.bundle_heading | escape }}</h2>
+            {%- if section.settings.bundle_note != blank -%}<p class="pair__note">{{ section.settings.bundle_note | escape }}</p>{%- endif -%}
+          </div>
+          <div class="pair__body">
+            <ul class="pair__items" role="list">
+              {%- for i in (0..pick_count) -%}
+                {%- liquid
+                  if forloop.first
+                    assign item = product
+                    assign item_variant = current_variant
+                  else
+                    assign pick_index = forloop.index0 | minus: 1
+                    assign h = pick_handles[pick_index]
+                    assign item = all_products[h]
+                    assign item_variant = item.selected_or_first_available_variant
+                  endif
+                -%}
+                {%- if item != blank and item_variant != blank -%}
+                  <li class="pair__card" data-bundle-card>
+                    <label class="pair__check">
+                      <input type="checkbox" value="{{ item_variant.id }}" data-price="{{ item_variant.price }}" data-bundle-item checked>
+                      <span class="visually-hidden">Include {{ item.title | escape }}</span>
+                    </label>
+                    <a href="{{ item.url }}" class="pair__media">
+                      {%- if item.featured_media -%}
+                        {{ item.featured_media.preview_image | image_url: width: 300 | image_tag: loading: 'lazy', widths: '150,300', sizes: '120px', alt: '' }}
+                      {%- else -%}
+                        {% render 'placeholder-art', type: 'product', uid: item.id %}
+                      {%- endif -%}
+                    </a>
+                    <div class="pair__info">
+                      {%- if forloop.first -%}<span class="pair__this">This item</span>{%- endif -%}
+                      <a href="{{ item.url }}" class="pair__name">{% render 'product-short-title', product: item, words: 7 %}</a>
+                      {%- unless item.has_only_default_variant -%}<span class="pair__variant">{{ item_variant.title | escape }}</span>{%- endunless -%}
+                      <span class="pair__price">{{ item_variant.price | money }}</span>
+                    </div>
+                  </li>
+                  {%- unless forloop.last -%}<li class="pair__plus" aria-hidden="true">+</li>{%- endunless -%}
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+            <div class="pair__total">
+              <p class="pair__total-label"><span data-bundle-count>{{ pick_count | plus: 1 }}</span> items selected</p>
+              <p class="pair__total-value" data-bundle-total></p>
+              <button type="button" class="btn btn--primary btn--lg btn--block" data-bundle-add>{% render 'icon', name: 'cart', class: 'icon--sm' %} Add selected to cart</button>
+              <p class="form-error" data-bundle-error role="alert" hidden></p>
+            </div>
+          </div>
+        </section>
+      {%- endif -%}
+    {%- endif -%}
 
     {%- comment -%} Tabs: built from blocks; any tab with no content is skipped. {%- endcomment -%}
     {%- capture tab_buttons -%}
@@ -209,6 +319,31 @@
   {%- endif -%}
 </product-info>
 
+{%- liquid
+  assign view_cat = ''
+  for c in product.collections
+    if c.handle != 'all' and c.handle != 'frontpage'
+      assign view_cat = c.title
+      break
+    endif
+  endfor
+-%}
+<script type="application/json" id="ProductViewData">
+  {
+    "id": {{ product.id | json }},
+    "handle": {{ product.handle | json }},
+    "title": {{ product.title | json }},
+    "url": {{ product.url | json }},
+    "price": {{ product.price_min | json }},
+    "price_varies": {{ product.price_varies | json }},
+    "image": {% if product.featured_media %}{{ product.featured_media | image_url: width: 600 | json }}{% else %}null{% endif %},
+    "category": {{ view_cat | json }},
+    "variant": {{ current_variant.id | json }},
+    "single_variant": {{ product.has_only_default_variant | json }},
+    "available": {{ product.available | json }}
+  }
+</script>
+
 <script type="application/ld+json">
   {
     "@context": "https://schema.org/",
@@ -247,8 +382,17 @@
     { "type": "header", "content": "Trust row" },
     { "type": "checkbox", "id": "show_trust", "label": "Show trust row under Add to cart", "default": true },
     { "type": "text", "id": "trust_secure", "label": "Checkout line", "default": "Secure, encrypted checkout" },
-    { "type": "text", "id": "trust_warranty", "label": "Warranty line", "default": "12-month warranty", "info": "A product's custom.warranty metafield (single line text) overrides this per product." },
+    { "type": "text", "id": "trust_warranty", "label": "Faulty items line", "default": "Faulty? We make it right", "info": "A product's custom.warranty metafield (single line text) overrides this per product." },
     { "type": "text", "id": "trust_returns", "label": "Returns line", "default": "30-day returns", "info": "Links to the page with handle returns-warranty if it exists, otherwise to your refund policy." },
+    { "type": "header", "content": "Dispatch estimate" },
+    { "type": "checkbox", "id": "show_dispatch", "label": "Show dispatch estimate", "default": true },
+    { "type": "text", "id": "dispatch_label", "label": "Heading", "default": "Dispatched in 3-4 business days" },
+    { "type": "range", "id": "dispatch_min", "label": "Fastest dispatch", "min": 0, "max": 10, "step": 1, "unit": "d", "default": 3 },
+    { "type": "range", "id": "dispatch_max", "label": "Slowest dispatch", "min": 0, "max": 15, "step": 1, "unit": "d", "default": 4 },
+    { "type": "header", "content": "Complete the set" },
+    { "type": "checkbox", "id": "show_bundle", "label": "Show Complete the set", "default": true, "info": "Suggests two other products from the same collection that can be added together." },
+    { "type": "text", "id": "bundle_heading", "label": "Heading", "default": "Often added together" },
+    { "type": "text", "id": "bundle_note", "label": "Offer note", "info": "Only fill this in if a real offer exists, e.g. an automatic discount for buying two items." },
     { "type": "header", "content": "Specifications" },
     { "type": "paragraph", "content": "The Specs tab reads a product metafield. Supported types: JSON (an object of name and value pairs), multi-line text (one Name: Value per line) or rich text. The tab is hidden for products without it." },
     { "type": "text", "id": "specs_namespace", "label": "Specs metafield namespace", "default": "custom" },

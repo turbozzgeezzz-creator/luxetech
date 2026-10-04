@@ -2,7 +2,9 @@
   "sections": {
     "main": {
       "type": "main-page",
-      "settings": {}
+      "settings": {
+        "show_title": false
+      }
     },
     "steps": {
       "type": "track-order",
@@ -46,9 +48,20 @@
         "s3",
         "s4"
       ]
+    },
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "tone": "ink",
+        "art": "art-bundle",
+        "kicker": "Orders",
+        "text": "<p>Find your tracking details in a few clicks.</p>",
+        "heading": "Track my order"
+      }
     }
   },
   "order": [
+    "hero",
     "main",
     "steps"
   ]
