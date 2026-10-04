@@ -48,7 +48,7 @@
                 {%- endfor -%}
               </span>
             {%- endif -%}
-            <span class="dept__cta">Shop {{ block.settings.title | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
+            <span class="dept__cta"><span class="dept__cta-long">Shop {{ block.settings.title | escape }}</span><span class="dept__cta-short">Shop</span> {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
           </a>
         </li>
       {%- endfor -%}
