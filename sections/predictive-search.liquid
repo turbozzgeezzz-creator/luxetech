@@ -27,7 +27,7 @@
                   {%- if p.featured_media -%}
                     {{ p.featured_media.preview_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 56, height: 56 }}
                   {%- else -%}
-                    {% render 'placeholder-art', type: 'product' %}
+                    {% render 'placeholder-art', type: 'product', uid: p.id %}
                   {%- endif -%}
                 </span>
                 <span class="predictive__info">

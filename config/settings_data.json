@@ -2,19 +2,19 @@
   "current": "Default",
   "presets": {
     "Default": {
-      "color_background": "#F5F5F2",
+      "color_background": "#F2F3F5",
       "color_surface": "#FFFFFF",
-      "color_ink": "#1D1E1B",
-      "color_muted": "#62655E",
-      "color_border": "#D8D9D3",
-      "color_primary": "#C9441B",
-      "color_accent": "#FBE8DF",
-      "color_success": "#2E7D32",
-      "color_warning": "#946200",
-      "color_error": "#A3221A",
+      "color_ink": "#0B1220",
+      "color_muted": "#586072",
+      "color_border": "#D3D7DE",
+      "color_primary": "#7D03FC",
+      "color_accent": "#EFE6FF",
+      "color_success": "#1E7A3C",
+      "color_warning": "#8F5B00",
+      "color_error": "#B42318",
       "cart_type": "drawer",
       "free_shipping_threshold": 0,
-      "color_subtle": "#ECEDE8"
+      "color_subtle": "#E7E9ED"
     }
   }
 }

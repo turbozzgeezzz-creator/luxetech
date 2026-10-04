@@ -1,0 +1,148 @@
+{%- comment -%}
+  Homepage hero with the live range sheet: the whole catalogue on one spec-style
+  panel (number, photo, short name, category, price, live stock dot). The figures
+  in the fact row are counted from the store, not typed in, so they stay true as
+  products are added or sell out.
+{%- endcomment -%}
+{%- liquid
+  assign source = section.settings.collection
+  if source == blank
+    assign source = collections.all
+  endif
+  assign total = source.products_count
+  assign in_stock = 0
+  for product in source.products limit: 50
+    if product.available
+      assign in_stock = in_stock | plus: 1
+    endif
+  endfor
+  assign category_count = 0
+  for c in collections
+    if c.handle == 'all' or c.handle == 'frontpage' or c.products_count == 0
+      continue
+    endif
+    assign category_count = category_count | plus: 1
+  endfor
+  assign rows = section.settings.rows
+-%}
+<section class="range-hero range-hero--{{ section.settings.tone }}" aria-labelledby="Heading-{{ section.id }}">
+  <div class="container range-hero__grid">
+    <div class="range-hero__copy">
+      <p class="eyebrow">
+        {{- section.settings.eyebrow | escape -}}
+        {%- if section.settings.show_counts %} · {{ total }} {{ total | pluralize: 'product', 'products' }} · {{ in_stock }} in stock{% endif -%}
+      </p>
+      <h1 class="range-hero__heading" id="Heading-{{ section.id }}">{{ section.settings.heading | escape | replace: '.', '<span class="range-hero__dot">.</span>' }}</h1>
+      {%- if section.settings.text != blank -%}
+        <div class="range-hero__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+      <div class="range-hero__actions">
+        {%- if section.settings.button_label != blank -%}
+          <a href="{{ section.settings.button_link | default: source.url }}" class="btn btn--primary btn--lg">
+            {{- section.settings.button_label | replace: '[count]', total | escape -}}
+            {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.button_label_2 != blank -%}
+          <a href="{{ section.settings.button_link_2 }}" class="btn btn--ghost btn--lg">{{ section.settings.button_label_2 | escape }}</a>
+        {%- endif -%}
+      </div>
+      <dl class="range-hero__facts">
+        <div class="fact">
+          <dt class="fact__label">Products</dt>
+          <dd class="fact__value">{{ total }}</dd>
+        </div>
+        {%- if category_count > 0 -%}
+          <div class="fact">
+            <dt class="fact__label">Categories</dt>
+            <dd class="fact__value">{{ category_count }}</dd>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.fact_value != blank -%}
+          <div class="fact">
+            <dt class="fact__label">{{ section.settings.fact_label | escape }}</dt>
+            <dd class="fact__value">{{ section.settings.fact_value | escape }}</dd>
+          </div>
+        {%- endif -%}
+      </dl>
+    </div>
+
+    <div class="range-sheet" role="group" aria-label="{{ section.settings.sheet_title | escape }}">
+      <div class="range-sheet__head">
+        <span class="range-sheet__title">{{ section.settings.sheet_title | escape }}</span>
+        <span class="range-sheet__live"><span class="stock__dot" aria-hidden="true"></span>Live stock</span>
+      </div>
+      <ol class="range-sheet__list" role="list">
+        {%- for product in source.products limit: rows -%}
+          {%- liquid
+            assign category = blank
+            for c in product.collections
+              if c.handle != 'all' and c.handle != 'frontpage'
+                assign category = c.title
+                break
+              endif
+            endfor
+            assign v = product.selected_or_first_available_variant
+          -%}
+          <li class="range-sheet__row">
+            <a href="{{ product.url }}" class="range-sheet__link">
+              <span class="range-sheet__no">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
+              <span class="range-sheet__thumb">
+                {%- if product.featured_media -%}
+                  {{ product.featured_media.preview_image | image_url: width: 120 | image_tag: loading: 'eager', widths: '60,120', sizes: '48px', alt: '' }}
+                {%- else -%}
+                  {% render 'placeholder-art', type: 'product', uid: product.id %}
+                {%- endif -%}
+              </span>
+              <span class="range-sheet__name">
+                <span class="range-sheet__title-text">{% render 'product-short-title', product: product, words: 6 %}</span>
+                {%- if category != blank -%}<span class="range-sheet__cat">{{ category | escape }}</span>{%- endif -%}
+              </span>
+              <span class="range-sheet__price">
+                {%- if product.price_varies -%}<small>from </small>{%- endif -%}
+                {{- product.price_min | money -}}
+              </span>
+              {%- capture stock_html -%}{% render 'stock-status', variant: v, compact: true %}{%- endcapture -%}
+              <span class="range-sheet__stock">{{ stock_html }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ol>
+      <a href="{{ source.url | default: routes.all_products_collection_url }}" class="range-sheet__foot">
+        <span>See all {{ total }} in the shop</span>
+        {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}
+      </a>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Range hero",
+  "tag": "div",
+  "class": "section-range-hero",
+  "settings": [
+    { "type": "select", "id": "tone", "label": "Background", "options": [
+      { "value": "ink", "label": "Ink" },
+      { "value": "paper", "label": "Paper" }
+    ], "default": "ink" },
+    { "type": "text", "id": "eyebrow", "label": "Small line above heading", "default": "The range" },
+    { "type": "checkbox", "id": "show_counts", "label": "Add live product and stock counts", "default": true },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Small range. Straight answers." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>We keep a deliberately short list of everyday tech and show you everything up front: live stock, the full price and how fast it ships.</p>" },
+    { "type": "text", "id": "button_label", "label": "Button", "default": "Browse all [count] products", "info": "[count] is replaced with the number of products." },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "text", "id": "button_label_2", "label": "Second button", "default": "How delivery works" },
+    { "type": "url", "id": "button_link_2", "label": "Second button link" },
+    { "type": "header", "content": "Fact row" },
+    { "type": "paragraph", "content": "Product and category counts are added automatically. Add one more fact of your own here." },
+    { "type": "text", "id": "fact_value", "label": "Extra fact", "default": "1-2 days" },
+    { "type": "text", "id": "fact_label", "label": "Extra fact label", "default": "To dispatch" },
+    { "type": "header", "content": "Range sheet" },
+    { "type": "text", "id": "sheet_title", "label": "Title", "default": "Range sheet" },
+    { "type": "collection", "id": "collection", "label": "Products from", "info": "Leave empty to list every product." },
+    { "type": "range", "id": "rows", "label": "Rows", "min": 4, "max": 16, "step": 1, "default": 12 }
+  ],
+  "presets": [{ "name": "Range hero" }]
+}
+{% endschema %}

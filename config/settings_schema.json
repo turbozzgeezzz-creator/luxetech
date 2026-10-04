@@ -14,7 +14,7 @@
         "type": "image_picker",
         "id": "logo",
         "label": "Logo image",
-        "info": "Leave empty to show the store name as a text wordmark."
+        "info": "Leave empty to use the Tech.LuxeDealers logo that ships with the theme."
       },
       {
         "type": "range",
@@ -24,7 +24,7 @@
         "max": 260,
         "step": 10,
         "unit": "px",
-        "default": 150
+        "default": 170
       },
       {
         "type": "image_picker",
@@ -39,7 +39,7 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "The LuxeTech signal palette: stone and white surfaces, graphite text, and one signal orange reserved for primary actions, links, sale prices and the indicator dot. Stock colors carry meaning on every product card, so keep them distinguishable from the brand color."
+        "content": "Tech.LuxeDealers palette: cool paper and white surfaces, near-black ink from the logo, and the logo violet for primary actions, links, sale prices and the signal dot. Stock colors carry meaning on every product card, so keep them distinguishable from the brand color."
       },
       {
         "type": "header",
@@ -49,13 +49,13 @@
         "type": "color",
         "id": "color_background",
         "label": "Page background",
-        "default": "#F5F5F2"
+        "default": "#F2F3F5"
       },
       {
         "type": "color",
         "id": "color_subtle",
         "label": "Panels (image backgrounds, bands)",
-        "default": "#ECEDE8"
+        "default": "#E7E9ED"
       },
       {
         "type": "color",
@@ -66,20 +66,20 @@
       {
         "type": "color",
         "id": "color_ink",
-        "label": "Graphite (text, footer)",
-        "default": "#1D1E1B"
+        "label": "Ink (text, footer, dark bands)",
+        "default": "#0B1220"
       },
       {
         "type": "color",
         "id": "color_muted",
         "label": "Secondary text",
-        "default": "#62655E"
+        "default": "#586072"
       },
       {
         "type": "color",
         "id": "color_border",
         "label": "Hairlines",
-        "default": "#D8D9D3"
+        "default": "#D3D7DE"
       },
       {
         "type": "header",
@@ -88,14 +88,14 @@
       {
         "type": "color",
         "id": "color_primary",
-        "label": "Signal orange (actions, links, sale prices)",
-        "default": "#C9441B"
+        "label": "Brand violet (actions, links, sale prices)",
+        "default": "#7D03FC"
       },
       {
         "type": "color",
         "id": "color_accent",
         "label": "Signal tint (save labels, highlight chips)",
-        "default": "#FBE8DF"
+        "default": "#EFE6FF"
       },
       {
         "type": "header",
@@ -105,19 +105,19 @@
         "type": "color",
         "id": "color_success",
         "label": "In stock",
-        "default": "#2E7D32"
+        "default": "#1E7A3C"
       },
       {
         "type": "color",
         "id": "color_warning",
         "label": "Low stock",
-        "default": "#946200"
+        "default": "#8F5B00"
       },
       {
         "type": "color",
         "id": "color_error",
         "label": "Errors",
-        "default": "#A3221A"
+        "default": "#B42318"
       }
     ]
   },
@@ -148,7 +148,7 @@
         "type": "checkbox",
         "id": "card_show_sku",
         "label": "Show SKU",
-        "default": true
+        "default": false
       },
       {
         "type": "checkbox",
@@ -258,8 +258,8 @@
         "max": 90,
         "step": 5,
         "unit": "d",
-        "default": 30,
-        "info": "Set to 0 to turn the New badge off."
+        "default": 0,
+        "info": "0 turns the New badge off. Worth leaving off while the whole range is new, or every card says New."
       }
     ]
   },

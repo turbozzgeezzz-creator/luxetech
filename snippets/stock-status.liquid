@@ -6,6 +6,7 @@
   Params:
   - variant: variant object (required)
   - id_prefix: optional; adds an id so the product page can swap it
+  - compact: true drops the shipping note (cards, where space is tight)
 {%- endcomment -%}
 {%- liquid
   assign state = 'in'
@@ -28,7 +29,7 @@
     {%- case state -%}
       {%- when 'in' -%}
         {{- settings.stock_in_text | default: 'In stock' -}}
-        {%- if settings.stock_shipping_note != blank %} &mdash; {{ settings.stock_shipping_note }}{% endif -%}
+        {%- if settings.stock_shipping_note != blank and compact != true %} &mdash; {{ settings.stock_shipping_note }}{% endif -%}
       {%- when 'low' -%}
         Low stock, only {{ variant.inventory_quantity }} left
       {%- when 'backorder' -%}

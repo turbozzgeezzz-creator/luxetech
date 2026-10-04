@@ -7,7 +7,7 @@
     {%- if item.image -%}
       {{ item.image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120,240', sizes: '120px', alt: '' }}
     {%- else -%}
-      {% render 'placeholder-art', type: 'product' %}
+      {% render 'placeholder-art', type: 'product', uid: item.product_id %}
     {%- endif -%}
   </a>
   <div class="cart-line__info">

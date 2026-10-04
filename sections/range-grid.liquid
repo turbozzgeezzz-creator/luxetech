@@ -1,0 +1,114 @@
+{%- comment -%}
+  The whole catalogue in one numbered grid: a large lead tile, then every other
+  product, then a closing tile sized to fill the last row exactly so the grid
+  never ends on a ragged gap. Built for a short range shown with confidence,
+  not a teaser for a bigger catalogue.
+
+  Grid maths: the lead tile covers 2x2 cells on the 4 and 3 column layouts and a
+  full row (2 cells) on 2 columns. The closing tile spans whatever is left of
+  the last row; those spans are passed to CSS as custom properties.
+{%- endcomment -%}
+{%- liquid
+  assign source = section.settings.collection
+  if source == blank
+    assign source = collections.all
+  endif
+  assign lead = section.settings.lead_product
+  assign limit = section.settings.limit
+
+  assign count = 0
+  for product in source.products limit: limit
+    assign count = count | plus: 1
+  endfor
+  if lead != blank
+    assign lead_in_source = false
+    for product in source.products limit: limit
+      if product.id == lead.id
+        assign lead_in_source = true
+        break
+      endif
+    endfor
+    unless lead_in_source
+      assign count = count | plus: 1
+    endunless
+  endif
+
+  assign cells_wide = count | plus: 3
+  assign rem4 = cells_wide | modulo: 4
+  assign span4 = 4 | minus: rem4
+  assign rem3 = cells_wide | modulo: 3
+  assign span3 = 3 | minus: rem3
+  assign cells_narrow = count | plus: 1
+  assign rem2 = cells_narrow | modulo: 2
+  assign span2 = 2 | minus: rem2
+-%}
+{%- if count > 0 -%}
+<section class="section range-grid-section" aria-labelledby="Heading-{{ section.id }}">
+  <div class="container">
+    <div class="section-head section-head--split">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="eyebrow eyebrow--muted">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+        <h2 class="section-head__title" id="Heading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+      </div>
+      {%- if section.settings.subheading != blank -%}
+        <p class="section-head__sub">{{ section.settings.subheading | replace: '[count]', count | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <ul class="range-grid" role="list" style="--close-span-4: {{ span4 }}; --close-span-3: {{ span3 }}; --close-span-2: {{ span2 }};">
+      {%- assign n = 0 -%}
+      {%- if lead != blank -%}
+        {%- assign n = 1 -%}
+        <li class="range-grid__item range-grid__item--lead">
+          {% render 'product-card', product: lead, section_id: section.id, index: 1, feature: true, lazy: false, sizes: '(min-width: 990px) 600px, 100vw' %}
+        </li>
+      {%- endif -%}
+      {%- for product in source.products limit: limit -%}
+        {%- if lead != blank and product.id == lead.id -%}{%- continue -%}{%- endif -%}
+        {%- assign n = n | plus: 1 -%}
+        {%- if n == 1 -%}
+          <li class="range-grid__item range-grid__item--lead">
+            {% render 'product-card', product: product, section_id: section.id, index: n, feature: true, lazy: false, sizes: '(min-width: 990px) 600px, 100vw' %}
+          </li>
+        {%- else -%}
+          <li class="range-grid__item">
+            {% render 'product-card', product: product, section_id: section.id, index: n, sizes: '(min-width: 1200px) 290px, (min-width: 750px) 30vw, 50vw' %}
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if section.settings.close_heading != blank -%}
+        <li class="range-grid__item range-grid__item--close">
+          <div class="range-close">
+            <p class="eyebrow">That's the full range</p>
+            <p class="range-close__heading">{{ section.settings.close_heading | escape }}</p>
+            {%- if section.settings.close_text != blank -%}<p class="range-close__text">{{ section.settings.close_text | escape }}</p>{%- endif -%}
+            {%- if section.settings.close_link_label != blank -%}
+              <a href="{{ section.settings.close_link | default: routes.root_url }}" class="btn btn--outline-light btn--sm">{{ section.settings.close_link_label | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>
+            {%- endif -%}
+          </div>
+        </li>
+      {%- endif -%}
+    </ul>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Full range grid",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small line above heading", "default": "Everything we stock" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The full range" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "[count] products, numbered and in one place. Nothing hidden behind filters or pages.", "info": "[count] is replaced with the number of products." },
+    { "type": "collection", "id": "collection", "label": "Products from", "info": "Leave empty to show every product." },
+    { "type": "product", "id": "lead_product", "label": "Lead product", "info": "Shown large in the first tile. Leave empty to use the first product." },
+    { "type": "range", "id": "limit", "label": "Products to show", "min": 4, "max": 48, "step": 1, "default": 24 },
+    { "type": "header", "content": "Closing tile" },
+    { "type": "text", "id": "close_heading", "label": "Heading", "default": "Looking for something specific?" },
+    { "type": "text", "id": "close_text", "label": "Text", "default": "Tell us the device you need it to work with and we'll tell you honestly whether anything here fits." },
+    { "type": "text", "id": "close_link_label", "label": "Link label", "default": "Ask our team" },
+    { "type": "url", "id": "close_link", "label": "Link" }
+  ],
+  "presets": [{ "name": "Full range grid" }]
+}
+{% endschema %}

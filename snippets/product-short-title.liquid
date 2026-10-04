@@ -1,0 +1,19 @@
+{%- comment -%}
+  Short product name for compact layouts (range sheet, featured tiles).
+  Uses the product metafield custom.short_title when it's filled in.
+  Otherwise takes the title up to the first comma, semicolon or " - " and
+  caps it at a few words, because supplier titles tend to be long keyword lists.
+
+  Params:
+  - product: product object (required)
+  - words: maximum words for the fallback (default 6)
+{%- endcomment -%}
+{%- liquid
+  assign max_words = words | default: 6
+  assign short = product.metafields.custom.short_title.value | strip
+  if short == blank
+    assign short = product.title | split: ',' | first | split: ';' | first | split: ' - ' | first | split: ' | ' | first | strip
+    assign short = short | truncatewords: max_words, '…'
+  endif
+  echo short | escape
+-%}

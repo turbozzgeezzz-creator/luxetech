@@ -1,0 +1,86 @@
+{%- comment -%}
+  "Before you buy" teaser: real questions with short answers, each linking to the
+  page with the full answer, plus a contact card. Content, not filler: keep the
+  answers in line with the FAQ, Shipping and Returns pages.
+{%- endcomment -%}
+<section class="section help-desk" aria-labelledby="Heading-{{ section.id }}">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="eyebrow eyebrow--muted">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+        <h2 class="section-head__title" id="Heading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+      </div>
+      {%- if section.settings.link_label != blank -%}
+        <a href="{{ section.settings.link | default: routes.root_url }}" class="section-head__link">{{ section.settings.link_label | escape }}</a>
+      {%- endif -%}
+    </div>
+    <ul class="help-grid" role="list">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'question' -%}
+            <li class="help-card" {{ block.shopify_attributes }}>
+              <p class="help-card__q"><span class="help-card__mark" aria-hidden="true">Q.</span>{{ block.settings.question | escape }}</p>
+              {%- if block.settings.answer != blank -%}<p class="help-card__a">{{ block.settings.answer | escape }}</p>{%- endif -%}
+              {%- if block.settings.link_label != blank and block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}" class="help-card__link">{{ block.settings.link_label | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</a>
+              {%- endif -%}
+            </li>
+          {%- when 'contact' -%}
+            <li class="help-card help-card--contact" {{ block.shopify_attributes }}>
+              <p class="help-card__q">{{ block.settings.heading | escape }}</p>
+              {%- if block.settings.text != blank -%}<p class="help-card__a">{{ block.settings.text | escape }}</p>{%- endif -%}
+              {%- if block.settings.link_label != blank -%}
+                <a href="{{ block.settings.link | default: routes.root_url }}" class="btn btn--primary btn--sm">{{ block.settings.link_label | escape }}</a>
+              {%- endif -%}
+            </li>
+        {%- endcase -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Before you buy",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small line above heading", "default": "Help desk" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Before you buy" },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "All questions" },
+    { "type": "url", "id": "link", "label": "Link" }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "Question" },
+        { "type": "textarea", "id": "answer", "label": "Short answer" },
+        { "type": "text", "id": "link_label", "label": "Link label", "default": "Full answer" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "contact",
+      "name": "Contact card",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Still not sure?" },
+        { "type": "textarea", "id": "text", "label": "Text" },
+        { "type": "text", "id": "link_label", "label": "Button", "default": "Ask a person" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Before you buy",
+      "blocks": [
+        { "type": "question", "settings": { "question": "Will it work with my device?" } },
+        { "type": "question", "settings": { "question": "How much is shipping?" } },
+        { "type": "contact", "settings": { "heading": "Still not sure?" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

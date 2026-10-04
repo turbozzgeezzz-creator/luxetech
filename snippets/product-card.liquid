@@ -7,6 +7,8 @@
   - lazy: default true; pass false for above-the-fold cards
   - sizes: image sizes attribute
   - heading_tag: default 'h3'
+  - index: optional catalogue number, shown as 01, 02... on the image
+  - feature: true for the large lead tile in the range grid
 {%- endcomment -%}
 {%- liquid
   assign v = product.selected_or_first_available_variant
@@ -54,8 +56,11 @@
 {%- capture cat_color -%}{% render 'category-color', type: product.type %}{%- endcapture -%}
 {%- assign cat_color = cat_color | strip -%}
 
-<article class="card{% if product.available == false %} card--soldout{% endif %}" data-product-id="{{ product.id }}">
+<article class="card{% if product.available == false %} card--soldout{% endif %}{% if feature %} card--feature{% endif %}" data-product-id="{{ product.id }}">
   <div class="card__media ratio ratio--{{ settings.card_image_ratio }}">
+    {%- if index != blank -%}
+      <span class="card__index" aria-hidden="true">{% if index < 10 %}0{% endif %}{{ index }}</span>
+    {%- endif -%}
     <a href="{{ product.url }}" class="card__media-link" tabindex="-1" aria-hidden="true">
       {%- if product.featured_media -%}
         {{ product.featured_media.preview_image | image_url: width: 800 | image_tag:
@@ -75,7 +80,7 @@
           }}
         {%- endif -%}
       {%- else -%}
-        {% render 'placeholder-art', type: 'product', class: 'card__img card__img--art' %}
+        {% render 'placeholder-art', type: 'product', uid: product.id, class: 'card__img card__img--art' %}
       {%- endif -%}
     </a>
 
@@ -101,7 +106,7 @@
 
     {% render 'price', product: product %}
 
-    {% render 'stock-status', variant: v %}
+    {% render 'stock-status', variant: v, compact: true %}
 
     {%- if settings.card_show_sku and v.sku != blank -%}
       <p class="card__sku">SKU {{ v.sku | escape }}</p>

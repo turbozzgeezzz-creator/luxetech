@@ -15,7 +15,7 @@
                 {%- if settings.logo != blank and block.settings.show_logo -%}
                   {{ settings.logo | image_url: width: 400 | image_tag: loading: 'lazy', widths: '200,400', sizes: '180px', alt: shop.name, class: 'footer__logo' }}
                 {%- else -%}
-                  <span class="wordmark wordmark--light">{{ shop.name | escape }}</span>
+                  <img src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="653" height="178" alt="{{ shop.name | escape }}" class="footer__logo" loading="lazy">
                 {%- endif -%}
               </a>
               {%- if block.settings.text != blank -%}

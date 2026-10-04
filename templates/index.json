@@ -1,64 +1,27 @@
 {
   "sections": {
     "hero": {
-      "type": "slideshow",
+      "type": "range-hero",
       "settings": {
-        "height": "md",
-        "autoplay": true,
-        "speed": 6
-      },
-      "blocks": {
-        "s1": {
-          "type": "slide",
-          "settings": {
-            "layout": "split",
-            "background": "#ECEDE8",
-            "text_tone": "dark",
-            "kicker": "Welcome to LuxeTech",
-            "heading": "Everyday tech, without the guesswork",
-            "text": "<p>Clear specs, live stock levels and straightforward returns on everything we sell.</p>",
-            "button_label": "Shop all products",
-            "button_link": "/collections/all",
-            "button_label_2": "How shipping works",
-            "button_link_2": "/pages/shipping-delivery"
-          }
-        },
-        "s2": {
-          "type": "slide",
-          "settings": {
-            "layout": "split",
-            "background": "#1D1E1B",
-            "text_tone": "light",
-            "kicker": "On sale",
-            "heading": "Marked-down tech, all in one place",
-            "text": "<p>Every product with a reduced price, with the original price shown so you can see exactly what you save.</p>",
-            "button_label": "See what's on sale",
-            "button_link": "/collections/sale"
-          }
-        },
-        "s3": {
-          "type": "slide",
-          "settings": {
-            "layout": "split",
-            "background": "#E5E3DD",
-            "text_tone": "dark",
-            "kicker": "Need a hand?",
-            "heading": "Questions before you buy?",
-            "text": "<p>Ask us about compatibility, specs or delivery and a real person will get back to you.</p>",
-            "button_label": "Contact support",
-            "button_link": "/pages/contact"
-          }
-        }
-      },
-      "block_order": [
-        "s1",
-        "s2",
-        "s3"
-      ]
+        "tone": "ink",
+        "eyebrow": "The range",
+        "show_counts": true,
+        "heading": "Small range. Straight answers.",
+        "text": "<p>We keep a deliberately short list of everyday tech and show you everything up front: live stock, the full price and how fast it ships.</p>",
+        "button_label": "Browse all [count] products",
+        "button_link": "/collections/all",
+        "button_label_2": "How delivery works",
+        "button_link_2": "/pages/shipping-delivery",
+        "fact_value": "1-2 days",
+        "fact_label": "To dispatch",
+        "sheet_title": "Range sheet",
+        "rows": 12
+      }
     },
     "categories": {
       "type": "category-grid",
       "settings": {
+        "eyebrow": "Four categories",
         "heading": "Shop by category",
         "link_label": "All categories",
         "columns": "4"
@@ -68,8 +31,8 @@
           "type": "category",
           "settings": {
             "title": "Audio",
-            "subtitle": "Headphones and speakers",
-            "icon": "headphones",
+            "subtitle": "Wireless earbuds",
+            "icon": "earbuds",
             "link": "/collections/audio"
           }
         },
@@ -77,7 +40,7 @@
           "type": "category",
           "settings": {
             "title": "Charging",
-            "subtitle": "Chargers, cables, power banks",
+            "subtitle": "Wireless charging and USB-C",
             "icon": "plug",
             "link": "/collections/charging"
           }
@@ -86,7 +49,7 @@
           "type": "category",
           "settings": {
             "title": "Smart home",
-            "subtitle": "Plugs, cameras, lighting",
+            "subtitle": "Coffee, blending and desserts",
             "icon": "home-device",
             "link": "/collections/smart-home"
           }
@@ -95,8 +58,8 @@
           "type": "category",
           "settings": {
             "title": "Accessories",
-            "subtitle": "Cases, mounts, stands",
-            "icon": "case",
+            "subtitle": "Hair care, wearables and cooling",
+            "icon": "watch",
             "link": "/collections/accessories"
           }
         }
@@ -107,6 +70,19 @@
         "c",
         "d"
       ]
+    },
+    "range": {
+      "type": "range-grid",
+      "settings": {
+        "eyebrow": "Everything we stock",
+        "heading": "The full range",
+        "subheading": "[count] products, numbered and in one place. Nothing hidden behind filters or pages.",
+        "limit": 24,
+        "close_heading": "Looking for something specific?",
+        "close_text": "Tell us the device you need it to work with and we'll tell you honestly whether anything here fits.",
+        "close_link_label": "Ask our team",
+        "close_link": "/pages/contact"
+      }
     },
     "deals": {
       "type": "product-rail",
@@ -119,100 +95,156 @@
         "link_label": "All sale items"
       }
     },
-    "trust": {
-      "type": "trust-band",
-      "settings": {},
-      "blocks": {
-        "t1": {
-          "type": "item",
-          "settings": {
-            "icon": "truck",
-            "title": "Fast, tracked shipping",
-            "text": "Every order ships with tracking."
-          }
-        },
-        "t2": {
-          "type": "item",
-          "settings": {
-            "icon": "repeat",
-            "title": "30-day returns",
-            "text": "Unused items, no questions asked."
-          }
-        },
-        "t3": {
-          "type": "item",
-          "settings": {
-            "icon": "shield",
-            "title": "12-month warranty",
-            "text": "On every product we sell."
-          }
-        },
-        "t4": {
-          "type": "item",
-          "settings": {
-            "icon": "headset",
-            "title": "Real human support",
-            "text": "Talk to people who know the gear."
-          }
-        }
-      },
-      "block_order": [
-        "t1",
-        "t2",
-        "t3",
-        "t4"
-      ]
-    },
-    "bestsellers": {
-      "type": "product-rail",
+    "story": {
+      "type": "brand-story",
       "settings": {
-        "heading": "Shop the range",
-        "subheading": "",
-        "style": "default",
-        "source": "all",
-        "limit": 10,
-        "link_label": "View all"
-      }
-    },
-    "promos": {
-      "type": "promo-banners",
-      "settings": {},
+        "eyebrow": "Why the list is short",
+        "heading": "Chosen, not listed",
+        "statement": "<p>Most tech stores list everything a supplier offers. We'd rather keep a short range of things people use every day, and be straight about each one.</p>",
+        "link_label": "More about us",
+        "link": "/pages/about-us"
+      },
       "blocks": {
         "p1": {
-          "type": "banner",
+          "type": "principle",
           "settings": {
-            "background": "#ECEDE8",
-            "text_tone": "dark",
-            "kicker": "",
-            "heading": "New arrivals",
-            "text": "The latest products added to the store.",
-            "link_label": "See what's new",
-            "link": "/collections/all?sort_by=created-descending"
+            "title": "A short range on purpose",
+            "text": "Charging, audio, small appliances and wearables. If we wouldn't use it ourselves, it doesn't go on the list."
           }
         },
         "p2": {
-          "type": "banner",
+          "type": "principle",
           "settings": {
-            "background": "#1D1E1B",
-            "text_tone": "light",
-            "kicker": "",
-            "heading": "Not sure what fits?",
-            "text": "Tell us your device and we'll point you to the right charger, cable or accessory.",
-            "link_label": "Ask our team",
-            "link": "/pages/contact"
+            "title": "Stock you can see",
+            "text": "Stock levels come from our inventory and update as orders come in, so in stock means we can send it."
+          }
+        },
+        "p3": {
+          "type": "principle",
+          "settings": {
+            "title": "The full price, up front",
+            "text": "Delivery options and costs for your address are shown at checkout before you pay. No account needed to order."
           }
         }
       },
       "block_order": [
         "p1",
-        "p2"
+        "p2",
+        "p3"
+      ]
+    },
+    "process": {
+      "type": "process-steps",
+      "settings": {
+        "eyebrow": "How we work",
+        "heading": "After you order",
+        "subheading": "What happens between checkout and your door, and what's covered after."
+      },
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "when": "Checkout",
+            "title": "Order from live stock",
+            "text": "Every product page shows its current stock before you buy, and backorders are marked."
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "when": "1-2 business days",
+            "title": "Packed and dispatched",
+            "text": "In-stock orders leave within 1-2 business days. Weekend orders go out the next business day.",
+            "link_label": "Shipping details",
+            "link": "/pages/shipping-delivery"
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "when": "On dispatch",
+            "title": "Tracking by email",
+            "text": "We email a tracking number when your order ships.",
+            "link_label": "Track an order",
+            "link": "/pages/track-order"
+          }
+        },
+        "s4": {
+          "type": "step",
+          "settings": {
+            "when": "After delivery",
+            "title": "Covered",
+            "text": "30 days to return unused items, and a 12-month warranty against defects from normal use.",
+            "link_label": "Returns and warranty",
+            "link": "/pages/returns-warranty"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ]
+    },
+    "help": {
+      "type": "help-desk",
+      "settings": {
+        "eyebrow": "Help desk",
+        "heading": "Before you buy",
+        "link_label": "All questions",
+        "link": "/pages/faq"
+      },
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "Will it work in my country?",
+            "answer": "Check the product details for plug type, voltage and compatibility. If anything is unclear, ask us before you order.",
+            "link_label": "Full answer",
+            "link": "/pages/faq"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "How much is shipping?",
+            "answer": "Delivery options and prices for your address are shown at checkout, before you pay.",
+            "link_label": "Shipping and delivery",
+            "link": "/pages/shipping-delivery"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "What if it arrives faulty?",
+            "answer": "Send your order number and a photo or video of the fault. We'll arrange a repair, replacement or refund under the 12-month warranty.",
+            "link_label": "Returns and warranty",
+            "link": "/pages/returns-warranty"
+          }
+        },
+        "c1": {
+          "type": "contact",
+          "settings": {
+            "heading": "Still not sure?",
+            "text": "Questions go to a real person on our team, not a bot. Include the device you're using and we'll check compatibility.",
+            "link_label": "Ask a person",
+            "link": "/pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "c1"
       ]
     },
     "newsletter": {
       "type": "newsletter",
       "settings": {
-        "heading": "Hear about deals and new arrivals first",
-        "text": "<p>Occasional emails with restocks, new products and subscriber offers.</p>",
+        "heading": "Restocks and new additions, first",
+        "text": "<p>One short email when something new joins the range or comes back in stock. Subscriber offers when we run them.</p>",
         "fine_print": "Unsubscribe any time. We never share your email."
       }
     }
@@ -220,10 +252,11 @@
   "order": [
     "hero",
     "categories",
+    "range",
     "deals",
-    "trust",
-    "bestsellers",
-    "promos",
+    "story",
+    "process",
+    "help",
     "newsletter"
   ]
 }

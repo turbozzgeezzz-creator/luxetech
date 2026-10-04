@@ -22,7 +22,7 @@
           class: 'header__logo-img'
         }}
       {%- else -%}
-        <span class="wordmark">{{ shop.name | escape }}</span>
+        <img src="{{ 'logo-tech-luxedealers.png' | asset_url }}" width="653" height="178" alt="{{ shop.name | escape }}" class="header__logo-img" loading="eager">
       {%- endif -%}
     </a>
 
@@ -125,7 +125,7 @@
                           }}
                         </span>
                       {%- else -%}
-                        <span class="mega-promo__media mega-promo__media--art">{% render 'placeholder-art', type: 'product' %}</span>
+                        <span class="mega-promo__media mega-promo__media--art">{% render 'placeholder-art', type: 'product', uid: block.id, caption: block.settings.title %}</span>
                       {%- endif -%}
                       <span class="mega-promo__body">
                         {%- if block.settings.promo_heading != blank -%}<span class="mega-promo__heading">{{ block.settings.promo_heading | escape }}</span>{%- endif -%}
