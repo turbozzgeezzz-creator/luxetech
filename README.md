@@ -107,7 +107,7 @@ The threshold is in the store's default currency. If you sell in multiple curren
 
 | Collection | Type | Condition | Used by |
 |---|---|---|---|
-| Sale | Automated | Compare-at price is not empty | Header *Sale* link, hero slide 2 |
+| Sale | Automated | Compare-at price is not empty | Hero slide 2. The header has no *Sale* link by default; once the collection has products, add a Link block in the header pointing to `/collections/sale`. |
 | Best sellers (optional) | Automated | Price is greater than 0, sort *Best selling* | Pick it in the second product rail and rename the rail *Best sellers* |
 
 The *Shop the range* rail shows the whole catalog until you pick a collection. It is not labelled *Best sellers* by default, because the theme can't sort by sales on its own.

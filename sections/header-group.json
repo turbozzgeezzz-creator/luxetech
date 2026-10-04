@@ -82,15 +82,6 @@
             "icon": "sparkle",
             "link": "/collections/all?sort_by=created-descending"
           }
-        },
-        "c6": {
-          "type": "link",
-          "settings": {
-            "title": "Sale",
-            "icon": "percent",
-            "highlight": true,
-            "link": "/collections/sale"
-          }
         }
       },
       "block_order": [
@@ -98,8 +89,7 @@
         "c2",
         "c3",
         "c4",
-        "c5",
-        "c6"
+        "c5"
       ]
     }
   },

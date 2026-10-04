@@ -65,8 +65,8 @@
     { "type": "checkbox", "id": "enabled", "label": "Show email popup", "default": true },
     { "type": "select", "id": "trigger", "label": "Open the popup", "options": [
       { "value": "delay", "label": "After a delay" },
-      { "value": "exit", "label": "When the visitor is about to leave (desktop), after a delay on phones" }
-    ], "default": "delay" },
+      { "value": "exit", "label": "On exit intent" }
+    ], "default": "delay", "info": "Exit intent opens the popup when a desktop visitor moves to leave the page. Phones always use the delay." },
     { "type": "range", "id": "delay", "label": "Show after", "min": 3, "max": 30, "step": 1, "unit": "s", "default": 9 },
     { "type": "range", "id": "repeat_days", "label": "Show again to visitors who closed it after", "min": 0, "max": 90, "step": 5, "unit": "d", "default": 0, "info": "0 means never: each visitor sees it once. People who sign up never see it again." },
     { "type": "checkbox", "id": "preview", "label": "Show in the theme editor", "default": false, "info": "Turn on to preview and edit the popup here. It opens immediately while previewing." },
