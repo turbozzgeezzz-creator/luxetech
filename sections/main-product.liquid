@@ -230,7 +230,7 @@
                     <div class="pair__info">
                       {%- if forloop.first -%}<span class="pair__this">This item</span>{%- endif -%}
                       <a href="{{ item.url }}" class="pair__name">{% render 'product-short-title', product: item, words: 7 %}</a>
-                      {%- unless item.has_only_default_variant -%}<span class="pair__variant">{{ item_variant.title | escape }}</span>{%- endunless -%}
+                      {%- if item.has_only_default_variant == false and item_variant.title.size > 2 -%}<span class="pair__variant">{{ item_variant.title | escape }}</span>{%- endif -%}
                       <span class="pair__price">{{ item_variant.price | money }}</span>
                     </div>
                   </li>

@@ -43,22 +43,24 @@
     </ul>
   </div>
 
+  {%- liquid
+    assign shown_handles = ''
+    assign tiles = 0
+  -%}
   <ul class="mega-auto__products" role="list">
     {%- for p in c.products limit: 4 -%}
-      <li>
-        <a href="{{ p.url }}" class="mega-product">
-          <span class="mega-product__media">
-            {%- if p.featured_media -%}
-              {{ p.featured_media.preview_image | image_url: width: 400 | image_tag: loading: 'lazy', widths: '200,300,400', sizes: '180px', alt: '' }}
-            {%- else -%}
-              {% render 'placeholder-art', type: 'product', uid: p.id %}
-            {%- endif -%}
-          </span>
-          <span class="mega-product__name">{% render 'product-short-title', product: p, words: 6 %}</span>
-          <span class="mega-product__price">{% if p.price_varies %}<small>From </small>{% endif %}{{ p.price_min | money }}</span>
-        </a>
-      </li>
+      {%- assign shown_handles = shown_handles | append: p.handle | append: ',' -%}
+      {%- assign tiles = tiles | plus: 1 -%}
+      <li>{% render 'mega-product', p: p, label: '' %}</li>
     {%- endfor -%}
+    {%- if tiles < 4 -%}
+      {%- for p in collections.all.products limit: 20 -%}
+        {%- if tiles >= 4 -%}{%- break -%}{%- endif -%}
+        {%- if shown_handles contains p.handle or p.available == false -%}{%- continue -%}{%- endif -%}
+        {%- assign tiles = tiles | plus: 1 -%}
+        <li>{% render 'mega-product', p: p, label: 'You might also like' %}</li>
+      {%- endfor -%}
+    {%- endif -%}
   </ul>
 
   <a href="{{ block.settings.promo_link | default: block.settings.link | default: c.url }}" class="mega-auto__promo bento-tone--{{ tone }}">
@@ -68,9 +70,9 @@
       <img src="{{ art | append: '.svg' | asset_url }}" alt="" class="bento-art" width="600" height="600" loading="lazy">
     {%- endif -%}
     <span class="mega-auto__promo-copy">
-      <span class="bento-kicker">{{ block.settings.promo_text | default: 'Hand-picked' | escape }}</span>
+      <span class="bento-kicker">{% if block.settings.promo_text != blank %}{{ block.settings.promo_text | escape }}{% else %}Hand-picked{% endif %}</span>
       <span class="mega-auto__promo-heading">{{ block.settings.promo_heading | default: block.settings.title | escape }}</span>
-      <span class="mega-auto__promo-cta">{{ block.settings.promo_link_label | default: 'Shop now' | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
+      <span class="mega-auto__promo-cta">{% if block.settings.promo_heading != blank %}{{ block.settings.promo_link_label | escape }}{% else %}Shop {{ block.settings.title | escape }}{% endif %} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
     </span>
   </a>
 </div>
