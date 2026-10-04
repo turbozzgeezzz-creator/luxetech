@@ -1,0 +1,34 @@
+{%- comment -%}
+  Picks a sensible icon for a menu title when the header falls back to a
+  Shopify navigation menu instead of category blocks. Outputs an icon name.
+{%- endcomment -%}
+{%- liquid
+  assign t = title | downcase
+  if t contains 'deal' or t contains 'sale' or t contains 'offer'
+    echo 'percent'
+  elsif t contains 'new'
+    echo 'sparkle'
+  elsif t contains 'head' or t contains 'audio' or t contains 'ear'
+    echo 'headphones'
+  elsif t contains 'speaker' or t contains 'sound'
+    echo 'speaker'
+  elsif t contains 'charg' or t contains 'power' or t contains 'cable' or t contains 'battery'
+    echo 'plug'
+  elsif t contains 'smart' or t contains 'home'
+    echo 'home-device'
+  elsif t contains 'camera' or t contains 'security'
+    echo 'camera'
+  elsif t contains 'watch' or t contains 'wear'
+    echo 'watch'
+  elsif t contains 'phone' or t contains 'mobile'
+    echo 'smartphone'
+  elsif t contains 'laptop' or t contains 'computer' or t contains 'pc'
+    echo 'laptop'
+  elsif t contains 'gam'
+    echo 'gamepad'
+  elsif t contains 'access' or t contains 'case'
+    echo 'case'
+  else
+    echo 'grid'
+  endif
+-%}

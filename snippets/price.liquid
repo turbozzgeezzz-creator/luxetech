@@ -1,0 +1,47 @@
+{%- comment -%}
+  Price block. Handles regular, sale (struck-through original + Save X%),
+  varying prices (From ...) and unit prices.
+
+  Params:
+  - product: product object (required)
+  - variant: optional variant; when given, its price is shown exactly (product page)
+  - size: optional 'lg' for the product page buy box
+  - id_prefix: optional; when set, elements get ids so JS can update them
+{%- endcomment -%}
+{%- liquid
+  assign show_from = false
+  if variant != blank
+    assign target = variant
+  elsif product.price_varies
+    assign target = product.variants | sort: 'price' | first
+    assign show_from = true
+  else
+    assign target = product.selected_or_first_available_variant
+  endif
+
+  assign price = target.price
+  assign compare = target.compare_at_price | default: 0
+  assign on_sale = false
+  if compare > price
+    assign on_sale = true
+    assign save_pct = compare | minus: price | times: 100.0 | divided_by: compare | round
+  endif
+-%}
+<div class="price{% if on_sale %} price--sale{% endif %}{% if size == 'lg' %} price--lg{% endif %}"{% if id_prefix %} id="{{ id_prefix }}-price"{% endif %}>
+  <span class="price__current">
+    <span class="visually-hidden">{% if on_sale %}Sale price{% else %}Price{% endif %}</span>
+    {%- if show_from -%}<span class="price__from">From </span>{%- endif -%}
+    {{- price | money -}}
+  </span>
+  {%- if on_sale -%}
+    <s class="price__compare"><span class="visually-hidden">Regular price</span>{{ compare | money }}</s>
+    <span class="price__save">Save {{ save_pct }}%</span>
+  {%- endif -%}
+  {%- if target.unit_price_measurement -%}
+    <span class="price__unit">
+      {{- target.unit_price | money }}/
+      {%- if target.unit_price_measurement.reference_value != 1 -%}{{ target.unit_price_measurement.reference_value }}{%- endif -%}
+      {{- target.unit_price_measurement.reference_unit -}}
+    </span>
+  {%- endif -%}
+</div>

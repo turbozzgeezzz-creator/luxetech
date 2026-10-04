@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    },
+    "steps": {
+      "type": "track-order",
+      "settings": {
+        "contact_label": "Contact support",
+        "contact_link": "/pages/contact"
+      },
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "title": "Check your shipping email",
+            "text": "<p>When your order ships, we email you a tracking number and a link to the carrier's tracking page.</p>"
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "title": "Open your order status page",
+            "text": "<p>Your order confirmation email has a View your order button. It opens your order status page, which shows the latest progress and tracking details.</p>"
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "title": "Or sign in to your account",
+            "text": "<p>If you checked out with an account, every order and its status is listed under your order history.</p>"
+          }
+        },
+        "s4": {
+          "type": "step",
+          "settings": {
+            "title": "Still can't find it?",
+            "text": "<p>Send us your order number and the email you ordered with and we'll check on it for you.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ]
+    }
+  },
+  "order": [
+    "main",
+    "steps"
+  ]
+}

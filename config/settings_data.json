@@ -1,0 +1,20 @@
+{
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "color_background": "#FFFFFF",
+      "color_surface": "#FFFFFF",
+      "color_ink": "#1B2433",
+      "color_muted": "#5E6878",
+      "color_border": "#E2E6EC",
+      "color_primary": "#1D4ED8",
+      "color_accent": "#E8EEFD",
+      "color_success": "#1A7F37",
+      "color_warning": "#B45309",
+      "color_error": "#C42B2B",
+      "cart_type": "drawer",
+      "free_shipping_threshold": 0,
+      "color_subtle": "#F4F6F9"
+    }
+  }
+}

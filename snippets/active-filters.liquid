@@ -1,0 +1,46 @@
+{%- comment -%}
+  Removable chips for every applied filter. Params: results, section_id, clear_url
+{%- endcomment -%}
+<div class="active-filters" id="ActiveFilters-{{ section_id }}" data-facet-swap>
+  {%- liquid
+    assign any_active = false
+    for filter in results.filters
+      if filter.active_values.size > 0
+        assign any_active = true
+      elsif filter.type == 'price_range'
+        if filter.min_value.value != nil or filter.max_value.value != nil
+          assign any_active = true
+        endif
+      endif
+    endfor
+  -%}
+  {%- if any_active -%}
+    <ul class="active-filters__list" role="list">
+      {%- for filter in results.filters -%}
+        {%- for value in filter.active_values -%}
+          <li>
+            <a href="{{ value.url_to_remove }}" class="chip chip--removable" data-facet-link>
+              <span>{{ filter.label | escape }}: {{ value.label | escape }}</span>
+              {% render 'icon', name: 'close', class: 'icon--xs' %}
+              <span class="visually-hidden">Remove filter</span>
+            </a>
+          </li>
+        {%- endfor -%}
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+            <li>
+              <a href="{{ filter.url_to_remove }}" class="chip chip--removable" data-facet-link>
+                <span>
+                  {{- filter.min_value.value | default: 0 | money }} to {{ filter.max_value.value | default: filter.range_max | money -}}
+                </span>
+                {% render 'icon', name: 'close', class: 'icon--xs' %}
+                <span class="visually-hidden">Remove filter</span>
+              </a>
+            </li>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      <li><a href="{{ clear_url }}" class="link-btn" data-facet-link>Clear all</a></li>
+    </ul>
+  {%- endif -%}
+</div>

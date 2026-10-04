@@ -1,0 +1,285 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign featured_media = current_variant.featured_media | default: product.featured_media
+  assign specs = product.metafields[section.settings.specs_namespace][section.settings.specs_key]
+  assign warranty = product.metafields.custom.warranty.value | default: section.settings.trust_warranty
+-%}
+
+<product-info class="pdp" data-section-id="{{ section.id }}" data-product-url="{{ product.url }}" data-update-url="true">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol role="list">
+        <li><a href="{{ routes.root_url }}">Home</a></li>
+        {%- if collection -%}
+          <li><a href="{{ collection.url }}">{{ collection.title | escape }}</a></li>
+        {%- elsif product.type != blank -%}
+          <li><a href="{{ product.type | url_for_type }}">{{ product.type | escape }}</a></li>
+        {%- endif -%}
+        <li><span aria-current="page">{{ product.title | escape }}</span></li>
+      </ol>
+    </nav>
+
+    <div class="pdp__grid">
+      <media-gallery class="gallery" data-section-id="{{ section.id }}">
+        {%- if product.media.size > 0 -%}
+          <div class="gallery__wrap">
+            <ul class="gallery__main" role="list" aria-label="Product media" tabindex="0">
+              {%- for media in product.media -%}
+                {%- liquid
+                  assign is_featured = false
+                  assign img_loading = 'lazy'
+                  assign img_alt = media.alt | default: product.title
+                  if media.id == featured_media.id
+                    assign is_featured = true
+                    assign img_loading = 'eager'
+                  endif
+                -%}
+                <li class="gallery__slide{% if is_featured %} is-active{% endif %}" data-media-id="{{ media.id }}" data-index="{{ forloop.index0 }}">
+                  {%- case media.media_type -%}
+                    {%- when 'image' -%}
+                      <button type="button" class="gallery__zoom" data-lightbox-open="{{ forloop.index0 }}" aria-label="Open image {{ forloop.index }} of {{ product.media.size }} full screen">
+                        {{ media | image_url: width: 1400 | image_tag:
+                          loading: img_loading,
+                          widths: '400,600,800,1000,1200,1400',
+                          sizes: '(min-width: 990px) 52vw, 100vw',
+                          alt: img_alt,
+                          class: 'gallery__img'
+                        }}
+                        <span class="gallery__zoom-hint">{% render 'icon', name: 'zoom', class: 'icon--sm' %}</span>
+                      </button>
+                    {%- when 'external_video' -%}
+                      <div class="gallery__video">{{ media | external_video_tag: loading: 'lazy' }}</div>
+                    {%- when 'video' -%}
+                      <div class="gallery__video">{{ media | video_tag: controls: true, preload: 'none' }}</div>
+                    {%- when 'model' -%}
+                      <div class="gallery__video">{{ media | model_viewer_tag }}</div>
+                  {%- endcase -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+            {%- if product.media.size > 1 -%}
+              <button type="button" class="gallery__arrow gallery__arrow--prev" data-gallery-prev aria-label="Previous image">{% render 'icon', name: 'chevron-left', class: 'icon--sm' %}</button>
+              <button type="button" class="gallery__arrow gallery__arrow--next" data-gallery-next aria-label="Next image">{% render 'icon', name: 'chevron-right', class: 'icon--sm' %}</button>
+            {%- endif -%}
+          </div>
+          {%- if product.media.size > 1 -%}
+            <ul class="gallery__thumbs" role="list" aria-label="Choose image">
+              {%- for media in product.media -%}
+                <li>
+                  <button type="button" class="gallery__thumb{% if media.id == featured_media.id %} is-active{% endif %}" data-thumb="{{ forloop.index0 }}" aria-label="Show image {{ forloop.index }}"{% if media.id == featured_media.id %} aria-current="true"{% endif %}>
+                    {{ media.preview_image | image_url: width: 160 | image_tag: loading: 'lazy', widths: '80,160', sizes: '80px', alt: '' }}
+                    {%- if media.media_type != 'image' -%}<span class="gallery__thumb-badge">{% render 'icon', name: 'play', class: 'icon--xs' %}</span>{%- endif -%}
+                  </button>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+
+          <dialog class="lightbox" aria-label="Product images">
+            <div class="lightbox__bar">
+              <span class="lightbox__count" data-lightbox-count></span>
+              <button type="button" class="lightbox__btn" data-lightbox-close aria-label="Close">{% render 'icon', name: 'close' %}</button>
+            </div>
+            <div class="lightbox__stage">
+              {%- if product.media.size > 1 -%}
+                <button type="button" class="lightbox__btn lightbox__nav lightbox__nav--prev" data-lightbox-prev aria-label="Previous image">{% render 'icon', name: 'chevron-left' %}</button>
+              {%- endif -%}
+              <img class="lightbox__img" alt="" width="1" height="1" data-lightbox-img>
+              {%- if product.media.size > 1 -%}
+                <button type="button" class="lightbox__btn lightbox__nav lightbox__nav--next" data-lightbox-next aria-label="Next image">{% render 'icon', name: 'chevron-right' %}</button>
+              {%- endif -%}
+            </div>
+            <script type="application/json" data-lightbox-json>
+              [
+                {%- for media in product.media -%}
+                  { "src": {{ media.preview_image | image_url: width: 2400 | json }}, "alt": {{ media.alt | default: product.title | json }}, "w": {{ media.preview_image.width | default: 1 }}, "h": {{ media.preview_image.height | default: 1 }}, "type": {{ media.media_type | json }} }{% unless forloop.last %},{% endunless %}
+                {%- endfor -%}
+              ]
+            </script>
+          </dialog>
+        {%- else -%}
+          <div class="gallery__main gallery__main--empty">
+            {{ 'product-1' | placeholder_svg_tag: 'gallery__img placeholder-svg' }}
+          </div>
+        {%- endif -%}
+      </media-gallery>
+
+      <div class="pdp__info">
+        {% render 'product-buybox',
+          product: product,
+          section_id: section.id,
+          mode: 'main',
+          heading_tag: 'h1',
+          show_sku: section.settings.show_sku,
+          show_dynamic_checkout: section.settings.show_dynamic_checkout
+        %}
+
+        {%- if section.settings.show_trust -%}
+          <ul class="buybox-trust" role="list">
+            {%- if section.settings.trust_secure != blank -%}
+              <li>{% render 'icon', name: 'lock', class: 'icon--sm' %}<span>{{ section.settings.trust_secure | escape }}</span></li>
+            {%- endif -%}
+            {%- if warranty != blank -%}
+              <li>{% render 'icon', name: 'shield', class: 'icon--sm' %}<span>{{ warranty | escape }}</span></li>
+            {%- endif -%}
+            {%- if section.settings.trust_returns != blank -%}
+              <li>
+                {% render 'icon', name: 'repeat', class: 'icon--sm' %}
+                {%- if pages['returns-warranty'].url != blank -%}
+                  <a href="{{ pages['returns-warranty'].url }}">{{ section.settings.trust_returns | escape }}</a>
+                {%- elsif shop.refund_policy != blank -%}
+                  <a href="{{ shop.refund_policy.url }}">{{ section.settings.trust_returns | escape }}</a>
+                {%- else -%}
+                  <span>{{ section.settings.trust_returns | escape }}</span>
+                {%- endif -%}
+              </li>
+            {%- endif -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%} Tabs: built from blocks; any tab with no content is skipped. {%- endcomment -%}
+    {%- capture tab_buttons -%}
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign tab_has_content = false
+          case block.type
+            when 'description'
+              if product.description != blank
+                assign tab_has_content = true
+              endif
+            when 'specs'
+              if specs != blank
+                assign tab_has_content = true
+              endif
+            when 'custom'
+              if block.settings.content != blank or block.settings.page != blank
+                assign tab_has_content = true
+              endif
+          endcase
+        -%}
+        {%- if tab_has_content -%}
+          <button type="button" role="tab" class="tabs__tab" id="Tab-{{ block.id }}" aria-controls="Panel-{{ block.id }}" aria-selected="false" tabindex="-1" {{ block.shopify_attributes }}>{{ block.settings.title | escape }}</button>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- if tab_buttons != blank -%}
+      <product-tabs class="tabs">
+        <div class="tabs__list" role="tablist" aria-label="Product details">{{ tab_buttons }}</div>
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'description' -%}
+              {%- if product.description != blank -%}
+                <div class="tabs__panel rte" role="tabpanel" id="Panel-{{ block.id }}" aria-labelledby="Tab-{{ block.id }}" tabindex="0">
+                  <h2 class="tabs__panel-title">{{ block.settings.title | escape }}</h2>
+                  {{ product.description }}
+                </div>
+              {%- endif -%}
+            {%- when 'specs' -%}
+              {%- if specs != blank -%}
+                <div class="tabs__panel" role="tabpanel" id="Panel-{{ block.id }}" aria-labelledby="Tab-{{ block.id }}" tabindex="0">
+                  <h2 class="tabs__panel-title">{{ block.settings.title | escape }}</h2>
+                  {% render 'spec-table', specs: specs %}
+                </div>
+              {%- endif -%}
+            {%- when 'custom' -%}
+              {%- if block.settings.content != blank or block.settings.page != blank -%}
+                <div class="tabs__panel rte" role="tabpanel" id="Panel-{{ block.id }}" aria-labelledby="Tab-{{ block.id }}" tabindex="0">
+                  <h2 class="tabs__panel-title">{{ block.settings.title | escape }}</h2>
+                  {{ block.settings.content }}
+                  {%- if block.settings.page != blank -%}{{ block.settings.page.content }}{%- endif -%}
+                </div>
+              {%- endif -%}
+          {%- endcase -%}
+        {%- endfor -%}
+      </product-tabs>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.sticky_atc and product.available -%}
+    <sticky-atc class="sticky-atc" hidden>
+      <div class="sticky-atc__info">
+        <span class="sticky-atc__title">{{ product.title | escape }}</span>
+        <span class="sticky-atc__price" data-sticky-price>{{ current_variant.price | money }}</span>
+      </div>
+      <button type="button" class="btn btn--primary" data-sticky-add>Add to cart</button>
+    </sticky-atc>
+  {%- endif -%}
+</product-info>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": {{ product.title | json }},
+    "url": {{ request.origin | append: product.url | json }},
+    {%- if product.featured_media -%}
+      "image": [{{ product.featured_media | image_url: width: 1200 | prepend: 'https:' | json }}],
+    {%- endif -%}
+    "description": {{ product.description | strip_html | truncate: 500 | json }},
+    {%- if current_variant.sku != blank -%}"sku": {{ current_variant.sku | json }},{%- endif -%}
+    "brand": { "@type": "Brand", "name": {{ product.vendor | json }} },
+    "offers": [
+      {%- for v in product.variants -%}
+        {
+          "@type": "Offer",
+          {%- if v.sku != blank -%}"sku": {{ v.sku | json }},{%- endif -%}
+          "availability": "http://schema.org/{% if v.available %}InStock{% else %}OutOfStock{% endif %}",
+          "price": {{ v.price | divided_by: 100.0 | json }},
+          "priceCurrency": {{ cart.currency.iso_code | json }},
+          "url": {{ request.origin | append: v.url | json }}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Product details",
+  "class": "section-main-product",
+  "settings": [
+    { "type": "checkbox", "id": "show_sku", "label": "Show SKU", "default": true },
+    { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show dynamic checkout buttons", "default": true, "info": "Express buttons such as Shop Pay, Apple Pay or PayPal, based on your payment settings." },
+    { "type": "checkbox", "id": "sticky_atc", "label": "Show sticky Add to cart bar on mobile", "default": true, "info": "Appears once the main button scrolls out of view." },
+    { "type": "header", "content": "Trust row" },
+    { "type": "checkbox", "id": "show_trust", "label": "Show trust row under Add to cart", "default": true },
+    { "type": "text", "id": "trust_secure", "label": "Checkout line", "default": "Secure, encrypted checkout" },
+    { "type": "text", "id": "trust_warranty", "label": "Warranty line", "default": "12-month warranty", "info": "A product's custom.warranty metafield (single line text) overrides this per product." },
+    { "type": "text", "id": "trust_returns", "label": "Returns line", "default": "30-day returns", "info": "Links to the page with handle returns-warranty if it exists, otherwise to your refund policy." },
+    { "type": "header", "content": "Specifications" },
+    { "type": "paragraph", "content": "The Specs tab reads a product metafield. Supported types: JSON (an object of name and value pairs), multi-line text (one Name: Value per line) or rich text. The tab is hidden for products without it." },
+    { "type": "text", "id": "specs_namespace", "label": "Specs metafield namespace", "default": "custom" },
+    { "type": "text", "id": "specs_key", "label": "Specs metafield key", "default": "specs" }
+  ],
+  "blocks": [
+    {
+      "type": "description",
+      "name": "Description tab",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Tab title", "default": "Overview" }
+      ]
+    },
+    {
+      "type": "specs",
+      "name": "Specs tab",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Tab title", "default": "Specifications" }
+      ]
+    },
+    {
+      "type": "custom",
+      "name": "Custom tab",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Tab title", "default": "Shipping and returns" },
+        { "type": "richtext", "id": "content", "label": "Content" },
+        { "type": "page", "id": "page", "label": "Or show a page" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,42 @@
+<section class="section section--tight">
+  <div class="container container--narrow">
+    <ol class="steps" role="list">
+      {%- for block in section.blocks -%}
+        <li class="step" {{ block.shopify_attributes }}>
+          <span class="step__num" aria-hidden="true">{{ forloop.index }}</span>
+          <div class="step__body">
+            <h2 class="step__title">{{ block.settings.title | escape }}</h2>
+            <div class="rte">{{ block.settings.text }}</div>
+          </div>
+        </li>
+      {%- endfor -%}
+    </ol>
+    <div class="track-actions">
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_url }}" class="btn btn--primary">{% if customer %}View my orders{% else %}Sign in to see my orders{% endif %}</a>
+      {%- endif -%}
+      <a href="{{ section.settings.contact_link | default: routes.root_url }}" class="btn btn--outline">{{ section.settings.contact_label | escape }}</a>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Order tracking steps",
+  "settings": [
+    { "type": "text", "id": "contact_label", "label": "Help button label", "default": "Contact support" },
+    { "type": "url", "id": "contact_link", "label": "Help button link" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Check your email" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Your order confirmation email has a View your order button that opens your live order status page.</p>" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Order tracking steps", "blocks": [{ "type": "step" }] }]
+}
+{% endschema %}

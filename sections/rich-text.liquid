@@ -1,0 +1,26 @@
+<section class="section">
+  <div class="container container--narrow rich-text rich-text--{{ section.settings.align }}">
+    {%- if section.settings.heading != blank -%}<h2 class="section-head__title">{{ section.settings.heading | escape }}</h2>{%- endif -%}
+    {%- if section.settings.text != blank -%}<div class="rte">{{ section.settings.text }}</div>{%- endif -%}
+    {%- if section.settings.button_label != blank -%}
+      <a href="{{ section.settings.button_link | default: routes.all_products_collection_url }}" class="btn btn--primary">{{ section.settings.button_label | escape }}</a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Rich text",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Tech we'd buy ourselves" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Tell customers what makes your store different.</p>" },
+    { "type": "text", "id": "button_label", "label": "Button label" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "select", "id": "align", "label": "Alignment", "options": [
+      { "value": "left", "label": "Left" },
+      { "value": "center", "label": "Center" }
+    ], "default": "center" }
+  ],
+  "presets": [{ "name": "Rich text" }]
+}
+{% endschema %}

@@ -1,0 +1,40 @@
+{%- liquid
+  assign has_any = false
+  if settings.support_email != blank or settings.support_phone != blank or settings.support_hours != blank or settings.store_address != blank
+    assign has_any = true
+  endif
+-%}
+<section class="section section--tight">
+  <div class="container container--narrow">
+    {%- if section.settings.text != blank -%}<div class="rte contact-intro">{{ section.settings.text }}</div>{%- endif -%}
+    {%- if has_any -%}
+      <ul class="contact-cards" role="list">
+        {%- if settings.support_email != blank -%}
+          <li class="contact-card">{% render 'icon', name: 'mail' %}<span class="contact-card__label">Email</span><a href="mailto:{{ settings.support_email }}">{{ settings.support_email | escape }}</a></li>
+        {%- endif -%}
+        {%- if settings.support_phone != blank -%}
+          <li class="contact-card">{% render 'icon', name: 'phone' %}<span class="contact-card__label">Phone</span><a href="tel:{{ settings.support_phone | remove: ' ' }}">{{ settings.support_phone | escape }}</a></li>
+        {%- endif -%}
+        {%- if settings.support_hours != blank -%}
+          <li class="contact-card">{% render 'icon', name: 'clock' %}<span class="contact-card__label">Support hours</span><span>{{ settings.support_hours | escape | newline_to_br }}</span></li>
+        {%- endif -%}
+        {%- if settings.store_address != blank -%}
+          <li class="contact-card">{% render 'icon', name: 'map-pin' %}<span class="contact-card__label">Address</span><address>{{ settings.store_address | escape | newline_to_br }}</address></li>
+        {%- endif -%}
+      </ul>
+    {%- elsif request.design_mode -%}
+      <p class="form-status form-status--error">Add your support email, phone, hours or address in Theme settings > Store details to show them here.</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Contact details",
+  "settings": [
+    { "type": "richtext", "id": "text", "label": "Intro", "default": "<p>Questions about a product, an order or a return? Send us a message with the form below and include your order number if you have one. We aim to reply within one business day.</p>" },
+    { "type": "paragraph", "content": "Email, phone, hours and address come from Theme settings > Store details. Anything left empty is hidden." }
+  ],
+  "presets": [{ "name": "Contact details" }]
+}
+{% endschema %}

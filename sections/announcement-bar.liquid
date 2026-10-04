@@ -1,0 +1,64 @@
+<div class="utility-bar">
+  <div class="utility-bar__inner container">
+    {%- liquid
+      assign show_free_ship = false
+      if section.settings.show_free_shipping and settings.free_shipping_threshold > 0
+        assign show_free_ship = true
+      endif
+    -%}
+    {%- if section.blocks.size > 0 or show_free_ship -%}
+      <ul class="utility-bar__messages" role="list">
+        {%- if show_free_ship -%}
+          <li class="utility-bar__message">
+            {% render 'icon', name: 'truck', class: 'icon--sm' %}
+            <span>Free shipping on orders over {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}</span>
+          </li>
+        {%- endif -%}
+        {%- for block in section.blocks -%}
+          <li class="utility-bar__message" {{ block.shopify_attributes }}>
+            {% render 'icon', name: block.settings.icon, class: 'icon--sm' %}
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}">{{ block.settings.text | escape }}</a>
+            {%- else -%}
+              <span>{{ block.settings.text | escape }}</span>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    {%- if section.settings.menu != blank and section.settings.menu.links.size > 0 -%}
+      <ul class="utility-bar__links" role="list">
+        {%- for link in section.settings.menu.links -%}
+          <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+        {%- endfor -%}
+      </ul>
+    {%- elsif settings.support_phone != blank -%}
+      <p class="utility-bar__links">
+        <a href="tel:{{ settings.support_phone | remove: ' ' }}">Support: {{ settings.support_phone }}</a>
+      </p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Utility bar",
+  "class": "section-utility",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "checkbox", "id": "show_free_shipping", "label": "Show free shipping message", "default": true, "info": "Uses the threshold in Theme settings > Cart. Hidden while the threshold is 0. Only turn the threshold on once a matching free shipping rate exists in Settings > Shipping and delivery." },
+    { "type": "link_list", "id": "menu", "label": "Right-side links", "info": "Optional small links, e.g. Help center, Track order, Contact. If empty, the support phone from Theme settings is shown." }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Tracked shipping on every order" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "select", "id": "icon", "label": "Icon", "options": [{"value": "truck", "label": "Truck"}, {"value": "shield", "label": "Shield"}, {"value": "repeat", "label": "Repeat"}, {"value": "chat", "label": "Chat"}, {"value": "headset", "label": "Headset"}, {"value": "lock", "label": "Lock"}, {"value": "box", "label": "Box"}, {"value": "gift", "label": "Gift"}, {"value": "clock", "label": "Clock"}, {"value": "percent", "label": "Percent"}, {"value": "bolt", "label": "Bolt"}, {"value": "check-circle", "label": "Check circle"}], "default": "truck" }
+      ]
+    }
+  ]
+}
+{% endschema %}

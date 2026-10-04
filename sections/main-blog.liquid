@@ -1,0 +1,35 @@
+<div class="container page">
+  <h1 class="page-title">{{ blog.title | escape }}</h1>
+  {%- paginate blog.articles by 12 -%}
+    {%- if blog.articles.size > 0 -%}
+      <ul class="article-grid" role="list">
+        {%- for article in blog.articles -%}
+          <li>
+            <article class="article-card">
+              <a href="{{ article.url }}" class="article-card__media ratio ratio--landscape" tabindex="-1" aria-hidden="true">
+                {%- if article.image -%}
+                  {{ article.image | image_url: width: 800 | image_tag: loading: 'lazy', widths: '400,600,800', sizes: '(min-width: 990px) 33vw, 100vw', alt: '' }}
+                {%- else -%}
+                  {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+              </a>
+              <p class="article-card__date"><time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'date' }}</time></p>
+              <h2 class="article-card__title"><a href="{{ article.url }}">{{ article.title | escape }}</a></h2>
+              <p class="article-card__excerpt">{{ article.excerpt_or_content | strip_html | truncatewords: 26 }}</p>
+            </article>
+          </li>
+        {%- endfor -%}
+      </ul>
+      {% render 'pagination', paginate: paginate %}
+    {%- else -%}
+      <p class="empty-state">No posts yet. Check back soon.</p>
+    {%- endif -%}
+  {%- endpaginate -%}
+</div>
+
+{% schema %}
+{
+  "name": "Blog posts",
+  "settings": []
+}
+{% endschema %}

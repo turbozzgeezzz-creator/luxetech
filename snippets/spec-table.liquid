@@ -1,0 +1,49 @@
+{%- comment -%}
+  Renders a specifications metafield as a two-column table.
+  Supports: json (object of name/value pairs, or a list of {label, value}),
+  multi_line_text_field (one "Name: Value" per line), rich_text_field, and
+  anything else as plain text.
+{%- endcomment -%}
+{%- case specs.type -%}
+  {%- when 'json' -%}
+    <table class="spec-table">
+      <tbody>
+        {%- for item in specs.value -%}
+          {%- liquid
+            if item.label != blank
+              assign spec_name = item.label
+              assign spec_value = item.value
+            elsif item.name != blank
+              assign spec_name = item.name
+              assign spec_value = item.value
+            else
+              assign spec_name = item.first
+              assign spec_value = item.last
+            endif
+          -%}
+          <tr><th scope="row">{{ spec_name | escape }}</th><td>{{ spec_value | escape }}</td></tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+  {%- when 'multi_line_text_field' -%}
+    {%- assign lines = specs.value | newline_to_br | split: '<br />' -%}
+    <table class="spec-table">
+      <tbody>
+        {%- for line in lines -%}
+          {%- assign line = line | strip -%}
+          {%- if line == blank -%}{%- continue -%}{%- endif -%}
+          {%- if line contains ':' -%}
+            {%- assign spec_name = line | split: ':' | first -%}
+            {%- assign spec_value = line | remove_first: spec_name | remove_first: ':' | strip -%}
+            <tr><th scope="row">{{ spec_name | strip | escape }}</th><td>{{ spec_value | escape }}</td></tr>
+          {%- else -%}
+            <tr><td colspan="2">{{ line | escape }}</td></tr>
+          {%- endif -%}
+        {%- endfor -%}
+      </tbody>
+    </table>
+  {%- when 'rich_text_field' -%}
+    <div class="rte">{{ specs | metafield_tag }}</div>
+  {%- else -%}
+    <div class="rte">{{ specs.value | escape | newline_to_br }}</div>
+{%- endcase -%}

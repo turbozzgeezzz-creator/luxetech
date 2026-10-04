@@ -1,0 +1,15 @@
+{%- comment -%}
+  Shown only inside the theme editor when a product section has no collection
+  selected, so the merchant can see the layout. Never rendered on the live store.
+{%- endcomment -%}
+<article class="card card--placeholder">
+  <div class="card__media ratio ratio--{{ settings.card_image_ratio }}">
+    {{ 'product-' | append: index | placeholder_svg_tag: 'card__img placeholder-svg' }}
+  </div>
+  <div class="card__body">
+    <p class="card__label">Brand</p>
+    <h3 class="card__title">Your product title</h3>
+    <div class="price"><span class="price__current">{{ 19900 | money }}</span></div>
+    <p class="card__sku">Pick a collection in the theme editor</p>
+  </div>
+</article>

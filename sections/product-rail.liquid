@@ -1,0 +1,95 @@
+{%- liquid
+  assign limit = section.settings.limit
+  assign source = section.settings.collection
+  if source == blank
+    assign source = collections.all
+  endif
+  assign only_sale = false
+  if section.settings.source == 'sale'
+    assign only_sale = true
+  endif
+
+  assign match_count = 0
+  for product in source.products limit: 50
+    if only_sale and product.compare_at_price_max <= product.price_min
+      continue
+    endif
+    assign match_count = match_count | plus: 1
+  endfor
+  assign has_products = false
+  if match_count > 0
+    assign has_products = true
+  endif
+-%}
+{%- if has_products or request.design_mode -%}
+<section class="section{% if section.settings.style == 'deals' %} section--deals{% endif %}" aria-labelledby="Heading-{{ section.id }}">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <h2 class="section-head__title" id="Heading-{{ section.id }}">
+          {%- if section.settings.style == 'deals' -%}{% render 'icon', name: 'bolt', class: 'section-head__icon' %}{%- endif -%}
+          {{- section.settings.heading | escape -}}
+        </h2>
+        {%- if section.settings.subheading != blank -%}
+          <p class="section-head__sub">{{ section.settings.subheading | escape }}</p>
+        {%- endif -%}
+      </div>
+      <div class="section-head__aside">
+        {%- if has_products -%}
+          <a href="{{ source.url | default: routes.all_products_collection_url }}" class="section-head__link">{{ section.settings.link_label | default: 'View all' | escape }}</a>
+        {%- endif -%}
+        <div class="rail-arrows" data-rail-arrows hidden>
+          <button type="button" class="rail-arrow" data-rail-prev aria-label="Scroll products left">{% render 'icon', name: 'chevron-left', class: 'icon--sm' %}</button>
+          <button type="button" class="rail-arrow" data-rail-next aria-label="Scroll products right">{% render 'icon', name: 'chevron-right', class: 'icon--sm' %}</button>
+        </div>
+      </div>
+    </div>
+
+    <product-rail class="rail">
+      <ul class="rail__track" role="list" tabindex="0" aria-label="{{ section.settings.heading | escape }}">
+        {%- if has_products -%}
+          {%- assign shown = 0 -%}
+          {%- for product in source.products limit: 50 -%}
+            {%- if only_sale and product.compare_at_price_max <= product.price_min -%}{%- continue -%}{%- endif -%}
+            {%- if shown >= limit -%}{%- break -%}{%- endif -%}
+            {%- assign shown = shown | plus: 1 -%}
+            <li class="rail__item">
+              {% render 'product-card', product: product, section_id: section.id, sizes: '(min-width: 1200px) 270px, (min-width: 750px) 33vw, 70vw' %}
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..4) -%}
+            <li class="rail__item">{% render 'product-card-placeholder', index: i %}</li>
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+    </product-rail>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product rail",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Best sellers" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "What customers are reordering this week." },
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "If empty, products come from your whole catalog." },
+    { "type": "select", "id": "source", "label": "Show", "options": [
+      { "value": "all", "label": "All products in the collection" },
+      { "value": "sale", "label": "Only products on sale (compare-at price set)" }
+    ], "default": "all" },
+    { "type": "range", "id": "limit", "label": "Products to show", "min": 4, "max": 16, "step": 1, "default": 10 },
+    { "type": "text", "id": "link_label", "label": "View all label", "default": "View all" },
+    { "type": "select", "id": "style", "label": "Style", "options": [
+      { "value": "default", "label": "Standard" },
+      { "value": "deals", "label": "Deals band (Volt accent)" }
+    ], "default": "default" },
+    { "type": "paragraph", "content": "The section hides itself on the live store when there are no matching products, so it never shows an empty rail." }
+  ],
+  "presets": [
+    { "name": "Product rail" },
+    { "name": "Deals rail", "settings": { "heading": "Today's deals", "subheading": "Marked-down prices on in-stock tech.", "style": "deals", "source": "sale", "link_label": "All deals" } }
+  ]
+}
+{% endschema %}

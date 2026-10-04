@@ -1,0 +1,112 @@
+{%- comment -%}
+  Product card used on rails, collection grids, search results and recommendations.
+
+  Params:
+  - product: product object (required)
+  - section_id: used to keep quick-add form ids unique on the page
+  - lazy: default true; pass false for above-the-fold cards
+  - sizes: image sizes attribute
+  - heading_tag: default 'h3'
+{%- endcomment -%}
+{%- liquid
+  assign v = product.selected_or_first_available_variant
+  assign heading_tag = heading_tag | default: 'h3'
+  assign img_sizes = sizes | default: '(min-width: 1200px) 280px, (min-width: 750px) 30vw, 50vw'
+  assign loading = 'lazy'
+  if lazy == false
+    assign loading = 'eager'
+  endif
+
+  assign img_alt = product.featured_media.alt | default: product.title
+  assign label = blank
+  if settings.card_label == 'vendor' and product.vendor != blank and product.vendor != shop.name
+    assign label = product.vendor
+  elsif settings.card_label != 'none' and product.type != blank
+    assign label = product.type
+  endif
+-%}
+{%- assign quick_style = settings.card_quick_style | default: 'button' -%}
+{%- capture quick_html -%}
+    {%- if settings.card_quick_add and product.available -%}
+      <div class="card__quick card__quick--{{ quick_style }}">
+        {%- if product.has_only_default_variant -%}
+          <product-form>
+            {%- assign form_id = 'QuickAdd-' | append: section_id | append: '-' | append: product.id -%}
+            {%- form 'product', product, id: form_id, class: 'quick-add-form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+              <input type="hidden" name="id" value="{{ v.id }}">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn--primary btn--sm btn--block card__quick-btn" aria-label="Add {{ product.title | escape }} to cart">
+                {% render 'icon', name: 'cart', class: 'icon--sm' %}
+                <span class="card__quick-text">Add to cart</span>
+              </button>
+              <p class="form-error" role="alert" hidden></p>
+            {%- endform -%}
+          </product-form>
+        {%- else -%}
+          <button type="button" class="btn btn--primary btn--sm btn--block card__quick-btn" data-quick-add="{{ product.url }}" aria-haspopup="dialog" aria-label="Choose options for {{ product.title | escape }}">
+            {% render 'icon', name: 'plus', class: 'icon--sm card__quick-icon--touch' %}
+            <span class="card__quick-text">Choose options</span>
+          </button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+{%- endcapture -%}
+{%- capture cat_color -%}{% render 'category-color', type: product.type %}{%- endcapture -%}
+{%- assign cat_color = cat_color | strip -%}
+
+<article class="card{% if product.available == false %} card--soldout{% endif %}" data-product-id="{{ product.id }}">
+  <div class="card__media ratio ratio--{{ settings.card_image_ratio }}">
+    <a href="{{ product.url }}" class="card__media-link" tabindex="-1" aria-hidden="true">
+      {%- if product.featured_media -%}
+        {{ product.featured_media.preview_image | image_url: width: 800 | image_tag:
+          loading: loading,
+          widths: '200,300,400,500,600,800',
+          sizes: img_sizes,
+          alt: img_alt,
+          class: 'card__img card__img--primary'
+        }}
+        {%- if settings.card_second_image and product.media.size > 1 -%}
+          {{ product.media[1].preview_image | image_url: width: 800 | image_tag:
+            loading: 'lazy',
+            widths: '200,300,400,500,600,800',
+            sizes: img_sizes,
+            alt: '',
+            class: 'card__img card__img--secondary'
+          }}
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'card__img placeholder-svg' }}
+      {%- endif -%}
+    </a>
+
+    {% render 'product-badges', product: product %}
+
+    {%- if quick_style == 'hover' -%}{{ quick_html }}{%- endif -%}
+  </div>
+
+  <div class="card__body">
+    {%- if label != blank -%}
+      <p class="card__label">
+        {%- if cat_color != blank -%}<span class="cat-tab" style="--cat: {{ cat_color }};" aria-hidden="true"></span>{%- endif -%}
+        {{- label | escape -}}
+      </p>
+    {%- endif -%}
+    <{{ heading_tag }} class="card__title">
+      <a href="{{ product.url }}" class="card__link">{{ product.title | escape }}</a>
+    </{{ heading_tag }}>
+
+    {%- if settings.card_show_rating -%}
+      {% render 'rating', product: product %}
+    {%- endif -%}
+
+    {% render 'price', product: product %}
+
+    {% render 'stock-status', variant: v %}
+
+    {%- if settings.card_show_sku and v.sku != blank -%}
+      <p class="card__sku">SKU {{ v.sku | escape }}</p>
+    {%- endif -%}
+
+    {%- if quick_style == 'button' -%}{{ quick_html }}{%- endif -%}
+  </div>
+</article>

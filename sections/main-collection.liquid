@@ -1,0 +1,92 @@
+{%- liquid
+  assign per_page = section.settings.per_page
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+-%}
+<div class="container collection-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol role="list">
+      <li><a href="{{ routes.root_url }}">Home</a></li>
+      <li><a href="{{ routes.collections_url }}">Collections</a></li>
+      <li><span aria-current="page">{{ collection.title | escape }}</span></li>
+    </ol>
+  </nav>
+
+  <header class="collection-hero{% if section.settings.show_image and collection.image %} collection-hero--image{% endif %}">
+    <div class="collection-hero__copy">
+      <h1 class="collection-hero__title">{{ collection.title | escape }}</h1>
+      {%- if section.settings.show_description and collection.description != blank -%}
+        <div class="collection-hero__desc rte">{{ collection.description }}</div>
+      {%- endif -%}
+    </div>
+    {%- if section.settings.show_image and collection.image -%}
+      <div class="collection-hero__media">
+        {{ collection.image | image_url: width: 600 | image_tag: loading: 'eager', widths: '300,450,600', sizes: '(min-width: 750px) 280px, 40vw', class: 'collection-hero__img' }}
+      </div>
+    {%- endif -%}
+  </header>
+
+  {%- paginate collection.products by per_page -%}
+    <facet-filters class="collection-layout{% if collection.filters.size == 0 %} collection-layout--no-filters{% endif %}" data-section-id="{{ section.id }}">
+      {% render 'facets',
+        results: collection,
+        section_id: section.id,
+        sort_options: collection.sort_options,
+        sort_by: sort_by,
+        clear_url: collection.url,
+        count: collection.products_count
+      %}
+
+      <div class="collection-results" id="ProductGrid-{{ section.id }}" data-facet-swap>
+        {% render 'active-filters', results: collection, section_id: section.id, clear_url: collection.url %}
+
+        {%- if collection.products.size > 0 -%}
+          <ul class="product-grid product-grid--{{ section.settings.columns }}" role="list">
+            {%- for product in collection.products -%}
+              {%- liquid
+                assign card_lazy = true
+                if forloop.index <= 4
+                  assign card_lazy = false
+                endif
+              -%}
+              <li>{% render 'product-card', product: product, section_id: section.id, lazy: card_lazy, heading_tag: 'h2', sizes: '(min-width: 1200px) 280px, (min-width: 990px) 28vw, (min-width: 750px) 33vw, 50vw' %}</li>
+            {%- endfor -%}
+          </ul>
+          {% render 'pagination', paginate: paginate %}
+        {%- else -%}
+          <div class="empty-state">
+            {%- assign filters_applied = false -%}
+            {%- for filter in collection.filters -%}
+              {%- if filter.active_values.size > 0 or filter.min_value.value != nil or filter.max_value.value != nil -%}{%- assign filters_applied = true -%}{%- endif -%}
+            {%- endfor -%}
+            {% render 'icon', name: 'search', class: 'empty-state__icon' %}
+            {%- if filters_applied -%}
+              <h2 class="empty-state__title">No products match these filters</h2>
+              <p>Try removing a filter or widening the price range.</p>
+              <a href="{{ collection.url }}" class="btn btn--primary" data-facet-link>Clear all filters</a>
+            {%- else -%}
+              <h2 class="empty-state__title">Nothing here yet</h2>
+              <p>We're stocking this category now. In the meantime, browse everything we carry.</p>
+              <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Shop all products</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </facet-filters>
+  {%- endpaginate -%}
+</div>
+
+{% schema %}
+{
+  "name": "Collection products",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "select", "id": "columns", "label": "Columns on desktop", "options": [
+      { "value": "3", "label": "3" },
+      { "value": "4", "label": "4" }
+    ], "default": "3" },
+    { "type": "checkbox", "id": "show_description", "label": "Show collection description", "default": true },
+    { "type": "checkbox", "id": "show_image", "label": "Show collection image", "default": false },
+    { "type": "paragraph", "content": "Filters come from Shopify's Search & Discovery app. Add price, availability, vendor, product type and option filters (like Color) there and they appear here automatically." }
+  ]
+}
+{% endschema %}

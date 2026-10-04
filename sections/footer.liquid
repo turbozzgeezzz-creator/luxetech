@@ -1,0 +1,178 @@
+{%- liquid
+  assign has_social = false
+  if settings.social_instagram != blank or settings.social_tiktok != blank or settings.social_youtube != blank or settings.social_facebook != blank or settings.social_x != blank or settings.social_pinterest != blank
+    assign has_social = true
+  endif
+-%}
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'about' -%}
+            <div class="footer__col footer__col--about" {{ block.shopify_attributes }}>
+              <a href="{{ routes.root_url }}" class="footer__brand">
+                {%- if settings.logo != blank and block.settings.show_logo -%}
+                  {{ settings.logo | image_url: width: 400 | image_tag: loading: 'lazy', widths: '200,400', sizes: '180px', alt: shop.name, class: 'footer__logo' }}
+                {%- else -%}
+                  <span class="wordmark wordmark--light">{{ shop.name | escape }}</span>
+                {%- endif -%}
+              </a>
+              {%- if block.settings.text != blank -%}
+                <div class="footer__about rte">{{ block.settings.text }}</div>
+              {%- endif -%}
+              {%- if settings.store_address != blank or settings.support_hours != blank or settings.support_email != blank or settings.support_phone != blank -%}
+                <ul class="footer__contact" role="list">
+                  {%- if settings.store_address != blank -%}
+                    <li>{% render 'icon', name: 'map-pin', class: 'icon--sm' %}<address>{{ settings.store_address | escape | newline_to_br }}</address></li>
+                  {%- endif -%}
+                  {%- if settings.support_hours != blank -%}
+                    <li>{% render 'icon', name: 'clock', class: 'icon--sm' %}<span>{{ settings.support_hours | escape | newline_to_br }}</span></li>
+                  {%- endif -%}
+                  {%- if settings.support_phone != blank -%}
+                    <li>{% render 'icon', name: 'phone', class: 'icon--sm' %}<a href="tel:{{ settings.support_phone | remove: ' ' }}">{{ settings.support_phone | escape }}</a></li>
+                  {%- endif -%}
+                  {%- if settings.support_email != blank -%}
+                    <li>{% render 'icon', name: 'mail', class: 'icon--sm' %}<a href="mailto:{{ settings.support_email }}">{{ settings.support_email | escape }}</a></li>
+                  {%- endif -%}
+                </ul>
+              {%- endif -%}
+            </div>
+
+          {%- when 'links' -%}
+            <nav class="footer__col" aria-labelledby="FooterHeading-{{ block.id }}" {{ block.shopify_attributes }}>
+              <h2 class="footer__heading" id="FooterHeading-{{ block.id }}">{{ block.settings.heading | escape }}</h2>
+              <ul class="footer__links" role="list">
+                {%- if block.settings.menu != blank and block.settings.menu.links.size > 0 -%}
+                  {%- for link in block.settings.menu.links -%}
+                    <li><a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+                  {%- endfor -%}
+                {%- else -%}
+                  {%- case block.settings.fallback -%}
+                    {%- when 'shop' -%}
+                      <li><a href="{{ routes.all_products_collection_url }}">All products</a></li>
+                      <li><a href="{{ routes.collections_url }}">All categories</a></li>
+                      <li><a href="{{ routes.search_url }}">Search</a></li>
+                    {%- when 'help' -%}
+                      {%- if pages.contact.url != blank -%}<li><a href="{{ pages.contact.url }}">Contact us</a></li>{%- endif -%}
+                      {%- if pages.faq.url != blank -%}<li><a href="{{ pages.faq.url }}">FAQ</a></li>{%- endif -%}
+                      {%- if pages['track-order'].url != blank -%}
+                        <li><a href="{{ pages['track-order'].url }}">Track my order</a></li>
+                      {%- elsif shop.customer_accounts_enabled -%}
+                        <li><a href="{{ routes.account_url }}">Track my order</a></li>
+                      {%- endif -%}
+                      {%- if pages['shipping-delivery'].url != blank -%}
+                        <li><a href="{{ pages['shipping-delivery'].url }}">Shipping and delivery</a></li>
+                      {%- elsif shop.shipping_policy != blank -%}
+                        <li><a href="{{ shop.shipping_policy.url }}">Shipping and delivery</a></li>
+                      {%- endif -%}
+                      {%- if pages['returns-warranty'].url != blank -%}
+                        <li><a href="{{ pages['returns-warranty'].url }}">Returns and warranty</a></li>
+                      {%- elsif shop.refund_policy != blank -%}
+                        <li><a href="{{ shop.refund_policy.url }}">Returns and refunds</a></li>
+                      {%- endif -%}
+                    {%- when 'company' -%}
+                      {%- if pages['about-us'].url != blank -%}
+                        <li><a href="{{ pages['about-us'].url }}">About us</a></li>
+                      {%- elsif pages.about.url != blank -%}
+                        <li><a href="{{ pages.about.url }}">About us</a></li>
+                      {%- endif -%}
+                      {%- if blogs.news.url != blank -%}<li><a href="{{ blogs.news.url }}">Blog</a></li>{%- endif -%}
+                      {%- if shop.privacy_policy != blank -%}<li><a href="{{ shop.privacy_policy.url }}">Privacy policy</a></li>{%- endif -%}
+                      {%- if shop.terms_of_service != blank -%}<li><a href="{{ shop.terms_of_service.url }}">Terms of service</a></li>{%- endif -%}
+                  {%- endcase -%}
+                {%- endif -%}
+              </ul>
+            </nav>
+
+          {%- when 'newsletter' -%}
+            <div class="footer__col footer__col--newsletter" {{ block.shopify_attributes }}>
+              <h2 class="footer__heading">{{ block.settings.heading | escape }}</h2>
+              {%- if block.settings.text != blank -%}<p class="footer__text">{{ block.settings.text | escape }}</p>{%- endif -%}
+              {% render 'newsletter-form', id: block.id, button_label: block.settings.button_label %}
+              {%- if has_social -%}
+                <ul class="social" role="list" aria-label="Follow us">
+                  {%- if settings.social_instagram != blank -%}<li><a href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram (opens in a new tab)">{% render 'icon', name: 'instagram' %}</a></li>{%- endif -%}
+                  {%- if settings.social_tiktok != blank -%}<li><a href="{{ settings.social_tiktok }}" target="_blank" rel="noopener" aria-label="TikTok (opens in a new tab)">{% render 'icon', name: 'tiktok' %}</a></li>{%- endif -%}
+                  {%- if settings.social_youtube != blank -%}<li><a href="{{ settings.social_youtube }}" target="_blank" rel="noopener" aria-label="YouTube (opens in a new tab)">{% render 'icon', name: 'youtube' %}</a></li>{%- endif -%}
+                  {%- if settings.social_facebook != blank -%}<li><a href="{{ settings.social_facebook }}" target="_blank" rel="noopener" aria-label="Facebook (opens in a new tab)">{% render 'icon', name: 'facebook' %}</a></li>{%- endif -%}
+                  {%- if settings.social_x != blank -%}<li><a href="{{ settings.social_x }}" target="_blank" rel="noopener" aria-label="X (opens in a new tab)">{% render 'icon', name: 'x' %}</a></li>{%- endif -%}
+                  {%- if settings.social_pinterest != blank -%}<li><a href="{{ settings.social_pinterest }}" target="_blank" rel="noopener" aria-label="Pinterest (opens in a new tab)">{% render 'icon', name: 'pinterest' %}</a></li>{%- endif -%}
+                </ul>
+              {%- endif -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <div class="container footer__bottom-inner">
+      <p class="footer__copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | link_to: routes.root_url }}. {{ powered_by_link }}</p>
+      {%- if section.settings.show_policies and shop.policies.size > 0 -%}
+        <ul class="footer__policies" role="list">
+          {%- for policy in shop.policies -%}
+            <li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+        <div class="payment-icons">
+          <span class="visually-hidden">Payment methods accepted</span>
+          <ul class="payment-icons__list" role="list">
+            {%- for type in shop.enabled_payment_types -%}
+              <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true, "info": "Pulled automatically from your Shopify payment settings." },
+    { "type": "checkbox", "id": "show_policies", "label": "Show policy links", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "about",
+      "name": "About and contact",
+      "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_logo", "label": "Show logo image", "default": false },
+        { "type": "richtext", "id": "text", "label": "About text", "default": "<p>Independent online store for everyday tech, from Luxe Dealers. Clear specs, real stock levels and straightforward returns.</p>" },
+        { "type": "paragraph", "content": "Address, support hours, phone and email come from Theme settings > Store details and only show when filled in." }
+      ]
+    },
+    {
+      "type": "links",
+      "name": "Link column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Shop" },
+        { "type": "link_list", "id": "menu", "label": "Menu" },
+        { "type": "select", "id": "fallback", "label": "Links to show if no menu is chosen", "options": [
+          { "value": "shop", "label": "Shop links" },
+          { "value": "help", "label": "Help links (contact, shipping, returns)" },
+          { "value": "company", "label": "Company links (about, blog, policies)" }
+        ], "default": "shop" }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter and social",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Deals in your inbox" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Restocks, new products and subscriber offers." },
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Sign up" }
+      ]
+    }
+  ]
+}
+{% endschema %}

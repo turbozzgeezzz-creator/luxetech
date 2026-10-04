@@ -1,0 +1,40 @@
+{%- comment -%}
+  Color-coded stock and fulfillment line.
+  States: in (green), low (amber), backorder (grey), out (grey).
+  Uses real inventory data only; untracked variants simply read as in stock.
+
+  Params:
+  - variant: variant object (required)
+  - id_prefix: optional; adds an id so the product page can swap it
+{%- endcomment -%}
+{%- liquid
+  assign state = 'in'
+  assign tracked = false
+  if variant.inventory_management == 'shopify'
+    assign tracked = true
+  endif
+
+  if variant == blank or variant.available == false
+    assign state = 'out'
+  elsif tracked and variant.inventory_quantity <= 0
+    assign state = 'backorder'
+  elsif tracked and variant.inventory_quantity <= settings.low_stock_threshold
+    assign state = 'low'
+  endif
+-%}
+<p class="stock stock--{{ state }}"{% if id_prefix %} id="{{ id_prefix }}-stock"{% endif %}>
+  <span class="stock__dot" aria-hidden="true"></span>
+  <span class="stock__text">
+    {%- case state -%}
+      {%- when 'in' -%}
+        {{- settings.stock_in_text | default: 'In stock' -}}
+        {%- if settings.stock_shipping_note != blank %} &mdash; {{ settings.stock_shipping_note }}{% endif -%}
+      {%- when 'low' -%}
+        Low stock, only {{ variant.inventory_quantity }} left
+      {%- when 'backorder' -%}
+        {{- settings.stock_backorder_text | default: 'Backordered' -}}
+      {%- else -%}
+        Sold out
+    {%- endcase -%}
+  </span>
+</p>

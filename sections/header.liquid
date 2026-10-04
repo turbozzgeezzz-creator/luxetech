@@ -1,0 +1,328 @@
+{%- liquid
+  assign fallback_menu = section.settings.menu
+  assign use_blocks = false
+  if section.blocks.size > 0
+    assign use_blocks = true
+  endif
+-%}
+
+<header class="header" data-sticky="{{ section.settings.sticky }}">
+  <div class="header__main container">
+    <button type="button" class="header__icon header__burger" aria-label="Open menu" aria-controls="MenuDrawer" aria-expanded="false" data-drawer-open="MenuDrawer">
+      {% render 'icon', name: 'menu' %}
+    </button>
+
+    <a href="{{ routes.root_url }}" class="header__logo" aria-label="{{ shop.name | escape }} home">
+      {%- if settings.logo != blank -%}
+        {{ settings.logo | image_url: width: 520 | image_tag:
+          loading: 'eager',
+          widths: '160,260,390,520',
+          sizes: '(min-width: 750px) var(--logo-width), 130px',
+          alt: shop.name,
+          class: 'header__logo-img'
+        }}
+      {%- else -%}
+        <span class="wordmark">{{ shop.name | escape }}</span>
+      {%- endif -%}
+    </a>
+
+    <predictive-search class="header__search" data-enabled="{{ settings.predictive_search }}">
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-form">
+        <label for="HeaderSearch" class="visually-hidden">Search the store</label>
+        <input
+          id="HeaderSearch"
+          class="search-form__input"
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="{{ settings.search_placeholder | escape }}"
+          autocomplete="off"
+          role="combobox"
+          aria-expanded="false"
+          aria-controls="PredictiveResults"
+          aria-autocomplete="list"
+        >
+        <input type="hidden" name="options[prefix]" value="last">
+        <button type="submit" class="search-form__submit" aria-label="Search">
+          {% render 'icon', name: 'search' %}
+        </button>
+      </form>
+      <div class="predictive" id="PredictiveResults" hidden></div>
+    </predictive-search>
+
+    <div class="header__actions">
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="header__icon header__account">
+          {% render 'icon', name: 'user' %}
+          <span class="header__icon-label">
+            {%- if customer -%}<small>Hi, {{ customer.first_name | default: 'there' | escape }}</small>Account{%- else -%}<small>Sign in</small>Account{%- endif -%}
+          </span>
+        </a>
+      {%- endif -%}
+      <a href="{{ routes.cart_url }}" class="header__icon header__cart" data-cart-toggle aria-label="Cart, {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}">
+        {% render 'icon', name: 'cart' %}
+        <span class="cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+        <span class="header__icon-label"><small>{{ cart.total_price | money }}</small>Cart</span>
+      </a>
+    </div>
+  </div>
+
+  <mega-menu class="mega-nav" role="navigation" aria-label="Shop by category">
+    <ul class="mega-nav__list container" role="list">
+      {%- if use_blocks -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign panel_id = 'MegaPanel-' | append: block.id
+            assign panel_links = nil
+            if block.type == 'mega'
+              if block.settings.menu != blank and block.settings.menu.links.size > 0
+                assign panel_links = block.settings.menu.links
+              else
+                assign menu_handle = block.settings.title | handle
+                if linklists[menu_handle].links.size > 0
+                  assign panel_links = linklists[menu_handle].links
+                else
+                  for main_link in fallback_menu.links
+                    if main_link.title == block.settings.title and main_link.links.size > 0
+                      assign panel_links = main_link.links
+                      break
+                    endif
+                  endfor
+                endif
+              endif
+            endif
+            assign has_panel = false
+            if panel_links.size > 0
+              assign has_panel = true
+            endif
+          -%}
+          <li class="mega-nav__item{% if block.type == 'link' and block.settings.highlight %} mega-nav__item--highlight{% endif %}" {{ block.shopify_attributes }}>
+            {%- if has_panel -%}
+              <button type="button" class="mega-nav__top" aria-expanded="false" aria-controls="{{ panel_id }}"{% if block.settings.color != blank %} style="--cat: {{ block.settings.color }};"{% endif %}>
+                {% render 'icon', name: block.settings.icon, class: 'mega-nav__icon' %}
+                <span>{{ block.settings.title | escape }}</span>
+                {% render 'icon', name: 'chevron-down', class: 'icon--xs mega-nav__chevron' %}
+              </button>
+              <div class="mega-panel" id="{{ panel_id }}" hidden>
+                <div class="mega-panel__inner container">
+                  <div class="mega-panel__links">
+                    <a href="{{ block.settings.link | default: panel_links.first.url }}" class="mega-panel__all">
+                      Shop all {{ block.settings.title | escape }}
+                    </a>
+                    {% render 'mega-columns', links: panel_links %}
+                  </div>
+                  {%- if block.settings.promo_image != blank or block.settings.promo_heading != blank -%}
+                    <a href="{{ block.settings.promo_link | default: block.settings.link }}" class="mega-promo">
+                      {%- if block.settings.promo_image != blank -%}
+                        {%- assign promo_alt = block.settings.promo_image.alt | default: block.settings.promo_heading -%}
+                        <span class="mega-promo__media">
+                          {{ block.settings.promo_image | image_url: width: 640 | image_tag:
+                            loading: 'lazy',
+                            widths: '320,480,640',
+                            sizes: '320px',
+                            alt: promo_alt,
+                            class: 'mega-promo__img'
+                          }}
+                        </span>
+                      {%- endif -%}
+                      <span class="mega-promo__body">
+                        {%- if block.settings.promo_heading != blank -%}<span class="mega-promo__heading">{{ block.settings.promo_heading | escape }}</span>{%- endif -%}
+                        {%- if block.settings.promo_text != blank -%}<span class="mega-promo__text">{{ block.settings.promo_text | escape }}</span>{%- endif -%}
+                        <span class="mega-promo__cta">{{ block.settings.promo_link_label | default: 'Shop deals' | escape }}</span>
+                      </span>
+                    </a>
+                  {%- endif -%}
+                </div>
+              </div>
+            {%- else -%}
+              <a href="{{ block.settings.link | default: routes.all_products_collection_url }}" class="mega-nav__top"{% if block.settings.color != blank %} style="--cat: {{ block.settings.color }};"{% endif %}>
+                {% render 'icon', name: block.settings.icon, class: 'mega-nav__icon' %}
+                <span>{{ block.settings.title | escape }}</span>
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for link in fallback_menu.links -%}
+          {%- capture guessed_icon -%}{% render 'nav-icon-guess', title: link.title %}{%- endcapture -%}
+          {%- assign panel_id = 'MegaPanel-menu-' | append: forloop.index -%}
+          <li class="mega-nav__item">
+            {%- if link.links.size > 0 -%}
+              <button type="button" class="mega-nav__top" aria-expanded="false" aria-controls="{{ panel_id }}">
+                {% render 'icon', name: guessed_icon, class: 'mega-nav__icon' %}
+                <span>{{ link.title | escape }}</span>
+                {% render 'icon', name: 'chevron-down', class: 'icon--xs mega-nav__chevron' %}
+              </button>
+              <div class="mega-panel" id="{{ panel_id }}" hidden>
+                <div class="mega-panel__inner container">
+                  <div class="mega-panel__links">
+                    <a href="{{ link.url }}" class="mega-panel__all">Shop all {{ link.title | escape }}</a>
+                    {% render 'mega-columns', links: link.links %}
+                  </div>
+                </div>
+              </div>
+            {%- else -%}
+              <a href="{{ link.url }}" class="mega-nav__top"{% if link.current %} aria-current="page"{% endif %}>
+                {% render 'icon', name: guessed_icon, class: 'mega-nav__icon' %}
+                <span>{{ link.title | escape }}</span>
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+  </mega-menu>
+</header>
+
+<menu-drawer class="drawer drawer--left" id="MenuDrawer" hidden>
+  <div class="drawer__overlay" data-drawer-close></div>
+  <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu" tabindex="-1">
+    <div class="drawer__head">
+      <span class="drawer__title">Shop by category</span>
+      <button type="button" class="header__icon" data-drawer-close aria-label="Close menu">{% render 'icon', name: 'close' %}</button>
+    </div>
+    <div class="drawer__body">
+      <ul class="drawer-cats" role="list">
+        {%- if use_blocks -%}
+          {%- for block in section.blocks -%}
+            {%- liquid
+            assign panel_links = nil
+            if block.type == 'mega'
+              if block.settings.menu != blank and block.settings.menu.links.size > 0
+                assign panel_links = block.settings.menu.links
+              else
+                assign menu_handle = block.settings.title | handle
+                if linklists[menu_handle].links.size > 0
+                  assign panel_links = linklists[menu_handle].links
+                else
+                  for main_link in fallback_menu.links
+                    if main_link.title == block.settings.title and main_link.links.size > 0
+                      assign panel_links = main_link.links
+                      break
+                    endif
+                  endfor
+                endif
+              endif
+            endif
+            assign has_panel = false
+            if panel_links.size > 0
+              assign has_panel = true
+            endif
+            -%}
+            <li>
+              {%- if has_panel -%}
+                <details class="drawer-cat">
+                  <summary class="drawer-cat__summary"{% if block.settings.color != blank %} style="--cat: {{ block.settings.color }};"{% endif %}>
+                    {% render 'icon', name: block.settings.icon, class: 'mega-nav__icon' %}
+                    <span>{{ block.settings.title | escape }}</span>
+                    {% render 'icon', name: 'chevron-down', class: 'icon--sm drawer-chevron' %}
+                  </summary>
+                  <div class="drawer-cat__panel">
+                    {%- if block.settings.link != blank -%}
+                      <a href="{{ block.settings.link }}" class="drawer-tree__link drawer-tree__link--all">Shop all {{ block.settings.title | escape }}</a>
+                    {%- endif -%}
+                    {% render 'menu-drawer-links', links: panel_links %}
+                  </div>
+                </details>
+              {%- else -%}
+                <a href="{{ block.settings.link | default: routes.all_products_collection_url }}" class="drawer-cat__summary{% if block.type == 'link' and block.settings.highlight %} is-highlight{% endif %}"{% if block.settings.color != blank %} style="--cat: {{ block.settings.color }};"{% endif %}>
+                  {% render 'icon', name: block.settings.icon, class: 'mega-nav__icon' %}
+                  <span>{{ block.settings.title | escape }}</span>
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for link in fallback_menu.links -%}
+            {%- capture guessed_icon -%}{% render 'nav-icon-guess', title: link.title %}{%- endcapture -%}
+            <li>
+              {%- if link.links.size > 0 -%}
+                <details class="drawer-cat">
+                  <summary class="drawer-cat__summary">
+                    {% render 'icon', name: guessed_icon, class: 'mega-nav__icon' %}
+                    <span>{{ link.title | escape }}</span>
+                    {% render 'icon', name: 'chevron-down', class: 'icon--sm drawer-chevron' %}
+                  </summary>
+                  <div class="drawer-cat__panel">
+                    <a href="{{ link.url }}" class="drawer-tree__link drawer-tree__link--all">Shop all {{ link.title | escape }}</a>
+                    {% render 'menu-drawer-links', links: link.links %}
+                  </div>
+                </details>
+              {%- else -%}
+                <a href="{{ link.url }}" class="drawer-cat__summary">
+                  {% render 'icon', name: guessed_icon, class: 'mega-nav__icon' %}
+                  <span>{{ link.title | escape }}</span>
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+
+      {%- if section.settings.drawer_menu != blank -%}
+        <nav class="drawer__secondary" aria-label="More links">
+          {% render 'menu-drawer-links', links: section.settings.drawer_menu.links %}
+        </nav>
+      {%- endif -%}
+    </div>
+    <div class="drawer__foot">
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="btn btn--outline btn--block">
+          {% render 'icon', name: 'user', class: 'icon--sm' %}
+          <span>{% if customer %}My account{% else %}Sign in or create account{% endif %}</span>
+        </a>
+      {%- endif -%}
+      {%- if settings.support_phone != blank or settings.support_email != blank -%}
+        <p class="drawer__support">
+          Need help?
+          {% if settings.support_phone != blank %}<a href="tel:{{ settings.support_phone | remove: ' ' }}">{{ settings.support_phone }}</a>{% endif %}
+          {% if settings.support_email != blank %}<a href="mailto:{{ settings.support_email }}">{{ settings.support_email }}</a>{% endif %}
+        </p>
+      {%- endif -%}
+    </div>
+  </div>
+</menu-drawer>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "max_blocks": 10,
+  "settings": [
+    { "type": "checkbox", "id": "sticky", "label": "Stick header to top on scroll", "default": true },
+    { "type": "link_list", "id": "menu", "label": "Fallback menu", "default": "main-menu", "info": "Used only when no category blocks are added. Nested menu items become mega menu columns." },
+    { "type": "link_list", "id": "drawer_menu", "label": "Extra mobile menu links", "info": "Optional. Shown under the categories in the mobile drawer, e.g. Help, Track order." },
+    { "type": "paragraph", "content": "Logo, search placeholder and live suggestions are set in Theme settings." }
+  ],
+  "blocks": [
+    {
+      "type": "mega",
+      "name": "Category with mega menu",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Label", "default": "Category" },
+        { "type": "select", "id": "icon", "label": "Icon", "options": [{"value": "headphones", "label": "Headphones"}, {"value": "earbuds", "label": "Earbuds"}, {"value": "speaker", "label": "Speaker"}, {"value": "plug", "label": "Charger"}, {"value": "battery", "label": "Battery"}, {"value": "cable", "label": "Cable"}, {"value": "bolt", "label": "Power"}, {"value": "home-device", "label": "Smart home"}, {"value": "camera", "label": "Camera"}, {"value": "bulb", "label": "Smart lighting"}, {"value": "watch", "label": "Watch"}, {"value": "smartphone", "label": "Smartphone"}, {"value": "tablet", "label": "Tablet"}, {"value": "laptop", "label": "Laptop"}, {"value": "monitor", "label": "Monitor"}, {"value": "tv", "label": "TV"}, {"value": "gamepad", "label": "Gamepad"}, {"value": "keyboard", "label": "Keyboard"}, {"value": "case", "label": "Phone case"}, {"value": "drone", "label": "Drone"}, {"value": "router", "label": "Networking"}, {"value": "tag", "label": "Deals tag"}, {"value": "percent", "label": "Percent"}, {"value": "gift", "label": "Gift"}, {"value": "sparkle", "label": "New arrivals"}, {"value": "box", "label": "Bundle"}, {"value": "grid", "label": "All categories"}], "default": "headphones" },
+        { "type": "color", "id": "color", "label": "Category color", "info": "Tints the icon. Use the same color as this category in Product type colors." },
+        { "type": "url", "id": "link", "label": "Category page", "info": "Used for the Shop all link." },
+        { "type": "link_list", "id": "menu", "label": "Subcategory menu", "info": "Create a menu in Online Store > Navigation. Top-level items become column headings, their nested items become the links. A flat menu flows into columns. If left empty, a menu with the same name as this label is used, or the matching item's sub-links in the main menu." },
+        { "type": "header", "content": "Promo tile" },
+        { "type": "image_picker", "id": "promo_image", "label": "Image" },
+        { "type": "text", "id": "promo_heading", "label": "Heading" },
+        { "type": "text", "id": "promo_text", "label": "Text" },
+        { "type": "text", "id": "promo_link_label", "label": "Link label", "default": "Shop deals" },
+        { "type": "url", "id": "promo_link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "link",
+      "name": "Single link",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Label", "default": "Deals" },
+        { "type": "select", "id": "icon", "label": "Icon", "options": [{"value": "headphones", "label": "Headphones"}, {"value": "earbuds", "label": "Earbuds"}, {"value": "speaker", "label": "Speaker"}, {"value": "plug", "label": "Charger"}, {"value": "battery", "label": "Battery"}, {"value": "cable", "label": "Cable"}, {"value": "bolt", "label": "Power"}, {"value": "home-device", "label": "Smart home"}, {"value": "camera", "label": "Camera"}, {"value": "bulb", "label": "Smart lighting"}, {"value": "watch", "label": "Watch"}, {"value": "smartphone", "label": "Smartphone"}, {"value": "tablet", "label": "Tablet"}, {"value": "laptop", "label": "Laptop"}, {"value": "monitor", "label": "Monitor"}, {"value": "tv", "label": "TV"}, {"value": "gamepad", "label": "Gamepad"}, {"value": "keyboard", "label": "Keyboard"}, {"value": "case", "label": "Phone case"}, {"value": "drone", "label": "Drone"}, {"value": "router", "label": "Networking"}, {"value": "tag", "label": "Deals tag"}, {"value": "percent", "label": "Percent"}, {"value": "gift", "label": "Gift"}, {"value": "sparkle", "label": "New arrivals"}, {"value": "box", "label": "Bundle"}, {"value": "grid", "label": "All categories"}], "default": "percent" },
+        { "type": "color", "id": "color", "label": "Icon color" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "checkbox", "id": "highlight", "label": "Highlight (use for Deals)", "default": false }
+      ]
+    }
+  ]
+}
+{% endschema %}

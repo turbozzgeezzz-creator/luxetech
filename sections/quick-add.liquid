@@ -1,0 +1,33 @@
+{%- comment -%}
+  Rendered into the quick-add dialog via the Section Rendering API:
+  /products/<handle>?section_id=quick-add
+{%- endcomment -%}
+<product-info class="quick-add" data-section-id="{{ section.id }}" data-update-url="false">
+  <div class="quick-add__media">
+    {%- assign qa_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
+    {%- if qa_media -%}
+      {%- assign qa_alt = qa_media.alt | default: product.title -%}
+      {{ qa_media.preview_image | image_url: width: 700 | image_tag: loading: 'eager', widths: '350,500,700', sizes: '(min-width: 750px) 340px, 90vw', alt: qa_alt, class: 'quick-add__img' }}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'quick-add__img placeholder-svg' }}
+    {%- endif -%}
+    <script type="application/json" data-media-json>
+      {
+        {%- for media in product.media -%}
+          "{{ media.id }}": {{ media.preview_image | image_url: width: 700 | json }}{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      }
+    </script>
+  </div>
+  <div class="quick-add__info">
+    {% render 'product-buybox', product: product, section_id: 'quick', mode: 'quick', heading_tag: 'h2', show_dynamic_checkout: false %}
+    <a href="{{ product.url }}" class="quick-add__more">View full details</a>
+  </div>
+</product-info>
+
+{% schema %}
+{
+  "name": "Quick add",
+  "settings": []
+}
+{% endschema %}

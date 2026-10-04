@@ -1,0 +1,49 @@
+<div class="container container--xs account-page">
+  <div id="RecoverPassword" class="account-card" hidden>
+    <h1 class="page-title">Reset your password</h1>
+    <p class="account-card__sub">We'll email you a link to set a new one.</p>
+    {%- form 'recover_customer_password', class: 'form-stack' -%}
+      {%- if form.posted_successfully? -%}
+        <p class="form-status form-status--success" role="status">If that email has an account, a reset link is on its way.</p>
+      {%- endif -%}
+      {%- if form.errors -%}<div class="form-status form-status--error" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+      <div class="field">
+        <label for="RecoverEmail">Email</label>
+        <input type="email" id="RecoverEmail" name="email" class="input" autocomplete="email" required>
+      </div>
+      <button type="submit" class="btn btn--primary btn--block">Send reset link</button>
+      <a href="#login" class="link-btn" data-toggle-recover>Back to sign in</a>
+    {%- endform -%}
+  </div>
+
+  <div id="CustomerLogin" class="account-card">
+    <h1 class="page-title">Sign in</h1>
+    {%- form 'customer_login', class: 'form-stack', novalidate: 'novalidate' -%}
+      {%- if form.errors -%}<div class="form-status form-status--error" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+      <div class="field">
+        <label for="CustomerEmail">Email</label>
+        <input type="email" id="CustomerEmail" name="customer[email]" class="input" autocomplete="email" autocapitalize="off" required>
+      </div>
+      {%- if form.password_needed -%}
+        <div class="field">
+          <label for="CustomerPassword">Password</label>
+          <input type="password" id="CustomerPassword" name="customer[password]" class="input" autocomplete="current-password" required>
+        </div>
+      {%- endif -%}
+      <button type="submit" class="btn btn--primary btn--block">Sign in</button>
+      {%- if form.password_needed -%}
+        <a href="#recover" class="link-btn" data-toggle-recover>Forgot your password?</a>
+      {%- endif -%}
+    {%- endform -%}
+    <p class="account-card__alt">New here? <a href="{{ routes.account_register_url }}">Create an account</a></p>
+  </div>
+
+  {%- if shop.checkout.guest_login -%}
+    <div class="account-card">
+      <h2 class="account-card__title">Continue as a guest</h2>
+      {%- form 'guest_login' -%}
+        <button type="submit" class="btn btn--outline btn--block">Continue to checkout</button>
+      {%- endform -%}
+    </div>
+  {%- endif -%}
+</div>

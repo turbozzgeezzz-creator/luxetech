@@ -1,0 +1,22 @@
+{%- comment -%}
+  Looks up the product type in the "Product type colors" theme setting and
+  outputs the matching hex color, or nothing. Usage:
+  {%- capture cat_color -%}{% render 'category-color', type: product.type %}{%- endcapture -%}
+{%- endcomment -%}
+{%- if type != blank and settings.category_colors != blank -%}
+  {%- liquid
+    assign wanted = type | strip | downcase
+    assign lines = settings.category_colors | newline_to_br | split: '<br />'
+    for line in lines
+      assign parts = line | split: ':'
+      if parts.size < 2
+        continue
+      endif
+      assign key = parts.first | strip | downcase
+      if key == wanted
+        echo parts.last | strip
+        break
+      endif
+    endfor
+  -%}
+{%- endif -%}

@@ -1,0 +1,78 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    },
+    "summary": {
+      "type": "trust-band",
+      "settings": {
+        "label": "Returns and warranty at a glance"
+      },
+      "blocks": {
+        "i1": {
+          "type": "item",
+          "settings": {
+            "icon": "repeat",
+            "title": "30-day returns",
+            "text": "On unused items in original packaging."
+          }
+        },
+        "i2": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "12-month warranty",
+            "text": "Covers defects from normal use."
+          }
+        },
+        "i3": {
+          "type": "item",
+          "settings": {
+            "icon": "chat",
+            "title": "Start with a message",
+            "text": "Contact us with your order number to begin."
+          }
+        },
+        "i4": {
+          "type": "item",
+          "settings": {
+            "icon": "check-circle",
+            "title": "Refund to original payment",
+            "text": "Once we've received and checked the item."
+          }
+        }
+      },
+      "block_order": [
+        "i1",
+        "i2",
+        "i3",
+        "i4"
+      ]
+    },
+    "returns": {
+      "type": "rich-text",
+      "settings": {
+        "heading": "Returns",
+        "text": "<p>If you change your mind, you can return an item within 30 days of delivery as long as it is unused, in its original packaging and with all accessories included.</p><h3>How to return an item</h3><ol><li>Contact us with your order number and the item you'd like to return.</li><li>We'll reply with return instructions and the address to send it to.</li><li>Pack the item securely and send it back. We recommend a tracked service.</li></ol><p>Once we receive and check the return, we refund the item to your original payment method and email you to confirm. Unless the item was faulty or we sent the wrong thing, return shipping costs are not refunded.</p>",
+        "align": "left"
+      }
+    },
+    "warranty": {
+      "type": "rich-text",
+      "settings": {
+        "heading": "Warranty and faulty items",
+        "text": "<p>Every product we sell is covered by a 12-month warranty against defects in materials and workmanship from normal use. The warranty doesn't cover accidental damage, misuse, liquid damage or normal wear.</p><p>If something stops working, contact us with your order number and a short description, photo or video of the problem. We'll arrange a repair, replacement or refund. If an item arrives damaged or faulty, contact us within 7 days of delivery and we'll cover the return shipping.</p><p>This policy is in addition to your rights under consumer law, which are not affected.</p>",
+        "align": "left",
+        "button_label": "Contact us",
+        "button_link": "/pages/contact"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "summary",
+    "returns",
+    "warranty"
+  ]
+}

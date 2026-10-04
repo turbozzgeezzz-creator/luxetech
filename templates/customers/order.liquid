@@ -1,0 +1,57 @@
+<div class="container account-page">
+  <a href="{{ routes.account_url }}" class="link-btn">{% render 'icon', name: 'chevron-left', class: 'icon--xs' %} Back to account</a>
+  <h1 class="page-title">Order {{ order.name }}</h1>
+  <p class="account-card__sub">Placed {{ order.created_at | date: format: 'date_at_time' }}</p>
+  {%- if order.cancelled -%}
+    <p class="form-status form-status--error">Cancelled {{ order.cancelled_at | date: format: 'date' }}. Reason: {{ order.cancel_reason_label }}</p>
+  {%- endif -%}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th scope="col">Product</th><th scope="col">SKU</th><th scope="col">Price</th><th scope="col">Qty</th><th scope="col">Total</th></tr></thead>
+      <tbody>
+        {%- for line_item in order.line_items -%}
+          <tr>
+            <td>
+              {{ line_item.title | link_to: line_item.product.url }}
+              {%- if line_item.fulfillment -%}
+                <br><small>Shipped {{ line_item.fulfillment.created_at | date: format: 'date' }}
+                {%- if line_item.fulfillment.tracking_url -%}, <a href="{{ line_item.fulfillment.tracking_url }}">track package</a>{%- endif -%}</small>
+              {%- endif -%}
+            </td>
+            <td>{{ line_item.sku }}</td>
+            <td>{{ line_item.final_price | money }}</td>
+            <td>{{ line_item.quantity }}</td>
+            <td>{{ line_item.final_line_price | money }}</td>
+          </tr>
+        {%- endfor -%}
+      </tbody>
+      <tfoot>
+        <tr><th scope="row" colspan="4">Subtotal</th><td>{{ order.line_items_subtotal_price | money }}</td></tr>
+        {%- for discount in order.cart_level_discount_applications -%}
+          <tr><th scope="row" colspan="4">Discount ({{ discount.title }})</th><td>-{{ discount.total_allocated_amount | money }}</td></tr>
+        {%- endfor -%}
+        {%- for shipping_method in order.shipping_methods -%}
+          <tr><th scope="row" colspan="4">Shipping ({{ shipping_method.title }})</th><td>{{ shipping_method.price | money }}</td></tr>
+        {%- endfor -%}
+        {%- for tax_line in order.tax_lines -%}
+          <tr><th scope="row" colspan="4">Tax ({{ tax_line.title }} {{ tax_line.rate | times: 100 }}%)</th><td>{{ tax_line.price | money }}</td></tr>
+        {%- endfor -%}
+        <tr><th scope="row" colspan="4">Total</th><td><strong>{{ order.total_net_amount | money_with_currency }}</strong></td></tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="account-grid account-grid--2">
+    <div class="account-card">
+      <h2 class="account-card__title">Billing address</h2>
+      <p>Payment status: {{ order.financial_status_label }}</p>
+      <address class="account-address">{{ order.billing_address | format_address }}</address>
+    </div>
+    {%- if order.shipping_address -%}
+      <div class="account-card">
+        <h2 class="account-card__title">Shipping address</h2>
+        <p>Fulfillment status: {{ order.fulfillment_status_label }}</p>
+        <address class="account-address">{{ order.shipping_address | format_address }}</address>
+      </div>
+    {%- endif -%}
+  </div>
+</div>

@@ -1,0 +1,76 @@
+{%- liquid
+  assign per_page = section.settings.per_page
+  assign sort_by = search.sort_by | default: search.default_sort_by
+  assign q_enc = search.terms | url_encode
+  assign clear_url = routes.search_url | append: '?q=' | append: q_enc | append: '&options%5Bprefix%5D=last'
+-%}
+<div class="container collection-page">
+  <header class="collection-hero">
+    <div class="collection-hero__copy">
+      <h1 class="collection-hero__title">{% if search.performed %}Results for &ldquo;{{ search.terms | escape }}&rdquo;{% else %}Search{% endif %}</h1>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-form search-form--page">
+        <label for="SearchPage" class="visually-hidden">Search</label>
+        <input type="search" id="SearchPage" name="q" class="search-form__input" value="{{ search.terms | escape }}" placeholder="{{ settings.search_placeholder | escape }}">
+        <input type="hidden" name="options[prefix]" value="last">
+        <button type="submit" class="search-form__submit" aria-label="Search">{% render 'icon', name: 'search' %}</button>
+      </form>
+    </div>
+  </header>
+
+  {%- if search.performed -%}
+    {%- paginate search.results by per_page -%}
+      <facet-filters class="collection-layout{% if search.filters.size == 0 %} collection-layout--no-filters{% endif %}" data-section-id="{{ section.id }}">
+        {% render 'facets',
+          results: search,
+          section_id: section.id,
+          sort_options: search.sort_options,
+          sort_by: sort_by,
+          clear_url: clear_url,
+          terms: search.terms,
+          count: search.results_count
+        %}
+        <div class="collection-results" id="ProductGrid-{{ section.id }}" data-facet-swap>
+          {% render 'active-filters', results: search, section_id: section.id, clear_url: clear_url %}
+          {%- if search.results.size > 0 -%}
+            <ul class="product-grid product-grid--{{ section.settings.columns }}" role="list">
+              {%- for item in search.results -%}
+                <li>
+                  {%- if item.object_type == 'product' -%}
+                    {% render 'product-card', product: item, section_id: section.id, heading_tag: 'h2' %}
+                  {%- else -%}
+                    <a href="{{ item.url }}" class="result-card">
+                      <span class="result-card__type">{% if item.object_type == 'article' %}Article{% else %}Page{% endif %}</span>
+                      <span class="result-card__title">{{ item.title | escape }}</span>
+                      <span class="result-card__text">{{ item.content | strip_html | truncatewords: 24 }}</span>
+                    </a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+            {% render 'pagination', paginate: paginate %}
+          {%- else -%}
+            <div class="empty-state">
+              {% render 'icon', name: 'search', class: 'empty-state__icon' %}
+              <h2 class="empty-state__title">No results for &ldquo;{{ search.terms | escape }}&rdquo;</h2>
+              <p>Check the spelling, try a more general term like a brand or product type, or remove filters.</p>
+              <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Browse all products</a>
+            </div>
+          {%- endif -%}
+        </div>
+      </facet-filters>
+    {%- endpaginate -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Search results",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Results per page", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "select", "id": "columns", "label": "Columns on desktop", "options": [
+      { "value": "3", "label": "3" },
+      { "value": "4", "label": "4" }
+    ], "default": "4" }
+  ]
+}
+{% endschema %}

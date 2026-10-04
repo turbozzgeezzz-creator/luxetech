@@ -1,0 +1,233 @@
+{
+  "sections": {
+    "hero": {
+      "type": "slideshow",
+      "settings": {
+        "height": "md",
+        "autoplay": true,
+        "speed": 6
+      },
+      "blocks": {
+        "s1": {
+          "type": "slide",
+          "settings": {
+            "layout": "split",
+            "background": "#EEF2F8",
+            "text_tone": "dark",
+            "kicker": "Welcome to LuxeTech",
+            "heading": "Everyday tech, without the guesswork",
+            "text": "<p>Clear specs, live stock levels and straightforward returns on everything we sell.</p>",
+            "button_label": "Shop all products",
+            "button_link": "/collections/all",
+            "button_label_2": "How shipping works",
+            "button_link_2": "/pages/shipping-delivery"
+          }
+        },
+        "s2": {
+          "type": "slide",
+          "settings": {
+            "layout": "split",
+            "background": "#F4F6F9",
+            "text_tone": "dark",
+            "kicker": "On sale",
+            "heading": "Marked-down tech, all in one place",
+            "text": "<p>Every product with a reduced price, with the original price shown so you can see exactly what you save.</p>",
+            "button_label": "See what's on sale",
+            "button_link": "/collections/sale"
+          }
+        },
+        "s3": {
+          "type": "slide",
+          "settings": {
+            "layout": "split",
+            "background": "#E8EEFD",
+            "text_tone": "dark",
+            "kicker": "Need a hand?",
+            "heading": "Questions before you buy?",
+            "text": "<p>Ask us about compatibility, specs or delivery and a real person will get back to you.</p>",
+            "button_label": "Contact support",
+            "button_link": "/pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3"
+      ]
+    },
+    "categories": {
+      "type": "category-grid",
+      "settings": {
+        "heading": "Shop by category",
+        "link_label": "All categories",
+        "columns": "4"
+      },
+      "blocks": {
+        "a": {
+          "type": "category",
+          "settings": {
+            "title": "Audio",
+            "subtitle": "Headphones and speakers",
+            "icon": "headphones",
+            "color": "#1D4ED8",
+            "link": "/collections/audio"
+          }
+        },
+        "b": {
+          "type": "category",
+          "settings": {
+            "title": "Charging",
+            "subtitle": "Chargers, cables, power banks",
+            "icon": "plug",
+            "color": "#1D4ED8",
+            "link": "/collections/charging"
+          }
+        },
+        "c": {
+          "type": "category",
+          "settings": {
+            "title": "Smart home",
+            "subtitle": "Plugs, cameras, lighting",
+            "icon": "home-device",
+            "color": "#1D4ED8",
+            "link": "/collections/smart-home"
+          }
+        },
+        "d": {
+          "type": "category",
+          "settings": {
+            "title": "Accessories",
+            "subtitle": "Cases, mounts, stands",
+            "icon": "case",
+            "color": "#1D4ED8",
+            "link": "/collections/accessories"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ]
+    },
+    "deals": {
+      "type": "product-rail",
+      "settings": {
+        "heading": "On sale now",
+        "subheading": "Reduced prices, with the original price shown on every item.",
+        "style": "deals",
+        "source": "sale",
+        "limit": 10,
+        "link_label": "All sale items"
+      }
+    },
+    "trust": {
+      "type": "trust-band",
+      "settings": {},
+      "blocks": {
+        "t1": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "title": "Fast, tracked shipping",
+            "text": "Every order ships with tracking."
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "icon": "repeat",
+            "title": "30-day returns",
+            "text": "Unused items, no questions asked."
+          }
+        },
+        "t3": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "12-month warranty",
+            "text": "On every product we sell."
+          }
+        },
+        "t4": {
+          "type": "item",
+          "settings": {
+            "icon": "headset",
+            "title": "Real human support",
+            "text": "Talk to people who know the gear."
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4"
+      ]
+    },
+    "bestsellers": {
+      "type": "product-rail",
+      "settings": {
+        "heading": "Shop the range",
+        "subheading": "",
+        "style": "default",
+        "source": "all",
+        "limit": 10,
+        "link_label": "View all"
+      }
+    },
+    "promos": {
+      "type": "promo-banners",
+      "settings": {},
+      "blocks": {
+        "p1": {
+          "type": "banner",
+          "settings": {
+            "background": "#E8EEFD",
+            "text_tone": "dark",
+            "kicker": "",
+            "heading": "New arrivals",
+            "text": "The latest products added to the store.",
+            "link_label": "See what's new",
+            "link": "/collections/all?sort_by=created-descending"
+          }
+        },
+        "p2": {
+          "type": "banner",
+          "settings": {
+            "background": "#F4F6F9",
+            "text_tone": "dark",
+            "kicker": "",
+            "heading": "Not sure what fits?",
+            "text": "Tell us your device and we'll point you to the right charger, cable or accessory.",
+            "link_label": "Ask our team",
+            "link": "/pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Hear about deals and new arrivals first",
+        "text": "<p>Occasional emails with restocks, new products and subscriber offers.</p>",
+        "fine_print": "Unsubscribe any time. We never share your email."
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "categories",
+    "deals",
+    "trust",
+    "bestsellers",
+    "promos",
+    "newsletter"
+  ]
+}

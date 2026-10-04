@@ -1,0 +1,52 @@
+{%- if section.blocks.size > 0 -%}
+<section class="section" aria-labelledby="Heading-{{ section.id }}">
+  <div class="container container--narrow">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="section-head__title faq__heading" id="Heading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    <div class="faq">
+      {%- for block in section.blocks -%}
+        <details class="faq__item" {{ block.shopify_attributes }}{% if forloop.first and section.settings.open_first %} open{% endif %}>
+          <summary class="faq__q">
+            <span>{{ block.settings.question | escape }}</span>
+            {% render 'icon', name: 'plus', class: 'icon--sm faq__icon' %}
+          </summary>
+          <div class="faq__a rte">{{ block.settings.answer }}</div>
+        </details>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {%- for block in section.blocks -%}
+        { "@type": "Question", "name": {{ block.settings.question | json }}, "acceptedAnswer": { "@type": "Answer", "text": {{ block.settings.answer | strip_html | json }} } }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  }
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "FAQ",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Frequently asked questions" },
+    { "type": "checkbox", "id": "open_first", "label": "Open the first answer", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "How long does delivery take?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Orders leave our warehouse within 1-2 business days. Delivery time after that depends on your location and the shipping method you pick at checkout.</p>" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "FAQ", "blocks": [{ "type": "question" }] }]
+}
+{% endschema %}

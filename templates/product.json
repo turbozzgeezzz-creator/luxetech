@@ -1,0 +1,46 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {},
+      "blocks": {
+        "overview": {
+          "type": "description",
+          "settings": {
+            "title": "Overview"
+          }
+        },
+        "specs": {
+          "type": "specs",
+          "settings": {
+            "title": "Specifications"
+          }
+        },
+        "shipping": {
+          "type": "custom",
+          "settings": {
+            "title": "Shipping and returns",
+            "content": "<p>Orders ship with tracking. Unused items can be returned within 30 days for a full refund. Every product carries a 12-month warranty against defects.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "overview",
+        "specs",
+        "shipping"
+      ]
+    },
+    "related": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "You might also like",
+        "intent": "related",
+        "limit": 8
+      }
+    }
+  },
+  "order": [
+    "main",
+    "related"
+  ]
+}

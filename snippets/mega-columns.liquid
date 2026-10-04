@@ -1,0 +1,37 @@
+{%- comment -%}
+  Renders the link columns inside a mega menu panel.
+  - links: array of link objects (a menu's top-level links, or a link's child links)
+  Links that have children become a column with a heading; menus with no
+  nesting at all flow into balanced columns instead.
+{%- endcomment -%}
+{%- liquid
+  assign nested = false
+  for l in links
+    if l.links.size > 0
+      assign nested = true
+      break
+    endif
+  endfor
+-%}
+{%- if nested -%}
+  <div class="mega-cols">
+    {%- for l in links -%}
+      <div class="mega-col">
+        <a href="{{ l.url }}" class="mega-col__heading{% if l.active %} is-active{% endif %}">{{ l.title | escape }}</a>
+        {%- if l.links.size > 0 -%}
+          <ul class="mega-col__list" role="list">
+            {%- for c in l.links -%}
+              <li><a href="{{ c.url }}" class="mega-col__link"{% if c.current %} aria-current="page"{% endif %}>{{ c.title | escape }}</a></li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+{%- else -%}
+  <ul class="mega-flow" role="list">
+    {%- for l in links -%}
+      <li><a href="{{ l.url }}" class="mega-col__link"{% if l.current %} aria-current="page"{% endif %}>{{ l.title | escape }}</a></li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

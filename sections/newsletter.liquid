@@ -1,0 +1,29 @@
+<section class="section">
+  <div class="container">
+    <div class="newsletter-band">
+      <div class="newsletter-band__copy">
+        <h2 class="newsletter-band__title">{{ section.settings.heading | escape }}</h2>
+        {%- if section.settings.text != blank -%}
+          <div class="newsletter-band__text">{{ section.settings.text }}</div>
+        {%- endif -%}
+      </div>
+      <div class="newsletter-band__form">
+        {% render 'newsletter-form', id: section.id, button_label: section.settings.button_label %}
+        <p class="newsletter-band__fine">{{ section.settings.fine_print | escape }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Hear about deals and new arrivals first" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Occasional emails with restocks, new products and subscriber offers.</p>" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Subscribe" },
+    { "type": "text", "id": "fine_print", "label": "Fine print", "default": "Unsubscribe any time. We never share your email." }
+  ],
+  "presets": [{ "name": "Newsletter" }]
+}
+{% endschema %}

@@ -1,0 +1,26 @@
+{%- comment -%}
+  Collapsible link tree for the mobile drawer.
+  - links: array of link objects
+{%- endcomment -%}
+<ul class="drawer-tree" role="list">
+  {%- for l in links -%}
+    <li>
+      {%- if l.links.size > 0 -%}
+        <details class="drawer-tree__group">
+          <summary class="drawer-tree__summary">
+            <span>{{ l.title | escape }}</span>
+            {% render 'icon', name: 'chevron-down', class: 'icon--sm drawer-chevron' %}
+          </summary>
+          <ul class="drawer-tree drawer-tree--sub" role="list">
+            <li><a href="{{ l.url }}" class="drawer-tree__link drawer-tree__link--all">All {{ l.title | escape }}</a></li>
+            {%- for c in l.links -%}
+              <li><a href="{{ c.url }}" class="drawer-tree__link">{{ c.title | escape }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </details>
+      {%- else -%}
+        <a href="{{ l.url }}" class="drawer-tree__link">{{ l.title | escape }}</a>
+      {%- endif -%}
+    </li>
+  {%- endfor -%}
+</ul>

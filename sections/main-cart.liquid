@@ -1,0 +1,71 @@
+<div class="container cart-page" id="MainCart" data-section-id="{{ section.id }}">
+  <h1 class="page-title">Your cart</h1>
+  {%- if cart.item_count > 0 -%}
+    <form action="{{ routes.cart_url }}" method="post" id="CartForm" class="cart-page__grid">
+      <div class="cart-page__lines">
+        {% render 'free-shipping-bar' %}
+        <cart-items data-context="page" data-section-id="{{ section.id }}">
+          <ul class="cart-lines" role="list">
+            {%- for item in cart.items -%}
+              {% render 'cart-line', item: item, line: forloop.index, context: 'page' %}
+            {%- endfor -%}
+          </ul>
+        </cart-items>
+        <noscript><button type="submit" name="update" class="btn btn--outline">Update cart</button></noscript>
+        <a href="{{ routes.all_products_collection_url }}" class="link-btn cart-page__continue">{% render 'icon', name: 'chevron-left', class: 'icon--xs' %} Continue shopping</a>
+      </div>
+
+      <aside class="cart-page__summary cart-summary" aria-label="Order summary">
+        <h2 class="cart-summary__title">Order summary</h2>
+        <p class="cart-summary__row"><span>Items ({{ cart.item_count }})</span><span>{{ cart.items_subtotal_price | money }}</span></p>
+        {%- for discount in cart.cart_level_discount_applications -%}
+          <p class="cart-summary__row cart-summary__row--discount"><span>{{ discount.title | escape }}</span><span>-{{ discount.total_allocated_amount | money }}</span></p>
+        {%- endfor -%}
+        <p class="cart-summary__row cart-summary__row--total"><span>Subtotal</span><span>{{ cart.total_price | money_with_currency }}</span></p>
+        <p class="cart-summary__note">Taxes, discount codes and shipping are calculated at checkout.</p>
+
+        {%- if settings.cart_show_note -%}
+          <div class="cart-note">
+            <label for="CartNote" class="cart-note__label">Order note</label>
+            <textarea id="CartNote" name="note" class="input" rows="3" placeholder="Delivery instructions, gift message..." data-cart-note>{{ cart.note }}</textarea>
+          </div>
+        {%- endif -%}
+
+        <button type="submit" name="checkout" class="btn btn--primary btn--lg btn--block">
+          {% render 'icon', name: 'lock', class: 'icon--sm' %}<span>Checkout securely</span>
+        </button>
+        {%- if additional_checkout_buttons -%}
+          <div class="cart-summary__express">{{ content_for_additional_checkout_buttons }}</div>
+        {%- endif -%}
+        <ul class="cart-summary__trust" role="list">
+          <li>{% render 'icon', name: 'shield', class: 'icon--sm' %} Encrypted, secure payment</li>
+          {%- if shop.refund_policy != blank -%}
+            <li>{% render 'icon', name: 'repeat', class: 'icon--sm' %} <a href="{{ shop.refund_policy.url }}">Returns policy</a></li>
+          {%- endif -%}
+        </ul>
+        <div class="payment-icons payment-icons--cart" aria-label="Accepted payment methods">
+          {%- for type in shop.enabled_payment_types -%}
+            {{ type | payment_type_svg_tag: class: 'payment-icon' }}
+          {%- endfor -%}
+        </div>
+      </aside>
+    </form>
+  {%- else -%}
+    <div class="empty-state empty-state--page">
+      {% render 'icon', name: 'cart', class: 'empty-state__icon' %}
+      <h2 class="empty-state__title">Your cart is empty</h2>
+      <p>Your next upgrade is a few clicks away.</p>
+      <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Start shopping</a>
+      {%- if shop.customer_accounts_enabled and customer == nil -%}
+        <p class="empty-state__aside">Have an account? <a href="{{ routes.account_login_url }}">Sign in</a> to see your saved cart.</p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Cart",
+  "settings": []
+}
+{% endschema %}

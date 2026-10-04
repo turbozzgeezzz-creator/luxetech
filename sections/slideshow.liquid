@@ -1,0 +1,167 @@
+{%- liquid
+  assign slide_count = section.blocks.size
+-%}
+{%- if slide_count > 0 -%}
+<slide-show
+  class="slideshow slideshow--{{ section.settings.height }}"
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-speed="{{ section.settings.speed | times: 1000 }}"
+  aria-roledescription="carousel"
+  aria-label="{{ section.settings.label | escape }}"
+>
+  <div class="slideshow__viewport">
+    <div class="slideshow__track" id="Slides-{{ section.id }}" aria-live="off">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign heading_tag = 'h2'
+          if section.index == 1 and forloop.first
+            assign heading_tag = 'h1'
+          endif
+          assign img_alt = block.settings.image.alt | default: block.settings.heading
+          assign img_loading = 'lazy'
+          assign img_priority = 'auto'
+          if forloop.first
+            assign img_loading = 'eager'
+            assign img_priority = 'high'
+          endif
+        -%}
+        <div
+          class="slide slide--{{ block.settings.layout }} slide--text-{{ block.settings.text_tone }}"
+          id="Slide-{{ block.id }}"
+          role="group"
+          aria-roledescription="slide"
+          aria-label="{{ forloop.index }} of {{ slide_count }}"
+          style="--slide-bg: {{ block.settings.background }};"
+          {% unless forloop.first %}aria-hidden="true" inert{% endunless %}
+          {{ block.shopify_attributes }}
+        >
+          <div class="slide__media">
+            {%- if block.settings.image != blank -%}
+              {%- if block.settings.layout == 'full' -%}
+                <picture>
+                  {%- if block.settings.image_mobile != blank -%}
+                    <source media="(max-width: 749px)" srcset="{{ block.settings.image_mobile | image_url: width: 750 }} 750w, {{ block.settings.image_mobile | image_url: width: 1100 }} 1100w" sizes="100vw">
+                  {%- endif -%}
+                  {{ block.settings.image | image_url: width: 2400 | image_tag:
+                    loading: img_loading,
+                    fetchpriority: img_priority,
+                    widths: '750,1100,1500,1920,2400',
+                    sizes: '100vw',
+                    alt: img_alt,
+                    class: 'slide__img'
+                  }}
+                </picture>
+              {%- else -%}
+                {{ block.settings.image | image_url: width: 1400 | image_tag:
+                  loading: img_loading,
+                  fetchpriority: img_priority,
+                  widths: '500,750,1000,1400',
+                  sizes: '(min-width: 990px) 50vw, 100vw',
+                  alt: img_alt,
+                  class: 'slide__img'
+                }}
+              {%- endif -%}
+            {%- elsif request.design_mode -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'slide__img placeholder-svg' }}
+            {%- endif -%}
+          </div>
+          <div class="slide__content container">
+            <div class="slide__copy">
+              {%- if block.settings.kicker != blank -%}
+                <p class="slide__kicker">{{ block.settings.kicker | escape }}</p>
+              {%- endif -%}
+              {%- if block.settings.heading != blank -%}
+                <{{ heading_tag }} class="slide__heading">{{ block.settings.heading | escape }}</{{ heading_tag }}>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <div class="slide__text">{{ block.settings.text }}</div>
+              {%- endif -%}
+              {%- if block.settings.button_label != blank or block.settings.button_label_2 != blank -%}
+                <div class="slide__actions">
+                  {%- if block.settings.button_label != blank -%}
+                    <a href="{{ block.settings.button_link | default: routes.all_products_collection_url }}" class="btn btn--primary btn--lg"{% unless forloop.first %} tabindex="-1"{% endunless %}>{{ block.settings.button_label | escape }}</a>
+                  {%- endif -%}
+                  {%- if block.settings.button_label_2 != blank -%}
+                    <a href="{{ block.settings.button_link_2 | default: routes.collections_url }}" class="btn btn--ghost btn--lg"{% unless forloop.first %} tabindex="-1"{% endunless %}>{{ block.settings.button_label_2 | escape }}</a>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- if slide_count > 1 -%}
+    <div class="slideshow__controls container">
+      <button type="button" class="slideshow__arrow" data-slide-prev aria-controls="Slides-{{ section.id }}" aria-label="Previous slide">{% render 'icon', name: 'chevron-left' %}</button>
+      <div class="slideshow__dots" role="group" aria-label="Choose slide">
+        {%- for block in section.blocks -%}
+          <button type="button" class="slideshow__dot" data-slide-to="{{ forloop.index0 }}" aria-label="Slide {{ forloop.index }}: {{ block.settings.heading | escape }}"{% if forloop.first %} aria-current="true"{% endif %}></button>
+        {%- endfor -%}
+      </div>
+      <button type="button" class="slideshow__arrow" data-slide-next aria-controls="Slides-{{ section.id }}" aria-label="Next slide">{% render 'icon', name: 'chevron-right' %}</button>
+      {%- if section.settings.autoplay -%}
+        <button type="button" class="slideshow__arrow slideshow__toggle" data-slide-toggle aria-label="Pause slideshow">
+          {% render 'icon', name: 'pause', class: 'icon--sm icon-when-playing' %}
+          {% render 'icon', name: 'play', class: 'icon--sm icon-when-paused' %}
+        </button>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</slide-show>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Hero slideshow",
+  "class": "section-slideshow",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "text", "id": "label", "label": "Accessible name", "default": "Featured promotions", "info": "Read by screen readers to describe the carousel." },
+    { "type": "select", "id": "height", "label": "Height", "options": [
+      { "value": "sm", "label": "Compact" },
+      { "value": "md", "label": "Medium" },
+      { "value": "lg", "label": "Tall" }
+    ], "default": "md" },
+    { "type": "checkbox", "id": "autoplay", "label": "Auto-rotate slides", "default": true, "info": "Pauses on hover, on keyboard focus, and is turned off for visitors who prefer reduced motion." },
+    { "type": "range", "id": "speed", "label": "Change slides every", "min": 3, "max": 12, "step": 1, "unit": "s", "default": 6 }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "select", "id": "layout", "label": "Layout", "options": [
+          { "value": "split", "label": "Text left, product image right" },
+          { "value": "full", "label": "Full-width image" }
+        ], "default": "split" },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Split layout: a cut-out product shot works best. Full-width: 2400 x 900px." },
+        { "type": "image_picker", "id": "image_mobile", "label": "Mobile image (full-width layout only)" },
+        { "type": "color", "id": "background", "label": "Background color", "default": "#EEF2F8" },
+        { "type": "select", "id": "text_tone", "label": "Text color", "options": [
+          { "value": "light", "label": "Light (for dark backgrounds)" },
+          { "value": "dark", "label": "Dark (for light backgrounds)" }
+        ], "default": "dark" },
+        { "type": "text", "id": "kicker", "label": "Small line above heading" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Slide heading" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Describe the product or offer this slide links to.</p>" },
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop now" },
+        { "type": "url", "id": "button_link", "label": "Button link" },
+        { "type": "text", "id": "button_label_2", "label": "Second button label" },
+        { "type": "url", "id": "button_link_2", "label": "Second button link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero slideshow",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide", "settings": { "background": "#F4F6F9", "heading": "Second slide heading", "button_label": "Shop now" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

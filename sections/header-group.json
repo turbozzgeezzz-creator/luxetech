@@ -1,0 +1,110 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "utility-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "m1": {
+          "type": "message",
+          "settings": {
+            "text": "Tracked shipping on every order",
+            "icon": "truck"
+          }
+        },
+        "m2": {
+          "type": "message",
+          "settings": {
+            "text": "30-day returns",
+            "icon": "repeat",
+            "link": "/pages/returns-warranty"
+          }
+        },
+        "m3": {
+          "type": "message",
+          "settings": {
+            "text": "12-month warranty",
+            "icon": "shield",
+            "link": "/pages/returns-warranty"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "m3"
+      ],
+      "settings": {}
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "sticky": true,
+        "menu": "main-menu"
+      },
+      "blocks": {
+        "c1": {
+          "type": "mega",
+          "settings": {
+            "title": "Audio",
+            "icon": "headphones",
+            "link": "/collections/audio"
+          }
+        },
+        "c2": {
+          "type": "mega",
+          "settings": {
+            "title": "Charging",
+            "icon": "plug",
+            "link": "/collections/charging"
+          }
+        },
+        "c3": {
+          "type": "mega",
+          "settings": {
+            "title": "Smart home",
+            "icon": "home-device",
+            "link": "/collections/smart-home"
+          }
+        },
+        "c4": {
+          "type": "mega",
+          "settings": {
+            "title": "Accessories",
+            "icon": "case",
+            "link": "/collections/accessories"
+          }
+        },
+        "c5": {
+          "type": "link",
+          "settings": {
+            "title": "New arrivals",
+            "icon": "sparkle",
+            "link": "/collections/all?sort_by=created-descending"
+          }
+        },
+        "c6": {
+          "type": "link",
+          "settings": {
+            "title": "Sale",
+            "icon": "percent",
+            "highlight": true,
+            "link": "/collections/sale"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6"
+      ]
+    }
+  },
+  "order": [
+    "utility-bar",
+    "header"
+  ]
+}

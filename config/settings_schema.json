@@ -1,0 +1,392 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "LuxeTech",
+    "theme_version": "2.0.0",
+    "theme_author": "Luxe Dealers",
+    "theme_documentation_url": "https://tech.luxedealers.com",
+    "theme_support_url": "https://tech.luxedealers.com"
+  },
+  {
+    "name": "Logo",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo image",
+        "info": "Leave empty to show the store name as a text wordmark."
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "label": "Logo width",
+        "min": 80,
+        "max": 260,
+        "step": 10,
+        "unit": "px",
+        "default": 150
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "Square image, 32 x 32px recommended."
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "A calm retail palette: white and light grey surfaces, slate text, and one brand blue for buttons, links, sale prices and key highlights. Stock colors carry meaning on every product card, so keep them distinguishable."
+      },
+      {
+        "type": "header",
+        "content": "Base"
+      },
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "Page background",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_subtle",
+        "label": "Subtle background (bands, utility bar)",
+        "default": "#F4F6F9"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Surface (cards, panels)",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Text and footer",
+        "default": "#1B2433"
+      },
+      {
+        "type": "color",
+        "id": "color_muted",
+        "label": "Secondary text",
+        "default": "#5E6878"
+      },
+      {
+        "type": "color",
+        "id": "color_border",
+        "label": "Borders",
+        "default": "#E2E6EC"
+      },
+      {
+        "type": "header",
+        "content": "Brand"
+      },
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "Brand color (buttons, links, sale prices)",
+        "default": "#1D4ED8"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Brand tint (highlight chips, save labels)",
+        "default": "#E8EEFD"
+      },
+      {
+        "type": "header",
+        "content": "Status"
+      },
+      {
+        "type": "color",
+        "id": "color_success",
+        "label": "In stock",
+        "default": "#1A7F37"
+      },
+      {
+        "type": "color",
+        "id": "color_warning",
+        "label": "Low stock",
+        "default": "#B45309"
+      },
+      {
+        "type": "color",
+        "id": "color_error",
+        "label": "Errors",
+        "default": "#C42B2B"
+      }
+    ]
+  },
+  {
+    "name": "Product cards",
+    "settings": [
+      {
+        "type": "select",
+        "id": "card_label",
+        "label": "Small label above the title",
+        "options": [
+          {
+            "value": "vendor",
+            "label": "Brand (vendor)"
+          },
+          {
+            "value": "type",
+            "label": "Product type"
+          },
+          {
+            "value": "none",
+            "label": "None"
+          }
+        ],
+        "default": "vendor"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_sku",
+        "label": "Show SKU",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_rating",
+        "label": "Show star rating when review data exists",
+        "default": true,
+        "info": "Reads the standard reviews.rating and reviews.rating_count product metafields written by Shopify Product Reviews and most review apps. Nothing is shown for products without review data."
+      },
+      {
+        "type": "checkbox",
+        "id": "card_quick_add",
+        "label": "Enable quick add",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "card_quick_style",
+        "label": "Quick add button",
+        "options": [
+          {
+            "value": "button",
+            "label": "Always visible under the price"
+          },
+          {
+            "value": "hover",
+            "label": "Show on hover over the image"
+          }
+        ],
+        "default": "button"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_second_image",
+        "label": "Show second image on hover",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "card_image_ratio",
+        "label": "Image shape",
+        "options": [
+          {
+            "value": "square",
+            "label": "Square"
+          },
+          {
+            "value": "portrait",
+            "label": "Portrait"
+          },
+          {
+            "value": "landscape",
+            "label": "Landscape"
+          }
+        ],
+        "default": "square"
+      },
+      {
+        "type": "header",
+        "content": "Category color code"
+      },
+      {
+        "type": "textarea",
+        "id": "category_colors",
+        "label": "Product type colors",
+        "info": "Optional. One per line, as Product type: #hex (e.g. Audio: #1D4ED8). Cards show a small color tab next to the label so shoppers can scan categories at a glance. Types not listed get no tab."
+      }
+    ]
+  },
+  {
+    "name": "Stock and badges",
+    "settings": [
+      {
+        "type": "range",
+        "id": "low_stock_threshold",
+        "label": "Low stock when quantity is at or below",
+        "min": 1,
+        "max": 25,
+        "step": 1,
+        "default": 5,
+        "info": "Only applies to variants where Shopify tracks inventory."
+      },
+      {
+        "type": "text",
+        "id": "stock_in_text",
+        "label": "In stock message",
+        "default": "In stock"
+      },
+      {
+        "type": "text",
+        "id": "stock_shipping_note",
+        "label": "Shipping note after in stock",
+        "default": "ships in 1-2 business days",
+        "info": "Example: ships today. Leave empty to show only the in stock message."
+      },
+      {
+        "type": "text",
+        "id": "stock_backorder_text",
+        "label": "Backordered message",
+        "default": "Backordered, ships when restocked",
+        "info": "Shown when a variant is out of stock but set to continue selling."
+      },
+      {
+        "type": "range",
+        "id": "new_badge_days",
+        "label": "Show New badge for products published in the last",
+        "min": 0,
+        "max": 90,
+        "step": 5,
+        "unit": "d",
+        "default": 30,
+        "info": "Set to 0 to turn the New badge off."
+      }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "When a product is added",
+        "options": [
+          {
+            "value": "drawer",
+            "label": "Open cart drawer"
+          },
+          {
+            "value": "page",
+            "label": "Go to cart page"
+          }
+        ],
+        "default": "drawer"
+      },
+      {
+        "type": "number",
+        "id": "free_shipping_threshold",
+        "label": "Free shipping threshold",
+        "default": 0,
+        "info": "Order subtotal, in your store's default currency, that unlocks free shipping. Must match the free shipping rate you set up in Settings > Shipping and delivery (the theme cannot create shipping rates). Set to 0 to hide the progress bar, the buy box line and the utility bar message."
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_show_note",
+        "label": "Show order note on cart page",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Store details",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Used in the footer business block. Anything left empty is simply not shown."
+      },
+      {
+        "type": "textarea",
+        "id": "store_address",
+        "label": "Business address"
+      },
+      {
+        "type": "textarea",
+        "id": "support_hours",
+        "label": "Support hours",
+        "info": "Example: Mon-Fri 9am-6pm ET"
+      },
+      {
+        "type": "text",
+        "id": "support_email",
+        "label": "Support email"
+      },
+      {
+        "type": "text",
+        "id": "support_phone",
+        "label": "Support phone"
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Only platforms with a URL get an icon in the footer."
+      },
+      {
+        "type": "text",
+        "id": "social_instagram",
+        "label": "Instagram",
+        "placeholder": "https://instagram.com/"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok",
+        "label": "TikTok",
+        "placeholder": "https://tiktok.com/@"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube",
+        "label": "YouTube",
+        "placeholder": "https://youtube.com/"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook",
+        "label": "Facebook",
+        "placeholder": "https://facebook.com/"
+      },
+      {
+        "type": "text",
+        "id": "social_x",
+        "label": "X (Twitter)",
+        "placeholder": "https://x.com/"
+      },
+      {
+        "type": "text",
+        "id": "social_pinterest",
+        "label": "Pinterest",
+        "placeholder": "https://pinterest.com/"
+      }
+    ]
+  },
+  {
+    "name": "Search",
+    "settings": [
+      {
+        "type": "text",
+        "id": "search_placeholder",
+        "label": "Search bar placeholder",
+        "default": "Search headphones, chargers, smart plugs..."
+      },
+      {
+        "type": "checkbox",
+        "id": "predictive_search",
+        "label": "Show live product suggestions while typing",
+        "default": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,44 @@
+<div class="container account-page">
+  <div class="account-head">
+    <h1 class="page-title">Hi, {{ customer.first_name | default: 'there' | escape }}</h1>
+    <a href="{{ routes.account_logout_url }}" class="btn btn--outline btn--sm">Sign out</a>
+  </div>
+  <div class="account-grid">
+    <section aria-labelledby="OrdersHeading">
+      <h2 class="account-card__title" id="OrdersHeading">Order history</h2>
+      {%- paginate customer.orders by 20 -%}
+        {%- if customer.orders.size > 0 -%}
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th scope="col">Order</th><th scope="col">Date</th><th scope="col">Payment</th><th scope="col">Fulfillment</th><th scope="col">Total</th></tr></thead>
+              <tbody>
+                {%- for order in customer.orders -%}
+                  <tr>
+                    <td><a href="{{ order.customer_url }}">{{ order.name }}</a></td>
+                    <td>{{ order.created_at | date: format: 'date' }}</td>
+                    <td>{{ order.financial_status_label }}</td>
+                    <td>{{ order.fulfillment_status_label }}</td>
+                    <td>{{ order.total_net_amount | money_with_currency }}</td>
+                  </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+          </div>
+          {% render 'pagination', paginate: paginate %}
+        {%- else -%}
+          <p class="account-card__sub">You haven't placed any orders yet.</p>
+          <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Start shopping</a>
+        {%- endif -%}
+      {%- endpaginate -%}
+    </section>
+    <aside class="account-card" aria-labelledby="AddressHeading">
+      <h2 class="account-card__title" id="AddressHeading">Default address</h2>
+      {%- if customer.default_address -%}
+        <address class="account-address">{{ customer.default_address | format_address }}</address>
+      {%- else -%}
+        <p class="account-card__sub">No address saved yet.</p>
+      {%- endif -%}
+      <a href="{{ routes.account_addresses_url }}" class="btn btn--outline btn--sm">Manage addresses ({{ customer.addresses_count }})</a>
+    </aside>
+  </div>
+</div>

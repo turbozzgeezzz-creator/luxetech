@@ -1,0 +1,27 @@
+{%- comment -%}
+  Numbered pagination. Shopify keeps filter and sort parameters in paginate
+  URLs, so pages work with filters applied. Param: paginate
+{%- endcomment -%}
+{%- if paginate.pages > 1 -%}
+  <nav class="pagination" aria-label="Pagination">
+    <ul role="list">
+      {%- if paginate.previous -%}
+        <li><a href="{{ paginate.previous.url }}" class="pagination__item pagination__item--arrow" aria-label="Previous page">{% render 'icon', name: 'chevron-left', class: 'icon--sm' %}</a></li>
+      {%- endif -%}
+      {%- for part in paginate.parts -%}
+        <li>
+          {%- if part.is_link -%}
+            <a href="{{ part.url }}" class="pagination__item" aria-label="Page {{ part.title }}">{{ part.title }}</a>
+          {%- elsif part.title == paginate.current_page -%}
+            <span class="pagination__item is-current" aria-current="page">{{ part.title }}</span>
+          {%- else -%}
+            <span class="pagination__item pagination__gap">{{ part.title }}</span>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+      {%- if paginate.next -%}
+        <li><a href="{{ paginate.next.url }}" class="pagination__item pagination__item--arrow" aria-label="Next page">{% render 'icon', name: 'chevron-right', class: 'icon--sm' %}</a></li>
+      {%- endif -%}
+    </ul>
+  </nav>
+{%- endif -%}

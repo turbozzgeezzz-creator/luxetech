@@ -1,0 +1,170 @@
+{%- comment -%}
+  Native Shopify filtering (Search & Discovery app filters) used by collection
+  and search pages. One form: a sidebar on desktop, a slide-up drawer on mobile.
+
+  Params:
+  - results: collection or search object (required)
+  - section_id (required)
+  - sort_options, sort_by: for the sort select
+  - clear_url: URL with all filters removed
+  - terms: search terms (search page only)
+  - count: number of results
+{%- endcomment -%}
+{%- liquid
+  assign form_id = 'FacetForm-' | append: section_id
+  assign active_count = 0
+  for filter in results.filters
+    if filter.type == 'price_range'
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign active_count = active_count | plus: 1
+      endif
+    else
+      assign active_count = active_count | plus: filter.active_values.size
+    endif
+  endfor
+-%}
+
+<div class="toolbar">
+  {%- if results.filters.size > 0 -%}
+    <button type="button" class="btn btn--outline btn--sm toolbar__filter" data-drawer-open="FacetDrawer-{{ section_id }}" aria-controls="FacetDrawer-{{ section_id }}" aria-expanded="false">
+      {% render 'icon', name: 'filter', class: 'icon--sm' %}
+      <span>Filter</span>
+      <span class="toolbar__badge" id="FacetCount-{{ section_id }}" data-facet-swap{% if active_count == 0 %} hidden{% endif %}>{{ active_count }}</span>
+    </button>
+  {%- endif -%}
+  <p class="toolbar__count" id="ProductCount-{{ section_id }}" role="status" data-facet-swap>
+    {{ count }} {{ count | pluralize: 'product', 'products' }}
+  </p>
+  {%- if sort_options.size > 0 -%}
+    <div class="toolbar__sort">
+      <label for="SortBy-{{ section_id }}">Sort by</label>
+      <div class="select">
+        <select name="sort_by" id="SortBy-{{ section_id }}" form="{{ form_id }}" class="select__input">
+          {%- for option in sort_options -%}
+            <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name | escape }}</option>
+          {%- endfor -%}
+        </select>
+        {% render 'icon', name: 'chevron-down', class: 'icon--sm select__chevron' %}
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+{%- if results.filters.size > 0 -%}
+<facet-drawer class="facets" id="FacetDrawer-{{ section_id }}">
+  <div class="facets__overlay" data-drawer-close></div>
+  <div class="facets__panel" role="dialog" aria-modal="false" aria-labelledby="FacetTitle-{{ section_id }}" tabindex="-1">
+    <div class="facets__head">
+      <h2 class="facets__title" id="FacetTitle-{{ section_id }}">Filters</h2>
+      <button type="button" class="header__icon facets__close" data-drawer-close aria-label="Close filters">{% render 'icon', name: 'close' %}</button>
+    </div>
+
+    <form id="{{ form_id }}" class="facets__form" action="{{ request.path }}" method="get" data-facet-form>
+      {%- if terms != blank -%}
+        <input type="hidden" name="q" value="{{ terms | escape }}">
+        <input type="hidden" name="options[prefix]" value="last">
+      {%- endif -%}
+      <div id="FacetBody-{{ section_id }}" class="facets__body" data-facet-swap>
+        {%- for filter in results.filters -%}
+          {%- liquid
+            assign filter_active = filter.active_values.size
+            if filter.type == 'price_range'
+              assign filter_active = 0
+              if filter.min_value.value != nil or filter.max_value.value != nil
+                assign filter_active = 1
+              endif
+            endif
+          -%}
+          <details class="facet" data-facet-index="{{ forloop.index }}"{% if forloop.index <= 4 or filter_active > 0 %} open{% endif %}>
+            <summary class="facet__summary">
+              <span>{{ filter.label | escape }}</span>
+              {%- if filter_active > 0 -%}<span class="facet__active">{{ filter_active }}</span>{%- endif -%}
+              {% render 'icon', name: 'chevron-down', class: 'icon--sm facet__chevron' %}
+            </summary>
+            <div class="facet__body">
+              {%- case filter.type -%}
+                {%- when 'price_range' -%}
+                  {%- liquid
+                    assign max_display = filter.range_max | money_without_currency | remove: ','
+                    assign min_val = ''
+                    assign max_val = ''
+                    if filter.min_value.value != nil
+                      assign min_val = filter.min_value.value | money_without_currency | remove: ','
+                    endif
+                    if filter.max_value.value != nil
+                      assign max_val = filter.max_value.value | money_without_currency | remove: ','
+                    endif
+                  -%}
+                  <div class="price-range">
+                    <div class="price-range__field">
+                      <label for="PriceMin-{{ section_id }}">Min</label>
+                      <span class="price-range__input">
+                        <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+                        <input type="number" inputmode="decimal" id="PriceMin-{{ section_id }}" name="{{ filter.min_value.param_name }}" value="{{ min_val }}" placeholder="0" min="0" max="{{ max_display }}" step="any">
+                      </span>
+                    </div>
+                    <span class="price-range__sep" aria-hidden="true">to</span>
+                    <div class="price-range__field">
+                      <label for="PriceMax-{{ section_id }}">Max</label>
+                      <span class="price-range__input">
+                        <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+                        <input type="number" inputmode="decimal" id="PriceMax-{{ section_id }}" name="{{ filter.max_value.param_name }}" value="{{ max_val }}" placeholder="{{ max_display }}" min="0" max="{{ max_display }}" step="any">
+                      </span>
+                    </div>
+                  </div>
+                  <p class="price-range__note">Highest price is {{ filter.range_max | money }}</p>
+                {%- else -%}
+                  {%- liquid
+                    assign is_swatch = false
+                    if filter.presentation == 'swatch'
+                      assign is_swatch = true
+                    endif
+                  -%}
+                  <fieldset class="facet__values{% if is_swatch %} facet__values--swatch{% endif %}">
+                    <legend class="visually-hidden">{{ filter.label | escape }}</legend>
+                    {%- for value in filter.values -%}
+                      {%- assign input_id = 'Filter-' | append: section_id | append: '-' | append: filter.param_name | handle | append: '-' | append: forloop.index -%}
+                      {%- assign is_disabled = false -%}
+                      {%- if value.count == 0 and value.active == false -%}{%- assign is_disabled = true -%}{%- endif -%}
+                      <div class="check{% if is_disabled %} is-disabled{% endif %}{% if forloop.index > 8 %} facet__more{% endif %}">
+                        <input
+                          type="checkbox"
+                          id="{{ input_id }}"
+                          name="{{ value.param_name }}"
+                          value="{{ value.value | escape }}"
+                          class="check__input"
+                          {% if value.active %}checked{% endif %}
+                          {% if is_disabled %}disabled{% endif %}
+                        >
+                        <label for="{{ input_id }}" class="check__label">
+                          {%- if is_swatch -%}
+                            <span class="swatch swatch--sm" style="{% if value.swatch.image %}background-image: url({{ value.swatch.image | image_url: width: 48 }});{% elsif value.swatch.color %}background-color: {{ value.swatch.color }};{% endif %}" aria-hidden="true"></span>
+                          {%- else -%}
+                            <span class="check__box" aria-hidden="true">{% render 'icon', name: 'check', class: 'icon--xs' %}</span>
+                          {%- endif -%}
+                          <span class="check__text">{{ value.label | escape }}</span>
+                          <span class="check__count">{{ value.count }}</span>
+                        </label>
+                      </div>
+                    {%- endfor -%}
+                    {%- if filter.values.size > 8 -%}
+                      <button type="button" class="link-btn facet__toggle" data-facet-more>Show all {{ filter.values.size }}</button>
+                    {%- endif -%}
+                  </fieldset>
+              {%- endcase -%}
+            </div>
+          </details>
+        {%- endfor -%}
+      </div>
+      <noscript><button type="submit" class="btn btn--primary btn--block">Apply filters</button></noscript>
+    </form>
+
+    <div class="facets__foot">
+      <a href="{{ clear_url }}" class="btn btn--outline" data-facet-link>Clear all</a>
+      <button type="button" class="btn btn--primary" data-drawer-close>
+        Show <span id="FacetResultCount-{{ section_id }}" data-facet-swap>{{ count }}</span> results
+      </button>
+    </div>
+  </div>
+</facet-drawer>
+{%- endif -%}

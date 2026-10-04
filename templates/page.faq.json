@@ -1,0 +1,127 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    },
+    "orders": {
+      "type": "faq",
+      "settings": {
+        "heading": "Orders and payment",
+        "open_first": false
+      },
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "Which payment methods do you accept?",
+            "answer": "<p>All the payment methods we accept are shown at checkout and as icons at the bottom of every page. Checkout is encrypted and we never see or store your full card details.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "Can I change or cancel my order?",
+            "answer": "<p>Contact us as soon as possible with your order number. If your order hasn't shipped yet, we can usually change the items or address, or cancel it. Once it has shipped, you can return it under our returns policy instead.</p>"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Do I need an account to order?",
+            "answer": "<p>No. You can check out as a guest. An account lets you see your order history and save addresses for next time.</p>"
+          }
+        },
+        "q4": {
+          "type": "question",
+          "settings": {
+            "question": "How do I use a discount code?",
+            "answer": "<p>Enter the code in the discount field at checkout. Only one code can usually be used per order, and each code has its own terms such as a minimum spend or expiry date.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4"
+      ]
+    },
+    "shipping": {
+      "type": "faq",
+      "settings": {
+        "heading": "Shipping and tracking",
+        "open_first": false
+      },
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "When will my order ship?",
+            "answer": "<p>Orders for in-stock items leave our warehouse within 1-2 business days. Each product page shows its current stock status before you buy.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "How much is shipping?",
+            "answer": "<p>Shipping options and prices for your address are shown at checkout before you pay. If we're running a free shipping offer, the threshold is shown in your cart.</p>"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "How do I track my order?",
+            "answer": "<p>When your order ships we email you a tracking number. You can also check your order status any time from your confirmation email or your account. See our <a href=\"/pages/track-order\">Track my order</a> page.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3"
+      ]
+    },
+    "returns": {
+      "type": "faq",
+      "settings": {
+        "heading": "Returns and warranty",
+        "open_first": false
+      },
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>You can return unused items in their original packaging within 30 days of delivery. See <a href=\"/pages/returns-warranty\">Returns and warranty</a> for the full details.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "My item is faulty. What should I do?",
+            "answer": "<p>Contact us with your order number and a short description, photo or video of the fault. Products are covered by a 12-month warranty against defects, and we'll arrange a repair, replacement or refund.</p>"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Do products work in my country?",
+            "answer": "<p>Check the specifications tab on each product page for plug type, voltage and compatibility details. If anything is unclear, ask us before you order.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3"
+      ]
+    }
+  },
+  "order": [
+    "main",
+    "orders",
+    "shipping",
+    "returns"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "show_payment_icons": true,
+        "show_policies": true
+      },
+      "blocks": {
+        "about": {
+          "type": "about",
+          "settings": {
+            "show_logo": false
+          }
+        },
+        "shop": {
+          "type": "links",
+          "settings": {
+            "heading": "Shop",
+            "fallback": "shop"
+          }
+        },
+        "help": {
+          "type": "links",
+          "settings": {
+            "heading": "Help and support",
+            "fallback": "help"
+          }
+        },
+        "company": {
+          "type": "links",
+          "settings": {
+            "heading": "Company",
+            "fallback": "company"
+          }
+        },
+        "news": {
+          "type": "newsletter",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "about",
+        "shop",
+        "help",
+        "company",
+        "news"
+      ]
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

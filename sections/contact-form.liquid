@@ -1,0 +1,41 @@
+<div class="container container--narrow page">
+  <div class="contact">
+    <h2 class="section-head__title">{{ section.settings.heading | escape }}</h2>
+    {%- form 'contact', id: 'ContactForm', class: 'form-stack' -%}
+      {%- if form.posted_successfully? -%}
+        <p class="form-status form-status--success" role="status" tabindex="-1" autofocus>{% render 'icon', name: 'check-circle', class: 'icon--sm' %} Thanks, we got your message and will reply within one business day.</p>
+      {%- elsif form.errors -%}
+        <div class="form-status form-status--error" role="alert">{{ form.errors | default_errors }}</div>
+      {%- endif -%}
+      <div class="form-row">
+        <div class="field">
+          <label for="ContactName">Name</label>
+          <input id="ContactName" class="input" type="text" name="contact[name]" autocomplete="name" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}">
+        </div>
+        <div class="field">
+          <label for="ContactEmail">Email <span aria-hidden="true">*</span></label>
+          <input id="ContactEmail" class="input" type="email" name="contact[email]" autocomplete="email" required value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+        </div>
+      </div>
+      <div class="field">
+        <label for="ContactOrder">Order number (optional)</label>
+        <input id="ContactOrder" class="input" type="text" name="contact[order_number]" value="{{ form.order_number }}">
+      </div>
+      <div class="field">
+        <label for="ContactBody">How can we help?</label>
+        <textarea id="ContactBody" class="input" rows="6" name="contact[body]">{{ form.body }}</textarea>
+      </div>
+      <button type="submit" class="btn btn--primary">Send message</button>
+    {%- endform -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contact form",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Send us a message" }
+  ],
+  "presets": [{ "name": "Contact form" }]
+}
+{% endschema %}

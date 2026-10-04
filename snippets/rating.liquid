@@ -1,0 +1,31 @@
+{%- comment -%}
+  Star rating from the standard reviews metafields
+  (reviews.rating = rating type, reviews.rating_count = integer).
+  Renders nothing at all when a product has no review data.
+
+  Params:
+  - product: product object (required)
+  - show_count: optional, default true
+{%- endcomment -%}
+{%- liquid
+  assign rating = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+-%}
+{%- if rating != blank and rating.rating != blank -%}
+  {%- liquid
+    assign scale_max = rating.scale_max | default: 5 | times: 1.0
+    assign rating_value = rating.rating | times: 1.0
+    assign pct = rating_value | divided_by: scale_max | times: 100 | round: 1
+    assign display = rating_value | divided_by: scale_max | times: 5 | round: 1
+  -%}
+  <div class="rating" role="img" aria-label="Rated {{ display }} out of 5{% if rating_count > 0 %}, {{ rating_count }} reviews{% endif %}">
+    <span class="rating__stars" style="--rating: {{ pct }}%;" aria-hidden="true">
+      <span class="rating__base">{% for i in (1..5) %}{% render 'icon', name: 'star' %}{% endfor %}</span>
+      <span class="rating__fill">{% for i in (1..5) %}{% render 'icon', name: 'star' %}{% endfor %}</span>
+    </span>
+    <span class="rating__value" aria-hidden="true">{{ display }}</span>
+    {%- if rating_count > 0 and show_count != false -%}
+      <span class="rating__count" aria-hidden="true">({{ rating_count }})</span>
+    {%- endif -%}
+  </div>
+{%- endif -%}

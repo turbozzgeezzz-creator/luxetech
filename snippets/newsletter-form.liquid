@@ -1,0 +1,44 @@
+{%- comment -%}
+  Shopify customer newsletter signup (adds the email to Customers with
+  marketing consent). Params: id (unique), button_label, tags (optional),
+  discount_code (optional; shown with an apply link after a successful signup)
+{%- endcomment -%}
+{%- assign form_id = 'Newsletter-' | append: id -%}
+{%- form 'customer', id: form_id, class: 'newsletter-form' -%}
+  <input type="hidden" name="contact[tags]" value="{{ tags | default: 'newsletter' }}">
+  {%- if form.posted_successfully? -%}
+    <p class="form-status form-status--success" role="status" tabindex="-1" autofocus>
+      {% render 'icon', name: 'check-circle', class: 'icon--sm' %} You're subscribed. Thanks for signing up.
+    </p>
+    {%- if discount_code != blank -%}
+      <div class="discount-reveal">
+        <p class="discount-reveal__label">Your code</p>
+        <p class="discount-reveal__code" data-discount-code>{{ discount_code | escape }}</p>
+        <div class="discount-reveal__actions">
+          <button type="button" class="btn btn--outline btn--sm" data-copy-code="{{ discount_code | escape }}">Copy code</button>
+          <a href="{{ routes.root_url }}discount/{{ discount_code | url_encode }}?redirect={{ routes.all_products_collection_url }}" class="btn btn--primary btn--sm">Apply to my cart</a>
+        </div>
+      </div>
+    {%- endif -%}
+  {%- else -%}
+    <div class="newsletter-form__row">
+      <label for="{{ form_id }}-email" class="visually-hidden">Email address</label>
+      <input
+        type="email"
+        id="{{ form_id }}-email"
+        name="contact[email]"
+        class="input"
+        placeholder="Email address"
+        autocomplete="email"
+        required
+        {% if form.errors %}aria-invalid="true" aria-describedby="{{ form_id }}-error"{% endif %}
+      >
+      <button type="submit" class="btn btn--primary">{{ button_label | default: 'Subscribe' | escape }}</button>
+    </div>
+    {%- if form.errors -%}
+      <p class="form-status form-status--error" id="{{ form_id }}-error" role="alert">
+        {{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}
+      </p>
+    {%- endif -%}
+  {%- endif -%}
+{%- endform -%}

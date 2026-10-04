@@ -1,0 +1,23 @@
+{%- comment -%} Address form fields. Params: form, prefix (unique id prefix) {%- endcomment -%}
+<div class="form-row">
+  <div class="field"><label for="AddrFirst-{{ prefix }}">First name</label><input type="text" id="AddrFirst-{{ prefix }}" name="address[first_name]" class="input" autocomplete="given-name" value="{{ form.first_name }}"></div>
+  <div class="field"><label for="AddrLast-{{ prefix }}">Last name</label><input type="text" id="AddrLast-{{ prefix }}" name="address[last_name]" class="input" autocomplete="family-name" value="{{ form.last_name }}"></div>
+</div>
+<div class="field"><label for="AddrCompany-{{ prefix }}">Company (optional)</label><input type="text" id="AddrCompany-{{ prefix }}" name="address[company]" class="input" autocomplete="organization" value="{{ form.company }}"></div>
+<div class="field"><label for="AddrOne-{{ prefix }}">Address</label><input type="text" id="AddrOne-{{ prefix }}" name="address[address1]" class="input" autocomplete="address-line1" value="{{ form.address1 }}"></div>
+<div class="field"><label for="AddrTwo-{{ prefix }}">Apartment, suite, etc. (optional)</label><input type="text" id="AddrTwo-{{ prefix }}" name="address[address2]" class="input" autocomplete="address-line2" value="{{ form.address2 }}"></div>
+<div class="form-row">
+  <div class="field"><label for="AddrCity-{{ prefix }}">City</label><input type="text" id="AddrCity-{{ prefix }}" name="address[city]" class="input" autocomplete="address-level2" value="{{ form.city }}"></div>
+  <div class="field"><label for="AddrZip-{{ prefix }}">ZIP / postal code</label><input type="text" id="AddrZip-{{ prefix }}" name="address[zip]" class="input" autocomplete="postal-code" value="{{ form.zip }}"></div>
+</div>
+<div class="form-row">
+  <div class="field">
+    <label for="AddrCountry-{{ prefix }}">Country</label>
+    <div class="select">
+      <select id="AddrCountry-{{ prefix }}" name="address[country]" class="select__input" autocomplete="country" data-default="{{ form.country }}">{{ all_country_option_tags }}</select>
+      {% render 'icon', name: 'chevron-down', class: 'icon--sm select__chevron' %}
+    </div>
+  </div>
+  <div class="field"><label for="AddrProvince-{{ prefix }}">State / province</label><input type="text" id="AddrProvince-{{ prefix }}" name="address[province]" class="input" autocomplete="address-level1" value="{{ form.province }}"></div>
+</div>
+<div class="field"><label for="AddrPhone-{{ prefix }}">Phone</label><input type="tel" id="AddrPhone-{{ prefix }}" name="address[phone]" class="input" autocomplete="tel" value="{{ form.phone }}"></div>

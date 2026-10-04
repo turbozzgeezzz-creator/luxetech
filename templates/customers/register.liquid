@@ -1,0 +1,32 @@
+<div class="container container--xs account-page">
+  <div class="account-card">
+    <h1 class="page-title">Create account</h1>
+    <p class="account-card__sub">Track orders, save addresses and check out faster.</p>
+    {%- form 'create_customer', class: 'form-stack', novalidate: 'novalidate' -%}
+      {%- if form.errors -%}<div class="form-status form-status--error" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+      <div class="form-row">
+        <div class="field">
+          <label for="RegisterFirstName">First name</label>
+          <input type="text" id="RegisterFirstName" name="customer[first_name]" class="input" autocomplete="given-name" value="{{ form.first_name }}">
+        </div>
+        <div class="field">
+          <label for="RegisterLastName">Last name</label>
+          <input type="text" id="RegisterLastName" name="customer[last_name]" class="input" autocomplete="family-name" value="{{ form.last_name }}">
+        </div>
+      </div>
+      <div class="field">
+        <label for="RegisterEmail">Email</label>
+        <input type="email" id="RegisterEmail" name="customer[email]" class="input" autocomplete="email" value="{{ form.email }}" required>
+      </div>
+      <div class="field">
+        <label for="RegisterPassword">Password</label>
+        <input type="password" id="RegisterPassword" name="customer[password]" class="input" autocomplete="new-password" required>
+      </div>
+      <label class="check__label check__label--inline">
+        <input type="checkbox" name="customer[accepts_marketing]" value="true" class="check__native"> Email me restocks and deals
+      </label>
+      <button type="submit" class="btn btn--primary btn--block">Create account</button>
+    {%- endform -%}
+    <p class="account-card__alt">Already have an account? <a href="{{ routes.account_login_url }}">Sign in</a></p>
+  </div>
+</div>

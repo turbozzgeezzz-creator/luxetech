@@ -1,0 +1,31 @@
+{%- comment -%}
+  Design tokens. Every color in theme.css reads from these variables so the
+  merchant's Colors settings flow through the whole theme.
+{%- endcomment -%}
+<style>
+  :root {
+    --c-bg: {{ settings.color_background }};
+    --c-subtle: {{ settings.color_subtle }};
+    --c-surface: {{ settings.color_surface }};
+    --c-ink: {{ settings.color_ink }};
+    --c-ink-rgb: {{ settings.color_ink.red }}, {{ settings.color_ink.green }}, {{ settings.color_ink.blue }};
+    --c-muted: {{ settings.color_muted }};
+    --c-border: {{ settings.color_border }};
+    --c-primary: {{ settings.color_primary }};
+    --c-primary-rgb: {{ settings.color_primary.red }}, {{ settings.color_primary.green }}, {{ settings.color_primary.blue }};
+    --c-primary-dark: {{ settings.color_primary | color_darken: 12 }};
+    --c-accent: {{ settings.color_accent }};
+    --c-accent-text: {{ settings.color_primary | color_darken: 18 }};
+    --c-success: {{ settings.color_success }};
+    --c-success-soft: {{ settings.color_success | color_modify: 'alpha', 0.1 }};
+    --c-warning: {{ settings.color_warning }};
+    --c-warning-soft: {{ settings.color_warning | color_modify: 'alpha', 0.12 }};
+    --c-error: {{ settings.color_error }};
+    --c-error-soft: {{ settings.color_error | color_modify: 'alpha', 0.1 }};
+    --c-on-ink: #FFFFFF;
+    --c-on-ink-muted: {{ settings.color_ink | color_mix: '#FFFFFF', 35 }};
+    --font-display: 'Archivo', 'Helvetica Neue', Arial, system-ui, sans-serif;
+    --font-body: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --logo-width: {{ settings.logo_width }}px;
+  }
+</style>

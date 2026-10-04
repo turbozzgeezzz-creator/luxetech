@@ -1,0 +1,43 @@
+{%- comment -%}
+  Image overlay badges: Sold out, Sale, Low stock, New.
+  Params:
+  - product: product object (required)
+{%- endcomment -%}
+{%- liquid
+  assign v = product.selected_or_first_available_variant
+  assign is_sale = false
+  if product.compare_at_price_max > product.price_min
+    for variant in product.variants
+      if variant.compare_at_price > variant.price
+        assign is_sale = true
+        break
+      endif
+    endfor
+  endif
+
+  assign is_low = false
+  if product.available and v.inventory_management == 'shopify' and v.inventory_quantity > 0 and v.inventory_quantity <= settings.low_stock_threshold
+    assign is_low = true
+  endif
+
+  assign is_new = false
+  if settings.new_badge_days > 0 and product.published_at != blank
+    assign now_s = 'now' | date: '%s' | plus: 0
+    assign pub_s = product.published_at | date: '%s' | plus: 0
+    assign age_days = now_s | minus: pub_s | divided_by: 86400
+    if age_days <= settings.new_badge_days
+      assign is_new = true
+    endif
+  endif
+-%}
+{%- if product.available == false or is_sale or is_low or is_new -%}
+  <ul class="badges" role="list">
+    {%- if product.available == false -%}
+      <li class="badge badge--soldout">Sold out</li>
+    {%- else -%}
+      {%- if is_sale -%}<li class="badge badge--sale">Sale</li>{%- endif -%}
+      {%- if is_low -%}<li class="badge badge--low">Low stock</li>{%- endif -%}
+      {%- if is_new -%}<li class="badge badge--new">New</li>{%- endif -%}
+    {%- endif -%}
+  </ul>
+{%- endif -%}

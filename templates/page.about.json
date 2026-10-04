@@ -1,0 +1,78 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    },
+    "intro": {
+      "type": "rich-text",
+      "settings": {
+        "heading": "Tech that earns its place on your desk",
+        "text": "<p>LuxeTech is the electronics store from Luxe Dealers. We keep a deliberately focused range of everyday tech: the chargers, audio, smart home devices and accessories people actually use every day.</p><p>Rather than listing everything a supplier offers, we choose products we'd be happy to use ourselves, and we tell you plainly what's in stock, what it costs and what to expect after you buy.</p>",
+        "align": "left"
+      }
+    },
+    "values": {
+      "type": "trust-band",
+      "settings": {
+        "label": "What you can expect from us"
+      },
+      "blocks": {
+        "i1": {
+          "type": "item",
+          "settings": {
+            "icon": "check-circle",
+            "title": "Honest listings",
+            "text": "Real stock levels, clear specs and the full price up front."
+          }
+        },
+        "i2": {
+          "type": "item",
+          "settings": {
+            "icon": "repeat",
+            "title": "Easy returns",
+            "text": "Changed your mind? Send unused items back within 30 days."
+          }
+        },
+        "i3": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "12-month warranty",
+            "text": "If something fails from normal use, we'll put it right."
+          }
+        },
+        "i4": {
+          "type": "item",
+          "settings": {
+            "icon": "headset",
+            "title": "People, not bots",
+            "text": "Questions go to a real person on our team."
+          }
+        }
+      },
+      "block_order": [
+        "i1",
+        "i2",
+        "i3",
+        "i4"
+      ]
+    },
+    "help": {
+      "type": "rich-text",
+      "settings": {
+        "heading": "Got a question?",
+        "text": "<p>Whether you're checking compatibility before you buy or need help with an order, we're happy to help.</p>",
+        "align": "left",
+        "button_label": "Contact us",
+        "button_link": "/pages/contact"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "intro",
+    "values",
+    "help"
+  ]
+}

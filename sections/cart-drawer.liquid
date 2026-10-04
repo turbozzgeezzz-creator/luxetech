@@ -1,0 +1,51 @@
+<cart-drawer class="drawer drawer--right" id="CartDrawer" hidden>
+  <div class="drawer__overlay" data-drawer-close></div>
+  <div class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="CartDrawerTitle" tabindex="-1">
+    <div id="CartDrawerInner" class="cart-drawer__inner" data-cart-count="{{ cart.item_count }}" data-cart-total="{{ cart.total_price | money | escape }}">
+      <div class="drawer__head">
+        <h2 class="drawer__title" id="CartDrawerTitle">Your cart{% if cart.item_count > 0 %} <span class="drawer__count">({{ cart.item_count }})</span>{% endif %}</h2>
+        <button type="button" class="header__icon" data-drawer-close aria-label="Close cart">{% render 'icon', name: 'close' %}</button>
+      </div>
+
+      {%- if cart.item_count > 0 -%}
+        <div class="drawer__body">
+          {% render 'free-shipping-bar' %}
+          <cart-items data-context="drawer">
+            <ul class="cart-lines" role="list">
+              {%- for item in cart.items -%}
+                {% render 'cart-line', item: item, line: forloop.index, context: 'drawer' %}
+              {%- endfor -%}
+            </ul>
+          </cart-items>
+        </div>
+        <div class="drawer__foot cart-summary">
+          {%- for discount in cart.cart_level_discount_applications -%}
+            <p class="cart-summary__row cart-summary__row--discount"><span>{{ discount.title | escape }}</span><span>-{{ discount.total_allocated_amount | money }}</span></p>
+          {%- endfor -%}
+          <p class="cart-summary__row cart-summary__row--total"><span>Subtotal</span><span>{{ cart.total_price | money_with_currency }}</span></p>
+          <p class="cart-summary__note">Taxes and shipping calculated at checkout.</p>
+          <form action="{{ routes.cart_url }}" method="post" class="cart-summary__actions">
+            <button type="submit" name="checkout" class="btn btn--primary btn--lg btn--block">
+              {% render 'icon', name: 'lock', class: 'icon--sm' %}<span>Checkout</span>
+            </button>
+            <a href="{{ routes.cart_url }}" class="btn btn--outline btn--block">View cart</a>
+          </form>
+        </div>
+      {%- else -%}
+        <div class="drawer__body cart-empty">
+          {% render 'icon', name: 'cart', class: 'empty-state__icon' %}
+          <p class="cart-empty__title">Your cart is empty</p>
+          <p>Find something you'll actually use every day.</p>
+          <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Start shopping</a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</cart-drawer>
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "settings": []
+}
+{% endschema %}

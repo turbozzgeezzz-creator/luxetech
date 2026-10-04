@@ -1,0 +1,18 @@
+<div class="container container--narrow empty-state empty-state--page">
+  <p class="empty-state__code">404</p>
+  <h1 class="empty-state__title">This page isn't plugged in</h1>
+  <p>The link may be broken or the product may have moved. Try a search instead.</p>
+  <form action="{{ routes.search_url }}" method="get" role="search" class="search-form search-form--page">
+    <label for="Search404" class="visually-hidden">Search</label>
+    <input type="search" id="Search404" name="q" class="search-form__input" placeholder="{{ settings.search_placeholder | escape }}">
+    <button type="submit" class="search-form__submit" aria-label="Search">{% render 'icon', name: 'search' %}</button>
+  </form>
+  <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Shop all products</a>
+</div>
+
+{% schema %}
+{
+  "name": "404",
+  "settings": []
+}
+{% endschema %}

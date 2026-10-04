@@ -1,0 +1,55 @@
+{%- comment -%}
+  Rendered via the Section Rendering API from the header search box:
+  /search/suggest?q=...&section_id=predictive-search
+{%- endcomment -%}
+{%- if predictive_search.performed -%}
+  {%- assign products = predictive_search.resources.products -%}
+  {%- assign collections = predictive_search.resources.collections -%}
+  <div class="predictive__inner" data-predictive-count="{{ products.size | plus: collections.size }}">
+    {%- if collections.size > 0 -%}
+      <div class="predictive__group">
+        <p class="predictive__heading">Categories</p>
+        <ul class="predictive__chips" role="list">
+          {%- for c in collections limit: 4 -%}
+            <li><a href="{{ c.url }}" class="chip">{{ c.title | escape }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+    {%- if products.size > 0 -%}
+      <div class="predictive__group">
+        <p class="predictive__heading">Products</p>
+        <ul class="predictive__list" role="listbox" aria-label="Products">
+          {%- for p in products limit: 6 -%}
+            <li role="option" id="predictive-option-{{ forloop.index }}" aria-selected="false">
+              <a href="{{ p.url }}" class="predictive__item" tabindex="-1">
+                <span class="predictive__thumb">
+                  {%- if p.featured_media -%}
+                    {{ p.featured_media.preview_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 56, height: 56 }}
+                  {%- endif -%}
+                </span>
+                <span class="predictive__info">
+                  <span class="predictive__title">{{ p.title | escape }}</span>
+                  {% render 'price', product: p %}
+                </span>
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+    {%- if products.size == 0 and collections.size == 0 -%}
+      <p class="predictive__empty">No matches for &ldquo;{{ predictive_search.terms | escape }}&rdquo;. Try a brand or product type.</p>
+    {%- endif -%}
+    <a href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}&amp;options%5Bprefix%5D=last" class="predictive__all">
+      See all results for &ldquo;{{ predictive_search.terms | escape }}&rdquo;
+    </a>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Predictive search",
+  "settings": []
+}
+{% endschema %}

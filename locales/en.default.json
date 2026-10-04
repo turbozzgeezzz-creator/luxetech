@@ -1,0 +1,18 @@
+{
+  "general": {
+    "search": {
+      "placeholder": "Search headphones, chargers, smart plugs..."
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to cart",
+      "sold_out": "Sold out",
+      "unavailable": "Unavailable"
+    }
+  },
+  "cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty"
+  }
+}

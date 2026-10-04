@@ -1,0 +1,27 @@
+{%- comment -%}
+  Progress toward free shipping. Hidden unless Theme settings > Cart >
+  Free shipping threshold is above 0.
+{%- endcomment -%}
+{%- if settings.free_shipping_threshold > 0 and cart.item_count > 0 -%}
+  {%- liquid
+    assign threshold = settings.free_shipping_threshold | times: 100
+    assign remaining = threshold | minus: cart.total_price
+    assign pct = cart.total_price | times: 100 | divided_by: threshold
+    if pct > 100
+      assign pct = 100
+    endif
+  -%}
+  <div class="ship-bar{% if remaining <= 0 %} ship-bar--done{% endif %}">
+    <p class="ship-bar__text" role="status">
+      {%- render 'icon', name: 'truck', class: 'icon--sm' -%}
+      {%- if remaining > 0 -%}
+        <span>You're <strong>{{ remaining | money }}</strong> away from free shipping</span>
+      {%- else -%}
+        <span>You've unlocked <strong>free shipping</strong></span>
+      {%- endif -%}
+    </p>
+    <div class="ship-bar__track" role="progressbar" aria-label="Progress to free shipping" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct }}">
+      <span class="ship-bar__fill" style="width: {{ pct }}%;"></span>
+    </div>
+  </div>
+{%- endif -%}

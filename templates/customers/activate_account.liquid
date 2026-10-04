@@ -1,0 +1,19 @@
+<div class="container container--xs account-page">
+  <div class="account-card">
+    <h1 class="page-title">Activate your account</h1>
+    <p class="account-card__sub">Create a password to finish setting up your account.</p>
+    {%- form 'activate_customer_password', class: 'form-stack' -%}
+      {%- if form.errors -%}<div class="form-status form-status--error" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+      <div class="field">
+        <label for="ActivatePassword">Password</label>
+        <input type="password" id="ActivatePassword" name="customer[password]" class="input" autocomplete="new-password" required>
+      </div>
+      <div class="field">
+        <label for="ActivatePasswordConfirm">Confirm password</label>
+        <input type="password" id="ActivatePasswordConfirm" name="customer[password_confirmation]" class="input" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="btn btn--primary btn--block">Activate account</button>
+      <button type="submit" name="decline" class="btn btn--outline btn--block">Decline invitation</button>
+    {%- endform -%}
+  </div>
+</div>

@@ -1,0 +1,160 @@
+{%- comment -%}
+  Buy box shared by the product page and the quick-add dialog.
+
+  Params:
+  - product (required)
+  - section_id (required): keeps element ids unique
+  - mode: 'main' (default) or 'quick'
+  - show_sku, show_dynamic_checkout, show_qty: booleans
+  - heading_tag: 'h1' on the product page, 'h2' in quick add
+{%- endcomment -%}
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign mode = mode | default: 'main'
+  assign heading_tag = heading_tag | default: 'h1'
+  assign uid = section_id | append: '-' | append: product.id
+  assign form_id = 'ProductForm-' | append: uid
+
+  assign label = blank
+  if product.vendor != blank and product.vendor != shop.name
+    assign label = product.vendor
+  elsif product.type != blank
+    assign label = product.type
+  endif
+-%}
+{%- capture cat_color -%}{% render 'category-color', type: product.type %}{%- endcapture -%}
+{%- assign cat_color = cat_color | strip -%}
+
+<div class="buybox">
+  {%- if label != blank -%}
+    <p class="buybox__label">
+      {%- if cat_color != blank -%}<span class="cat-tab" style="--cat: {{ cat_color }};" aria-hidden="true"></span>{%- endif -%}
+      {%- if label == product.vendor -%}
+        <a href="{{ product.vendor | url_for_vendor }}">{{ label | escape }}</a>
+      {%- else -%}
+        <a href="{{ product.type | url_for_type }}">{{ label | escape }}</a>
+      {%- endif -%}
+    </p>
+  {%- endif -%}
+
+  <{{ heading_tag }} class="buybox__title">
+    {%- if mode == 'quick' -%}<a href="{{ product.url }}">{{ product.title | escape }}</a>{%- else -%}{{ product.title | escape }}{%- endif -%}
+  </{{ heading_tag }}>
+
+  <div class="buybox__meta">
+    {% render 'rating', product: product %}
+    {%- if show_sku != false -%}
+      <p class="buybox__sku"{% if current_variant.sku == blank %} hidden{% endif %}>SKU <span data-sku>{{ current_variant.sku | escape }}</span></p>
+    {%- endif -%}
+  </div>
+
+  <div class="buybox__price" data-price-slot>
+    {% render 'price', product: product, variant: current_variant, size: 'lg' %}
+  </div>
+
+  <div data-stock-slot>
+    {% render 'stock-status', variant: current_variant %}
+  </div>
+
+  {%- if settings.free_shipping_threshold > 0 -%}
+    <p class="buybox__ship">
+      {% render 'icon', name: 'truck', class: 'icon--sm' %}
+      <span>Free shipping on orders over {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}</span>
+    </p>
+  {%- endif -%}
+
+  {%- if mode == 'main' and product.metafields.custom.highlights != blank -%}
+    {%- assign highlights = product.metafields.custom.highlights.value -%}
+    {%- if highlights.size > 0 -%}
+      <ul class="buybox__highlights">
+        {%- for h in highlights -%}
+          <li>{% render 'icon', name: 'check', class: 'icon--sm' %}<span>{{ h | escape }}</span></li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- unless product.has_only_default_variant -%}
+    <div class="variant-picker" data-variant-picker>
+      {%- for option in product.options_with_values -%}
+        {%- assign uses_swatch = false -%}
+        {%- if option.values.first.swatch != blank -%}{%- assign uses_swatch = true -%}{%- endif -%}
+        <fieldset class="option" data-option-index="{{ forloop.index0 }}">
+          <legend class="option__legend">
+            {{ option.name | escape }}: <span class="option__selected" data-selected-value>{{ option.selected_value | escape }}</span>
+          </legend>
+          <div class="option__values{% if uses_swatch %} option__values--swatch{% endif %}">
+            {%- for value in option.values -%}
+              {%- assign input_id = 'Opt-' | append: uid | append: '-' | append: option.position | append: '-' | append: forloop.index -%}
+              <input
+                type="radio"
+                class="option__input visually-hidden"
+                id="{{ input_id }}"
+                name="Option-{{ uid }}-{{ option.position }}"
+                value="{{ value | escape }}"
+                {% if option.selected_value == value %}checked{% endif %}
+              >
+              <label for="{{ input_id }}" class="option__pill{% if uses_swatch %} option__pill--swatch{% endif %}">
+                {%- if uses_swatch -%}
+                  <span class="swatch" style="{% if value.swatch.image %}background-image: url({{ value.swatch.image | image_url: width: 64 }});{% elsif value.swatch.color %}background-color: {{ value.swatch.color }};{% endif %}" aria-hidden="true"></span>
+                  <span class="visually-hidden">{{ value | escape }}</span>
+                {%- else -%}
+                  {{ value | escape }}
+                {%- endif -%}
+                <span class="visually-hidden option__na-label"> (unavailable)</span>
+              </label>
+            {%- endfor -%}
+          </div>
+        </fieldset>
+      {%- endfor -%}
+    </div>
+  {%- endunless -%}
+
+  <product-form class="buybox__form" data-mode="{{ mode }}">
+    {%- form 'product', product, id: form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+      <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
+      <div class="buybox__actions">
+        {%- if show_qty != false -%}
+          <quantity-input class="qty">
+            <button type="button" class="qty__btn" name="minus" aria-label="Decrease quantity">{% render 'icon', name: 'minus', class: 'icon--sm' %}</button>
+            <label for="Qty-{{ uid }}" class="visually-hidden">Quantity</label>
+            <input type="number" id="Qty-{{ uid }}" class="qty__input" name="quantity" value="1" min="1" step="1" inputmode="numeric">
+            <button type="button" class="qty__btn" name="plus" aria-label="Increase quantity">{% render 'icon', name: 'plus', class: 'icon--sm' %}</button>
+          </quantity-input>
+        {%- endif -%}
+        <button
+          type="submit"
+          name="add"
+          class="btn btn--primary btn--lg buybox__add"
+          data-add-button
+          {% unless current_variant.available %}disabled{% endunless %}
+        >
+          {% render 'icon', name: 'cart', class: 'icon--sm' %}
+          <span data-add-label>{% if current_variant.available %}Add to cart{% else %}Sold out{% endif %}</span>
+        </button>
+      </div>
+      <p class="form-error" role="alert" hidden></p>
+      {%- if show_dynamic_checkout -%}
+        <div class="buybox__dynamic">{{ form | payment_button }}</div>
+      {%- endif -%}
+    {%- endform -%}
+  </product-form>
+
+  <script type="application/json" data-variant-json>
+    [
+      {%- for v in product.variants -%}
+        {%- capture v_price -%}{% render 'price', product: product, variant: v, size: 'lg' %}{%- endcapture -%}
+        {%- capture v_stock -%}{% render 'stock-status', variant: v %}{%- endcapture -%}
+        {
+          "id": {{ v.id }},
+          "options": {{ v.options | json }},
+          "available": {{ v.available | json }},
+          "sku": {{ v.sku | json }},
+          "media": {{ v.featured_media.id | json }},
+          "priceHtml": {{ v_price | strip_newlines | json }},
+          "stockHtml": {{ v_stock | strip_newlines | json }}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  </script>
+</div>
