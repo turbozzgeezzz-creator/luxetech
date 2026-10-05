@@ -305,6 +305,21 @@
     ]
   },
   {
+    "name": "Reviews",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Built for Judge.me. Install Judge.me, then turn on its app embed in Theme settings > App embeds. Stars on product cards and the reviews section on product pages fill in automatically."
+      },
+      {
+        "type": "checkbox",
+        "id": "judgeme_enabled",
+        "label": "Show Judge.me reviews and stars",
+        "default": true
+      }
+    ]
+  },
+  {
     "name": "Volume and bundle deals",
     "settings": [
       {

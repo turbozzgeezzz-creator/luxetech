@@ -14,6 +14,7 @@
     <div class="bento">
       {%- if slides.size > 0 -%}
         <bento-carousel class="bento__main" data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.speed }}">
+          <div class="bento__track" data-bento-track>
           {%- for block in slides -%}
             {%- assign is_offer = block.settings.open_offer -%}
             <div class="bento-slide tone tone--{{ block.settings.tone }}{% if forloop.first %} is-active{% endif %}" data-slide aria-roledescription="slide" aria-label="{{ forloop.index }} of {{ slides.size }}" {{ block.shopify_attributes }}>
@@ -43,6 +44,7 @@
               </div>
             </div>
           {%- endfor -%}
+          </div>
           {%- if slides.size > 1 -%}
             <div class="bento__controls">
               <button type="button" class="bento__arrow" data-prev aria-label="Previous slide">{% render 'icon', name: 'chevron-left', class: 'icon--sm' %}</button>
@@ -293,6 +295,18 @@
             {
               "value": "ill-wishlist",
               "label": "Heart"
+            },
+            {
+              "value": "ill-newsletter",
+              "label": "Envelope and coupon"
+            },
+            {
+              "value": "ill-blog-haircare",
+              "label": "Straightener, comb and dial"
+            },
+            {
+              "value": "ill-blog-tracker",
+              "label": "Keys and tracker"
             }
           ],
           "default": "ill-devices"

@@ -1,0 +1,109 @@
+{%- comment -%}
+  Order tracker. Left: paste a tracking number, pick the carrier (or let
+  17TRACK detect it) and the carrier's live tracking page opens.
+  Right: no tracking number yet? Send the order number and email through the
+  store's contact form, or sign in to see every order.
+  Carrier links use {number} where the tracking number goes.
+{%- endcomment -%}
+{%- assign carriers = section.blocks | where: 'type', 'carrier' -%}
+<section class="section section--tight tracker-section" id="tracker">
+  <div class="container">
+    <div class="tracker">
+      <div class="tracker__card tracker__card--lookup tone tone--light">
+        <p class="tone-kicker">{% render 'icon', name: 'truck', class: 'icon--sm' %} {{ section.settings.lookup_kicker | escape }}</p>
+        <h2 class="tracker__title">{{ section.settings.lookup_heading | escape }}</h2>
+        <p class="tracker__text">{{ section.settings.lookup_text | escape }}</p>
+        <order-tracker class="tracker__form">
+          <form action="#" data-tracker-form novalidate>
+            <div class="field">
+              <label for="TrackNumber-{{ section.id }}" class="field__label">Tracking number</label>
+              <input type="text" id="TrackNumber-{{ section.id }}" class="input" name="number" placeholder="e.g. 33ABC1234567" autocomplete="off" autocapitalize="characters" spellcheck="false" required aria-describedby="TrackError-{{ section.id }}">
+            </div>
+            <div class="field">
+              <label for="TrackCarrier-{{ section.id }}" class="field__label">Carrier</label>
+              <div class="select">
+                <select id="TrackCarrier-{{ section.id }}" class="input select__input" name="carrier">
+                  {%- for block in carriers -%}
+                    <option value="{{ block.settings.url | escape }}"{% if forloop.first %} selected{% endif %}>{{ block.settings.name | escape }}</option>
+                  {%- endfor -%}
+                </select>
+                {% render 'icon', name: 'chevron-down', class: 'icon--sm select__chevron' %}
+              </div>
+            </div>
+            <p class="tracker__error" id="TrackError-{{ section.id }}" role="alert" hidden>Enter your tracking number first.</p>
+            <button type="submit" class="btn btn--primary btn--lg tracker__submit">{{ section.settings.lookup_button | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</button>
+            <p class="tracker__fine">{{ section.settings.lookup_fine | escape }}</p>
+          </form>
+        </order-tracker>
+      </div>
+
+      <div class="tracker__card tracker__card--help tone tone--violet">
+        <p class="tone-kicker">{% render 'icon', name: 'chat', class: 'icon--sm' %} {{ section.settings.help_kicker | escape }}</p>
+        <h2 class="tracker__title">{{ section.settings.help_heading | escape }}</h2>
+        <p class="tracker__text">{{ section.settings.help_text | escape }}</p>
+        {%- form 'contact', id: 'OrderHelp', class: 'tracker__help-form' -%}
+          {%- if form.posted_successfully? -%}
+            <p class="form-status form-status--success" role="status" tabindex="-1" autofocus>{% render 'icon', name: 'check-circle', class: 'icon--sm' %} Thanks. We'll check on your order and email you, usually within one business day.</p>
+          {%- else -%}
+            <input type="hidden" name="contact[subject]" value="Order status request">
+            <div class="tracker__row">
+              <div class="field">
+                <label for="OrderHelp-order" class="field__label">Order number</label>
+                <input type="text" id="OrderHelp-order" class="input" name="contact[Order number]" placeholder="#1001" required>
+              </div>
+              <div class="field">
+                <label for="OrderHelp-email" class="field__label">Email used at checkout</label>
+                <input type="email" id="OrderHelp-email" class="input" name="contact[email]" autocomplete="email" placeholder="you@example.com" required{% if form.errors %} aria-invalid="true"{% endif %}>
+              </div>
+            </div>
+            {%- if form.errors -%}
+              <p class="form-status form-status--error" role="alert">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</p>
+            {%- endif -%}
+            <button type="submit" class="btn tone-btn btn--lg">{{ section.settings.help_button | escape }}</button>
+          {%- endif -%}
+        {%- endform -%}
+        {%- if shop.customer_accounts_enabled -%}
+          <a href="{{ routes.account_url }}" class="tracker__account">{% render 'icon', name: 'user', class: 'icon--sm' %} {% if customer %}See all my orders{% else %}Have an account? Sign in to see your orders{% endif %}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Order tracker",
+  "settings": [
+    { "type": "header", "content": "Tracking lookup" },
+    { "type": "text", "id": "lookup_kicker", "label": "Small line", "default": "Live tracking" },
+    { "type": "text", "id": "lookup_heading", "label": "Heading", "default": "Track your parcel" },
+    { "type": "text", "id": "lookup_text", "label": "Text", "default": "Paste the tracking number from your shipping email. Not sure who the carrier is? Leave it on auto-detect." },
+    { "type": "text", "id": "lookup_button", "label": "Button", "default": "Track my parcel" },
+    { "type": "text", "id": "lookup_fine", "label": "Fine print", "default": "Opens the carrier's tracking page in a new tab." },
+    { "type": "header", "content": "Order help" },
+    { "type": "text", "id": "help_kicker", "label": "Small line", "default": "No tracking number yet?" },
+    { "type": "text", "id": "help_heading", "label": "Heading", "default": "We'll check on it for you" },
+    { "type": "text", "id": "help_text", "label": "Text", "default": "Orders are dispatched within 3-4 business days, and your tracking number arrives by email when it ships. Waiting longer? Send us your order details." },
+    { "type": "text", "id": "help_button", "label": "Button", "default": "Check my order" }
+  ],
+  "blocks": [
+    {
+      "type": "carrier",
+      "name": "Carrier",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Name", "default": "Australia Post" },
+        { "type": "text", "id": "url", "label": "Tracking link", "info": "Use {number} where the tracking number goes.", "default": "https://auspost.com.au/mypost/track/details/{number}" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Order tracker",
+      "blocks": [
+        { "type": "carrier", "settings": { "name": "Auto-detect carrier", "url": "https://t.17track.net/en#nums={number}" } },
+        { "type": "carrier", "settings": { "name": "Australia Post", "url": "https://auspost.com.au/mypost/track/details/{number}" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

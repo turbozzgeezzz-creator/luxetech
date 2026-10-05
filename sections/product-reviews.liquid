@@ -3,7 +3,8 @@
   reviews.rating / reviews.rating_count metafields (written by Shopify's
   Product Reviews app and most review apps). Without reviews it shows an
   honest empty state. Add your review app's block here in the theme editor
-  to show its reviews list and review form.
+  to show its reviews list and review form. With Judge.me enabled in theme
+  settings, its review widget loads here automatically.
 {%- endcomment -%}
 {%- liquid
   assign rating = product.metafields.reviews.rating.value
@@ -42,6 +43,9 @@
               {% render block %}
           {%- endcase -%}
         {%- endfor -%}
+        {%- if settings.judgeme_enabled and section.blocks.size == 0 -%}
+          <div id="judgeme_product_reviews" class="jdgm-widget jdgm-review-widget jdgm-outside-widget" data-id="{{ product.id }}">{{ product.metafields.judgeme.widget }}</div>
+        {%- endif -%}
         {%- if section.blocks.size == 0 -%}
           <div class="reviews__placeholder">
             <span class="reviews__placeholder-icon">{% render 'icon', name: 'chat' %}</span>
@@ -61,7 +65,7 @@
     { "type": "text", "id": "empty_text", "label": "No reviews text", "default": "No reviews yet. Bought this? We'd love to hear what you think." },
     { "type": "text", "id": "placeholder_text", "label": "Placeholder text", "default": "Reviews from verified customers will appear here." },
     { "type": "text", "id": "button_label", "label": "Button", "default": "Share your experience" },
-    { "type": "url", "id": "button_link", "label": "Button link", "info": "Defaults to your contact page. Point it at your review app's form once installed." }
+    { "type": "url", "id": "button_link", "label": "Button link", "info": "Defaults to your contact page. Hidden while Judge.me reviews are showing." }
   ],
   "blocks": [{ "type": "@app" }],
   "presets": [{ "name": "Product reviews" }]

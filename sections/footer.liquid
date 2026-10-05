@@ -74,8 +74,6 @@
                       {%- endif -%}
                       {%- if pages.faq.url != blank -%}<li><a href="{{ pages.faq.url }}">FAQs</a></li>{%- endif -%}
                       {%- if pages['track-order'].url != blank -%}<li><a href="{{ pages['track-order'].url }}">Track my order</a></li>{%- endif -%}
-                      {%- if terms_url != blank -%}<li><a href="{{ terms_url }}">Terms and conditions</a></li>{%- endif -%}
-                      {%- if privacy_url != blank -%}<li><a href="{{ privacy_url }}">Privacy policy</a></li>{%- endif -%}
                     {%- when 'account' -%}
                       {%- if shop.customer_accounts_enabled -%}
                         {%- if customer -%}
@@ -88,7 +86,7 @@
                         {%- endif -%}
                       {%- endif -%}
                       <li><a href="{{ routes.cart_url }}">My cart</a></li>
-                      {%- if pages['track-order'].url != blank -%}<li><a href="{{ pages['track-order'].url }}">Where's my order?</a></li>{%- endif -%}
+                      {%- if pages.wishlist.url != blank -%}<li><a href="{{ pages.wishlist.url }}">My wishlist</a></li>{%- endif -%}
                     {%- when 'company' -%}
                       {%- if pages['about-us'].url != blank -%}<li><a href="{{ pages['about-us'].url }}">About us</a></li>{%- endif -%}
                       {%- if pages['about-us'].url != blank -%}<li><a href="{{ pages['about-us'].url }}#why">Why shop with us</a></li>{%- endif -%}

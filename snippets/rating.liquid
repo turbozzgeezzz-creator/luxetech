@@ -1,7 +1,8 @@
 {%- comment -%}
   Star rating from the standard reviews metafields
   (reviews.rating = rating type, reviews.rating_count = integer).
-  Renders nothing at all when a product has no review data.
+  Renders nothing at all when a product has no review data. Without that
+  data, falls back to the Judge.me preview badge when Judge.me is enabled.
 
   Params:
   - product: product object (required)
@@ -28,4 +29,6 @@
       <span class="rating__count" aria-hidden="true">({{ rating_count }})</span>
     {%- endif -%}
   </div>
+{%- elsif settings.judgeme_enabled and product.metafields.judgeme.badge != blank -%}
+  <div class="jdgm-widget jdgm-preview-badge" data-id="{{ product.id }}"{% if template.name == 'product' %} data-template="product"{% endif %}>{{ product.metafields.judgeme.badge }}</div>
 {%- endif -%}

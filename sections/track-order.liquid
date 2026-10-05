@@ -1,5 +1,8 @@
 <section class="section section--tight">
   <div class="container container--narrow">
+    {%- if section.settings.heading != blank -%}
+      <div class="section-head"><h2 class="section-head__title">{{ section.settings.heading | escape }}</h2></div>
+    {%- endif -%}
     <ol class="steps" role="list">
       {%- for block in section.blocks -%}
         <li class="step" {{ block.shopify_attributes }}>
@@ -24,6 +27,7 @@
 {
   "name": "Order tracking steps",
   "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
     { "type": "text", "id": "contact_label", "label": "Help button label", "default": "Contact support" },
     { "type": "url", "id": "contact_link", "label": "Help button link" }
   ],

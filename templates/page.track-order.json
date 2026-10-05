@@ -10,7 +10,8 @@
       "type": "track-order",
       "settings": {
         "contact_label": "Contact support",
-        "contact_link": "/pages/contact"
+        "contact_link": "/pages/contact",
+        "heading": "Where to find your tracking details"
       },
       "blocks": {
         "s1": {
@@ -55,14 +56,63 @@
         "tone": "violet",
         "art": "ill-track",
         "kicker": "Orders",
-        "text": "<p>Find your tracking details in a few clicks.</p>",
+        "text": "<p>Paste your tracking number for live updates, or send us your order number and we'll check on it for you.</p>",
         "heading": "Track my order"
       }
+    },
+    "tracker": {
+      "type": "order-tracker",
+      "settings": {},
+      "blocks": {
+        "c1": {
+          "type": "carrier",
+          "settings": {
+            "name": "Auto-detect carrier",
+            "url": "https://t.17track.net/en#nums={number}"
+          }
+        },
+        "c2": {
+          "type": "carrier",
+          "settings": {
+            "name": "Australia Post",
+            "url": "https://auspost.com.au/mypost/track/details/{number}"
+          }
+        },
+        "c3": {
+          "type": "carrier",
+          "settings": {
+            "name": "Aramex",
+            "url": "https://www.aramex.com.au/tools/track?l={number}"
+          }
+        },
+        "c4": {
+          "type": "carrier",
+          "settings": {
+            "name": "CouriersPlease",
+            "url": "https://www.couriersplease.com.au/tools-track/no/{number}"
+          }
+        },
+        "c5": {
+          "type": "carrier",
+          "settings": {
+            "name": "DHL",
+            "url": "https://www.dhl.com/au-en/home/tracking/tracking-express.html?submit=1&tracking-id={number}"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5"
+      ]
     }
   },
   "order": [
     "hero",
-    "main",
-    "steps"
+    "tracker",
+    "steps",
+    "main"
   ]
 }
