@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500"><defs>
+<radialGradient id="gillaboutau" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7D03FC" stop-opacity=".55"/><stop offset=".5" stop-color="#7D03FC" stop-opacity=".18"/><stop offset="1" stop-color="#7D03FC" stop-opacity="0"/></radialGradient>
+<linearGradient id="willaboutau" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#E9ECF3"/><stop offset="1" stop-color="#B9C0CF"/></linearGradient>
+<linearGradient id="wsillaboutau" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C8CEDB"/><stop offset=".35" stop-color="#FFFFFF"/><stop offset="1" stop-color="#AEB6C6"/></linearGradient>
+<linearGradient id="millaboutau" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A5366"/><stop offset=".45" stop-color="#232A38"/><stop offset="1" stop-color="#0C1019"/></linearGradient>
+<linearGradient id="mhillaboutau" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#151A25"/><stop offset=".3" stop-color="#5A6478"/><stop offset=".55" stop-color="#262D3B"/><stop offset="1" stop-color="#0E121B"/></linearGradient>
+<linearGradient id="scillaboutau" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B4DFF"/><stop offset=".5" stop-color="#5B12E0"/><stop offset="1" stop-color="#1A0B5C"/></linearGradient>
+<linearGradient id="vlillaboutau" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B57CFF"/><stop offset="1" stop-color="#7D03FC"/></linearGradient>
+<linearGradient id="tanillaboutau" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A88B62"/><stop offset=".5" stop-color="#D9C39C"/><stop offset="1" stop-color="#9B7E55"/></linearGradient>
+<linearGradient id="cardillaboutau" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4E1F5"/></linearGradient>
+<linearGradient id="kraftillaboutau" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8C79A"/><stop offset="1" stop-color="#B98B55"/></linearGradient>
+<filter id="billaboutau" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+<filter id="sillaboutau" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="dillaboutau" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#0B0620" flood-opacity=".35"/></filter>
+</defs><circle cx="300" cy="250" r="230" fill="url(#gillaboutau)"/><g transform="translate(220 250) rotate(-10) scale(0.6)" filter="url(#dillaboutau)"><rect x="-92" y="-180" width="184" height="360" rx="36" fill="#0B0F18"/>
+<rect x="-84" y="-172" width="168" height="344" rx="30" fill="url(#scillaboutau)"/>
+<rect x="-30" y="-162" width="60" height="16" rx="8" fill="#0B0F18"/><rect x="-60" y="-110" width="120" height="120" rx="16" fill="#fff" opacity=".18"/><path d="M-10 -80 V-20 a16 16 0 1 1 -10 -14 V-70 l50 -12 V-30 a16 16 0 1 1 -10 -14 V-74 Z" fill="#fff"/><rect x="-60" y="40" width="120" height="6" rx="3" fill="#fff" opacity=".5"/><rect x="-60" y="40" width="70" height="6" rx="3" fill="#fff"/><g fill="#fff"><circle cx="0" cy="90" r="18"/><path d="M-50 82 l-14 8 14 8z M50 82 l14 8 -14 8z"/></g>
+<path d="M-84 -60 L84 -150 V-110 L-84 -20 Z" fill="#fff" opacity=".07"/></g><g transform="translate(410 330) rotate(6) scale(0.6)" filter="url(#dillaboutau)"><rect x="-130" y="-95" width="260" height="190" rx="78" fill="url(#willaboutau)"/>
+<path d="M-130 -23 H130" stroke="#AEB6C6" stroke-width="3"/><rect x="-112" y="-81" width="224" height="40" rx="20" fill="#fff" opacity=".55"/>
+<rect x="-24" y="-31" width="48" height="10" rx="5" fill="#C8CEDB"/><circle cx="0" cy="35" r="7" fill="#7D03FC"/><circle cx="0" cy="35" r="18" fill="#7D03FC" opacity=".35" filter="url(#sillaboutau)"/></g><g transform="translate(480 110) rotate(0) scale(0.45)"><path d="M0 -40 Q6 -6 40 0 Q6 6 0 40 Q-6 6 -40 0 Q-6 -6 0 -40 Z" fill="#fff"/></g></svg>

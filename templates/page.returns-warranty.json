@@ -73,8 +73,8 @@
     "hero": {
       "type": "page-hero",
       "settings": {
-        "tone": "grape",
-        "art": "art-deals",
+        "tone": "ink",
+        "art": "ill-returns",
         "kicker": "Returns",
         "text": "<p>30-day change-of-mind returns on unused items, and faulty items repaired, replaced or refunded.</p>",
         "heading": "Returns and refunds",

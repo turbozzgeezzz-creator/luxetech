@@ -1,0 +1,20 @@
+{%- comment -%}
+  Country/currency selector using Shopify Markets. Only renders when more than
+  one country or currency is available (Settings > Markets in Shopify admin).
+  Params: id (unique), variant ('bar' | 'footer' | 'drawer')
+{%- endcomment -%}
+{%- if localization.available_countries.size > 1 -%}
+  {%- assign form_id = 'Localization-' | append: id -%}
+  {%- assign form_class = 'currency-form currency-form--' | append: variant -%}
+  {%- form 'localization', id: form_id, class: form_class -%}
+    <label for="{{ form_id }}-country" class="currency-form__label">{% render 'icon', name: 'globe', class: 'icon--xs' %}<span class="visually-hidden">Country and currency</span></label>
+    <select name="country_code" id="{{ form_id }}-country" class="currency-form__select" data-autosubmit>
+      {%- for country in localization.available_countries -%}
+        <option value="{{ country.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
+          {{ country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol }})
+        </option>
+      {%- endfor -%}
+    </select>
+    <noscript><button type="submit" class="btn btn--sm btn--outline">Update</button></noscript>
+  {%- endform -%}
+{%- endif -%}

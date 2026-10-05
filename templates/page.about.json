@@ -3,8 +3,8 @@
     "hero": {
       "type": "page-hero",
       "settings": {
-        "tone": "violet",
-        "art": "art-hero",
+        "tone": "ink",
+        "art": "ill-about",
         "kicker": "About us",
         "text": "<p>We're the tech side of Luxe Dealers: a specialist store for the audio, charging, smart kitchen and wearable gear that earns a place in your day. Every product is picked by our team, and every question gets a straight answer.</p>",
         "heading": "Everyday tech, chosen by people who use it",
@@ -86,7 +86,7 @@
             "tagline": "Wireless earbuds and true-wireless sound",
             "link": "/collections/audio",
             "tone": "violet",
-            "art": "art-audio"
+            "art": "ill-about-audio"
           }
         },
         "d2": {
@@ -97,7 +97,7 @@
             "tagline": "Magnetic wireless pads and USB-C",
             "link": "/collections/charging",
             "tone": "ink",
-            "art": "art-charging"
+            "art": "ill-about-charging"
           }
         },
         "d3": {
@@ -107,8 +107,8 @@
             "kicker": "Kitchen",
             "tagline": "Espresso, blending and desserts",
             "link": "/collections/smart-home",
-            "tone": "violet",
-            "art": "art-home"
+            "tone": "light",
+            "art": "ill-about-home"
           }
         },
         "d4": {
@@ -119,7 +119,7 @@
             "tagline": "Smartwatches, hair care and cooling",
             "link": "/collections/accessories",
             "tone": "grape",
-            "art": "art-accessories"
+            "art": "ill-about-accessories"
           }
         }
       },

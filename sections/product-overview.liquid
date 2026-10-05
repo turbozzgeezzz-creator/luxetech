@@ -1,0 +1,113 @@
+{%- comment -%}
+  Product overview: intro, feature cards and an "at a glance" panel.
+  Feature cards come from the product metafield custom.highlights when set,
+  otherwise from "- " bullet lines or <li> items in the description.
+  Nothing here is invented: when a product has no bullet list, only the intro
+  and the at-a-glance panel show.
+{%- endcomment -%}
+{%- liquid
+  assign desc = product.description
+  assign features = ''
+  assign highlights = product.metafields.custom.highlights.value
+  if highlights.size > 0
+    assign features = highlights | join: '|||'
+  elsif desc contains '<li'
+    assign parts = desc | split: '<li'
+    for part in parts offset: 1 limit: 6
+      assign item = part | prepend: '<li' | split: '</li>' | first | strip_html | strip
+      if item != blank
+        assign features = features | append: item | append: '|||'
+      endif
+    endfor
+  elsif desc contains '<br>- ' or desc contains '<br/>- ' or desc contains '<br />- '
+    assign normalized = desc | replace: '<br/>', '<br>' | replace: '<br />', '<br>'
+    assign parts = normalized | split: '<br>- '
+    for part in parts offset: 1 limit: 6
+      assign item = part | split: '<br>' | first | strip_html | strip
+      if item != blank
+        assign features = features | append: item | append: '|||'
+      endif
+    endfor
+  endif
+  assign feature_list = features | split: '|||'
+
+  assign intro = desc | split: '</p>' | first | strip_html | strip | truncatewords: 60
+  if intro contains 'Key Features'
+    assign intro = ''
+  endif
+
+  assign category = blank
+  for c in product.collections
+    if c.handle != 'all' and c.handle != 'frontpage'
+      assign category = c
+      break
+    endif
+  endfor
+  assign icons = 'bolt,sparkle,shield,check-circle,headphones,clock' | split: ','
+-%}
+<section class="section product-overview" id="overview" aria-labelledby="OverviewHeading-{{ section.id }}">
+  <div class="container">
+    <div class="overview">
+      <div class="overview__main">
+        <p class="eyebrow eyebrow--muted">Overview</p>
+        <h2 class="overview__title" id="OverviewHeading-{{ section.id }}">{% render 'product-short-title', product: product, words: 8 %}</h2>
+        {%- if intro != blank -%}<p class="overview__intro">{{ intro }}</p>{%- endif -%}
+        {%- if feature_list.size > 0 -%}
+          <ul class="overview__features" role="list" data-stagger>
+            {%- for f in feature_list -%}
+              {%- liquid
+                assign f_title = ''
+                assign f_text = f
+                if f contains ':'
+                  assign head = f | split: ':' | first | strip
+                  if head.size < 42
+                    assign f_title = head
+                    assign f_text = f | remove_first: head | remove_first: ':' | strip
+                  endif
+                endif
+                assign icon_index = forloop.index0 | modulo: icons.size
+                assign icon_name = icons[icon_index]
+              -%}
+              <li class="feature">
+                <span class="feature__icon">{% render 'icon', name: icon_name, class: 'icon--sm' %}</span>
+                <span class="feature__body">
+                  {%- if f_title != blank -%}<span class="feature__title">{{ f_title | escape }}</span>{%- endif -%}
+                  <span class="feature__text">{{ f_text | capitalize | escape }}</span>
+                </span>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+      <aside class="overview__glance" aria-label="At a glance">
+        <p class="overview__glance-title">At a glance</p>
+        <dl class="glance">
+          {%- if category != blank -%}<div><dt>Department</dt><dd><a href="{{ category.url }}">{{ category.title | escape }}</a></dd></div>{%- endif -%}
+          {%- unless product.has_only_default_variant -%}<div><dt>Options</dt><dd>{{ product.variants.size }} {{ product.variants.size | pluralize: 'option', 'options' }}</dd></div>{%- endunless -%}
+          <div><dt>Price</dt><dd>{% if product.price_varies %}From {% endif %}{{ product.price_min | money }}</dd></div>
+          <div><dt>Availability</dt><dd>{% if product.available %}In stock{% else %}Sold out{% endif %}</dd></div>
+          <div><dt>Dispatch</dt><dd>{{ section.settings.dispatch | escape }}</dd></div>
+          <div><dt>Returns</dt><dd>{{ section.settings.returns | escape }}</dd></div>
+          {%- if product.selected_or_first_available_variant.sku != blank -%}<div><dt>SKU</dt><dd>{{ product.selected_or_first_available_variant.sku | escape }}</dd></div>{%- endif -%}
+        </dl>
+        <ul class="overview__promises" role="list">
+          <li>{% render 'icon', name: 'truck', class: 'icon--sm' %} Tracked delivery</li>
+          <li>{% render 'icon', name: 'lock', class: 'icon--sm' %} Secure checkout</li>
+          <li>{% render 'icon', name: 'shield', class: 'icon--sm' %} Faulty items put right</li>
+          <li>{% render 'icon', name: 'chat', class: 'icon--sm' %} Real people support</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product overview",
+  "settings": [
+    { "type": "text", "id": "dispatch", "label": "Dispatch line", "default": "3-4 business days" },
+    { "type": "text", "id": "returns", "label": "Returns line", "default": "30-day change of mind" }
+  ],
+  "presets": [{ "name": "Product overview" }]
+}
+{% endschema %}

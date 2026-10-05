@@ -8,19 +8,19 @@
   assign key = block.settings.title | handle
   case key
     when 'audio'
-      assign art = 'art-audio'
+      assign art = 'ill-mega-audio'
       assign tone = 'violet'
     when 'charging'
-      assign art = 'art-charging'
+      assign art = 'ill-mega-charging'
       assign tone = 'ink'
     when 'smart-home', 'kitchen', 'home'
-      assign art = 'art-home'
+      assign art = 'ill-mega-home'
       assign tone = 'violet'
     when 'accessories', 'wearables'
-      assign art = 'art-accessories'
+      assign art = 'ill-mega-accessories'
       assign tone = 'grape'
     else
-      assign art = 'art-hero'
+      assign art = 'ill-col-all'
       assign tone = 'violet'
   endcase
 -%}
@@ -63,16 +63,12 @@
     {%- endif -%}
   </ul>
 
-  <a href="{{ block.settings.promo_link | default: block.settings.link | default: c.url }}" class="mega-auto__promo bento-tone--{{ tone }}">
-    {%- if block.settings.promo_image != blank -%}
-      {{ block.settings.promo_image | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320,480,640', sizes: '300px', alt: '', class: 'bento-art' }}
-    {%- else -%}
-      <img src="{{ art | append: '.svg' | asset_url }}" alt="" class="bento-art" width="600" height="600" loading="lazy">
-    {%- endif -%}
+  <a href="{{ block.settings.promo_link | default: block.settings.link | default: c.url }}" class="mega-auto__promo tone tone--{{ tone }}">
+    <span class="mega-auto__promo-art art-box">{% render 'ill', name: art, image: block.settings.promo_image, sizes: '300px' %}</span>
     <span class="mega-auto__promo-copy">
-      <span class="bento-kicker">{% if block.settings.promo_text != blank %}{{ block.settings.promo_text | escape }}{% else %}Hand-picked{% endif %}</span>
+      <span class="tone-kicker">{% if block.settings.promo_text != blank %}{{ block.settings.promo_text | escape }}{% else %}Hand-picked{% endif %}</span>
       <span class="mega-auto__promo-heading">{{ block.settings.promo_heading | default: block.settings.title | escape }}</span>
-      <span class="mega-auto__promo-cta">{% if block.settings.promo_heading != blank %}{{ block.settings.promo_link_label | escape }}{% else %}Shop {{ block.settings.title | escape }}{% endif %} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
+      <span class="mega-auto__promo-cta tone-pill">{% if block.settings.promo_heading != blank %}{{ block.settings.promo_link_label | escape }}{% else %}Shop {{ block.settings.title | escape }}{% endif %} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
     </span>
   </a>
 </div>

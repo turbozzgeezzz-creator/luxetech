@@ -19,7 +19,10 @@
   <meta property="og:image:secure_url" content="https:{{ page_image | image_url: width: 1200 }}">
   <meta property="og:image:width" content="{{ page_image.width }}">
   <meta property="og:image:height" content="{{ page_image.height }}">
+{%- else -%}
+  <meta property="og:image" content="https:{{ 'logo-tech-luxedealers.png' | asset_url }}">
 {%- endif -%}
+<meta property="og:locale" content="{{ request.locale.iso_code | replace: '-', '_' }}">
 {%- if request.page_type == 'product' -%}
   <meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html }}">
   <meta property="og:price:currency" content="{{ cart.currency.iso_code }}">

@@ -23,11 +23,23 @@
     {%- endif -%}
 
     {% render 'meta-tags' %}
+    {% render 'structured-data' %}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=JetBrains+Mono:wght@400..700&display=swap">
 
+    <script>
+      /* Apply the saved or device colour mode before first paint (no flash). */
+      (function () {
+        var mode = {{ settings.dark_mode | default: 'device' | json }};
+        if (mode === 'off') return;
+        var saved = null;
+        try { saved = localStorage.getItem('luxetech:theme'); } catch (e) {}
+        var dark = saved ? saved === 'dark' : (mode === 'device' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+      })();
+    </script>
     {% render 'css-variables' %}
 
     {{ 'theme.css' | asset_url | stylesheet_tag }}
@@ -60,6 +72,7 @@
     {% sections 'header-group' %}
 
     <main id="MainContent" class="main-content" role="main" tabindex="-1">
+      {%- if request.page_type == 'index' -%}<h1 class="visually-hidden">{{ shop.name | escape }}: audio, charging, smart kitchen and wearable tech</h1>{%- endif -%}
       {{ content_for_layout }}
     </main>
 

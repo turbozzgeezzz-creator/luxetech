@@ -137,6 +137,10 @@
           </ul>
         {%- endif -%}
 
+        {%- for block in section.blocks -%}
+          {%- if block.type == '@app' -%}{% render block %}{%- endif -%}
+        {%- endfor -%}
+
         {%- if section.settings.show_dispatch -%}
           <div class="dispatch-card">
             <span class="dispatch-card__icon">{% render 'icon', name: 'truck' %}</span>
@@ -194,11 +198,11 @@
         assign pick_handles = picks | split: ','
       -%}
       {%- if pick_count > 0 and product.available -%}
-        <section class="pair" data-bundle aria-labelledby="PairHeading-{{ section.id }}">
+        <section class="pair" data-bundle{% if settings.bundle_enabled %} data-bundle-pct="{{ settings.bundle_pct }}"{% endif %} aria-labelledby="PairHeading-{{ section.id }}">
           <div class="pair__head">
             <p class="eyebrow">Complete the set</p>
             <h2 class="pair__title" id="PairHeading-{{ section.id }}">{{ section.settings.bundle_heading | escape }}</h2>
-            {%- if section.settings.bundle_note != blank -%}<p class="pair__note">{{ section.settings.bundle_note | escape }}</p>{%- endif -%}
+            {%- if settings.bundle_enabled -%}<p class="pair__note">Save {{ settings.bundle_pct }}% when you add two or more together</p>{%- elsif section.settings.bundle_note != blank -%}<p class="pair__note">{{ section.settings.bundle_note | escape }}</p>{%- endif -%}
           </div>
           <div class="pair__body">
             <ul class="pair__items" role="list">
@@ -356,6 +360,9 @@
     "description": {{ product.description | strip_html | truncate: 500 | json }},
     {%- if current_variant.sku != blank -%}"sku": {{ current_variant.sku | json }},{%- endif -%}
     "brand": { "@type": "Brand", "name": {{ product.vendor | json }} },
+    {%- if product.metafields.reviews.rating.value != blank and product.metafields.reviews.rating_count.value > 0 -%}
+    "aggregateRating": { "@type": "AggregateRating", "ratingValue": {{ product.metafields.reviews.rating.value.rating | json }}, "bestRating": {{ product.metafields.reviews.rating.value.scale_max | json }}, "reviewCount": {{ product.metafields.reviews.rating_count.value | json }} },
+    {%- endif -%}
     "offers": [
       {%- for v in product.variants -%}
         {
@@ -364,6 +371,8 @@
           "availability": "http://schema.org/{% if v.available %}InStock{% else %}OutOfStock{% endif %}",
           "price": {{ v.price | divided_by: 100.0 | json }},
           "priceCurrency": {{ cart.currency.iso_code | json }},
+          "itemCondition": "https://schema.org/NewCondition",
+          "seller": { "@type": "Organization", "name": {{ shop.name | json }} },
           "url": {{ request.origin | append: v.url | json }}
         }{% unless forloop.last %},{% endunless %}
       {%- endfor -%}
@@ -399,6 +408,7 @@
     { "type": "text", "id": "specs_key", "label": "Specs metafield key", "default": "specs" }
   ],
   "blocks": [
+    { "type": "@app" },
     {
       "type": "description",
       "name": "Description tab",

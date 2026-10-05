@@ -1,8 +1,9 @@
 {%- comment -%}
   Bento promo hero: a rotating main banner with promo tiles around it.
   Tiles 1-2 fill the left column, tiles 3-5 the row under the banner.
-  Each slide and tile uses a built-in illustration unless an image is uploaded.
-  Tick "Opens welcome-offer popup" on a slide or tile to make it open the email popup.
+  Copy and artwork each get their own area, so text always sits on a solid
+  background. Tick "Opens welcome-offer popup" to make a slide or tile open
+  the email popup.
 {%- endcomment -%}
 {%- liquid
   assign slides = section.blocks | where: 'type', 'slide'
@@ -14,32 +15,31 @@
       {%- if slides.size > 0 -%}
         <bento-carousel class="bento__main" data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.speed }}">
           {%- for block in slides -%}
-            {%- liquid
-              assign tone = block.settings.tone
-              assign is_offer = block.settings.open_offer
-            -%}
-            <div class="bento-slide bento-tone--{{ tone }}{% if forloop.first %} is-active{% endif %}" data-slide aria-roledescription="slide" aria-label="{{ forloop.index }} of {{ slides.size }}" {{ block.shopify_attributes }}>
-              <div class="bento-slide__art">
-                {%- if block.settings.image != blank -%}
-                  {{ block.settings.image | image_url: width: 1800 | image_tag: loading: 'eager', widths: '700,1000,1400,1800', sizes: '(min-width: 990px) 75vw, 100vw', alt: block.settings.image.alt, class: 'bento-art' }}
-                {%- else -%}
-                  <img src="{{ block.settings.art | append: '.svg' | asset_url }}" alt="" class="bento-art" width="1200" height="600" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
-                {%- endif -%}
-              </div>
+            {%- assign is_offer = block.settings.open_offer -%}
+            <div class="bento-slide tone tone--{{ block.settings.tone }}{% if forloop.first %} is-active{% endif %}" data-slide aria-roledescription="slide" aria-label="{{ forloop.index }} of {{ slides.size }}" {{ block.shopify_attributes }}>
               <div class="bento-slide__copy">
-                {%- if block.settings.kicker != blank -%}<p class="bento-kicker">{{ block.settings.kicker | escape }}</p>{%- endif -%}
+                {%- if block.settings.kicker != blank -%}<p class="tone-kicker">{{ block.settings.kicker | escape }}</p>{%- endif -%}
                 <h2 class="bento-slide__heading">{{ block.settings.heading | escape }}</h2>
                 {%- if block.settings.text != blank -%}<p class="bento-slide__text">{{ block.settings.text | escape }}</p>{%- endif -%}
                 <div class="bento-slide__actions">
                   {%- if block.settings.button_label != blank -%}
-                    <a href="{% if is_offer %}#{% else %}{{ block.settings.link | default: routes.all_products_collection_url }}{% endif %}" class="btn btn--white btn--lg"{% if is_offer %} data-open-popup{% endif %}>
+                    <a href="{% if is_offer %}#{% else %}{{ block.settings.link | default: routes.all_products_collection_url }}{% endif %}" class="btn tone-btn btn--lg"{% if is_offer %} data-open-popup{% endif %}>
                       {{- block.settings.button_label | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' -%}
                     </a>
                   {%- endif -%}
                   {%- if block.settings.button_label_2 != blank -%}
-                    <a href="{{ block.settings.link_2 | default: routes.root_url }}" class="btn btn--outline-light btn--lg">{{ block.settings.button_label_2 | escape }}</a>
+                    <a href="{{ block.settings.link_2 | default: routes.root_url }}" class="btn tone-btn-2 btn--lg">{{ block.settings.button_label_2 | escape }}</a>
                   {%- endif -%}
                 </div>
+              </div>
+              <div class="bento-slide__art art-box">
+                {%- liquid
+                  assign slide_loading = 'lazy'
+                  if forloop.first
+                    assign slide_loading = 'eager'
+                  endif
+                -%}
+                {% render 'ill', name: block.settings.art, image: block.settings.image, sizes: '(min-width: 990px) 40vw, 90vw', loading: slide_loading %}
               </div>
             </div>
           {%- endfor -%}
@@ -58,23 +58,15 @@
       {%- endif -%}
 
       {%- for block in tiles limit: 5 -%}
-        {%- liquid
-          assign is_offer = block.settings.open_offer
-        -%}
-        <a href="{% if is_offer %}#{% else %}{{ block.settings.link | default: routes.all_products_collection_url }}{% endif %}" class="bento-tile bento-tile--{{ forloop.index }} bento-tone--{{ block.settings.tone }}"{% if is_offer %} data-open-popup{% endif %} {{ block.shopify_attributes }}>
-          <span class="bento-tile__art">
-            {%- if block.settings.image != blank -%}
-              {{ block.settings.image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '400,600,900', sizes: '(min-width: 990px) 25vw, 50vw', alt: '', class: 'bento-art' }}
-            {%- else -%}
-              <img src="{{ block.settings.art | append: '.svg' | asset_url }}" alt="" class="bento-art" width="600" height="600" loading="lazy">
-            {%- endif -%}
-          </span>
+        {%- assign is_offer = block.settings.open_offer -%}
+        <a href="{% if is_offer %}#{% else %}{{ block.settings.link | default: routes.all_products_collection_url }}{% endif %}" class="bento-tile bento-tile--{{ forloop.index }} tone tone--{{ block.settings.tone }}"{% if is_offer %} data-open-popup{% endif %} {{ block.shopify_attributes }}>
           <span class="bento-tile__copy">
-            {%- if block.settings.kicker != blank -%}<span class="bento-kicker">{{ block.settings.kicker | escape }}</span>{%- endif -%}
+            {%- if block.settings.kicker != blank -%}<span class="tone-kicker">{{ block.settings.kicker | escape }}</span>{%- endif -%}
             <span class="bento-tile__heading">{{ block.settings.heading | escape }}</span>
             {%- if block.settings.text != blank -%}<span class="bento-tile__text">{{ block.settings.text | escape }}</span>{%- endif -%}
-            {%- if block.settings.button_label != blank -%}<span class="bento-tile__cta">{{ block.settings.button_label | escape }}</span>{%- endif -%}
+            {%- if block.settings.button_label != blank -%}<span class="bento-tile__cta tone-pill">{{ block.settings.button_label | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>{%- endif -%}
           </span>
+          <span class="bento-tile__art art-box">{% render 'ill', name: block.settings.art, image: block.settings.image, sizes: '(min-width: 990px) 15vw, 40vw' %}</span>
         </a>
       {%- endfor -%}
     </div>
@@ -88,10 +80,32 @@
   "class": "section-bento",
   "max_blocks": 10,
   "settings": [
-    { "type": "text", "id": "label", "label": "Accessible name", "default": "Featured offers and categories" },
-    { "type": "checkbox", "id": "autoplay", "label": "Rotate slides", "default": true },
-    { "type": "range", "id": "speed", "label": "Time per slide", "min": 3, "max": 12, "step": 1, "unit": "s", "default": 6 },
-    { "type": "paragraph", "content": "Tiles 1-2 fill the left column and tiles 3-5 the row under the banner. Tick Opens welcome-offer popup on a slide or tile to make it open the email popup." }
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Accessible name",
+      "default": "Featured offers and categories"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Rotate slides",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Time per slide",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "default": 6
+    },
+    {
+      "type": "paragraph",
+      "content": "Tiles 1-2 fill the left column and tiles 3-5 the row under the banner."
+    }
   ],
   "blocks": [
     {
@@ -99,32 +113,239 @@
       "name": "Banner slide",
       "limit": 5,
       "settings": [
-        { "type": "select", "id": "tone", "label": "Color", "options": [
-          { "value": "violet", "label": "Violet night" },
-          { "value": "grape", "label": "Bright violet" },
-          { "value": "ink", "label": "Ink" },
-          { "value": "light", "label": "Light" }
-        ], "default": "violet" },
-        { "type": "select", "id": "art", "label": "Illustration", "options": [
-          { "value": "art-hero", "label": "Devices on stage" },
-          { "value": "art-audio", "label": "Earbuds" },
-          { "value": "art-charging", "label": "Wireless charging" },
-          { "value": "art-home", "label": "Coffee and blender" },
-          { "value": "art-accessories", "label": "Smartwatch" },
-          { "value": "art-dryer", "label": "Hair dryer" },
-          { "value": "art-deals", "label": "Price tag" },
-          { "value": "art-bundle", "label": "Boxes" },
-          { "value": "art-guide", "label": "Phone and charger" }
-        ], "default": "art-hero" },
-        { "type": "image_picker", "id": "image", "label": "Image", "info": "Replaces the illustration. Wide images (2:1) work best." },
-        { "type": "text", "id": "kicker", "label": "Small line above heading" },
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Banner heading" },
-        { "type": "text", "id": "text", "label": "Text" },
-        { "type": "text", "id": "button_label", "label": "Button", "default": "Shop now" },
-        { "type": "url", "id": "link", "label": "Button link" },
-        { "type": "checkbox", "id": "open_offer", "label": "Opens welcome-offer popup", "default": false },
-        { "type": "text", "id": "button_label_2", "label": "Second button" },
-        { "type": "url", "id": "link_2", "label": "Second button link" }
+        {
+          "type": "select",
+          "id": "tone",
+          "label": "Color",
+          "options": [
+            {
+              "value": "violet",
+              "label": "Violet night"
+            },
+            {
+              "value": "grape",
+              "label": "Bright violet"
+            },
+            {
+              "value": "ink",
+              "label": "Ink"
+            },
+            {
+              "value": "light",
+              "label": "Light"
+            }
+          ],
+          "default": "violet"
+        },
+        {
+          "type": "select",
+          "id": "art",
+          "label": "Illustration",
+          "options": [
+            {
+              "value": "ill-devices",
+              "label": "Phone, watch and earbuds"
+            },
+            {
+              "value": "ill-offer",
+              "label": "Gift and price tag"
+            },
+            {
+              "value": "ill-charge",
+              "label": "Phone on wireless charger"
+            },
+            {
+              "value": "ill-buds",
+              "label": "Earbuds with sound waves"
+            },
+            {
+              "value": "ill-espresso",
+              "label": "Espresso machine and cup"
+            },
+            {
+              "value": "ill-watch",
+              "label": "Smartwatch"
+            },
+            {
+              "value": "ill-haircare",
+              "label": "Hair dryer and straightener"
+            },
+            {
+              "value": "ill-shipping",
+              "label": "Parcel"
+            },
+            {
+              "value": "ill-dept-audio",
+              "label": "Open earbuds case"
+            },
+            {
+              "value": "ill-dept-charging",
+              "label": "Earbuds case charging"
+            },
+            {
+              "value": "ill-dept-home",
+              "label": "Blender and ice cream maker"
+            },
+            {
+              "value": "ill-dept-accessories",
+              "label": "Fan and tracker"
+            },
+            {
+              "value": "ill-coupon",
+              "label": "10% coupon"
+            },
+            {
+              "value": "ill-col-audio",
+              "label": "Earbud and case"
+            },
+            {
+              "value": "ill-col-charging",
+              "label": "USB-C cable"
+            },
+            {
+              "value": "ill-col-home",
+              "label": "Espresso and blender"
+            },
+            {
+              "value": "ill-col-accessories",
+              "label": "Straightener and tracker"
+            },
+            {
+              "value": "ill-col-all",
+              "label": "Mixed tech"
+            },
+            {
+              "value": "ill-about",
+              "label": "Shopping bag"
+            },
+            {
+              "value": "ill-contact",
+              "label": "Chat bubbles"
+            },
+            {
+              "value": "ill-faq",
+              "label": "Question and lightbulb"
+            },
+            {
+              "value": "ill-delivery",
+              "label": "Delivery van"
+            },
+            {
+              "value": "ill-returns",
+              "label": "Returns box"
+            },
+            {
+              "value": "ill-track",
+              "label": "Map and pin"
+            },
+            {
+              "value": "ill-guides",
+              "label": "Open book"
+            },
+            {
+              "value": "ill-terms",
+              "label": "Document and shield"
+            },
+            {
+              "value": "ill-blog-charger",
+              "label": "Charger and cable"
+            },
+            {
+              "value": "ill-blog-earbuds",
+              "label": "Earbuds and brush"
+            },
+            {
+              "value": "ill-blog-espresso",
+              "label": "Coffee and beans"
+            },
+            {
+              "value": "ill-mega-audio",
+              "label": "Phone and earbud"
+            },
+            {
+              "value": "ill-mega-charging",
+              "label": "Power adapter"
+            },
+            {
+              "value": "ill-mega-home",
+              "label": "Ice cream maker"
+            },
+            {
+              "value": "ill-mega-accessories",
+              "label": "Hair dryer"
+            },
+            {
+              "value": "ill-about-audio",
+              "label": "Music phone and case"
+            },
+            {
+              "value": "ill-about-charging",
+              "label": "Adapter and pad"
+            },
+            {
+              "value": "ill-about-home",
+              "label": "Ice cream and coffee"
+            },
+            {
+              "value": "ill-about-accessories",
+              "label": "Watch and straightener"
+            },
+            {
+              "value": "ill-wishlist",
+              "label": "Heart"
+            }
+          ],
+          "default": "ill-devices"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Replaces the illustration. Use a cut-out or transparent image for the cleanest look."
+        },
+        {
+          "type": "text",
+          "id": "kicker",
+          "label": "Small line above heading"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Banner heading"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button",
+          "default": "Shop now"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Button link"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_offer",
+          "label": "Opens welcome-offer popup",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "button_label_2",
+          "label": "Second button"
+        },
+        {
+          "type": "url",
+          "id": "link_2",
+          "label": "Second button link"
+        }
       ]
     },
     {
@@ -132,33 +353,236 @@
       "name": "Promo tile",
       "limit": 5,
       "settings": [
-        { "type": "select", "id": "tone", "label": "Color", "options": [
-          { "value": "violet", "label": "Violet night" },
-          { "value": "grape", "label": "Bright violet" },
-          { "value": "ink", "label": "Ink" },
-          { "value": "light", "label": "Light" }
-        ], "default": "violet" },
-        { "type": "select", "id": "art", "label": "Illustration", "options": [
-          { "value": "art-hero", "label": "Devices on stage" },
-          { "value": "art-audio", "label": "Earbuds" },
-          { "value": "art-charging", "label": "Wireless charging" },
-          { "value": "art-home", "label": "Coffee and blender" },
-          { "value": "art-accessories", "label": "Smartwatch" },
-          { "value": "art-dryer", "label": "Hair dryer" },
-          { "value": "art-deals", "label": "Price tag" },
-          { "value": "art-bundle", "label": "Boxes" },
-          { "value": "art-guide", "label": "Phone and charger" }
-        ], "default": "art-audio" },
-        { "type": "image_picker", "id": "image", "label": "Image", "info": "Replaces the illustration." },
-        { "type": "text", "id": "kicker", "label": "Small line above heading" },
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Tile heading" },
-        { "type": "text", "id": "text", "label": "Text" },
-        { "type": "text", "id": "button_label", "label": "Button", "default": "Shop now" },
-        { "type": "url", "id": "link", "label": "Link" },
-        { "type": "checkbox", "id": "open_offer", "label": "Opens welcome-offer popup", "default": false }
+        {
+          "type": "select",
+          "id": "tone",
+          "label": "Color",
+          "options": [
+            {
+              "value": "violet",
+              "label": "Violet night"
+            },
+            {
+              "value": "grape",
+              "label": "Bright violet"
+            },
+            {
+              "value": "ink",
+              "label": "Ink"
+            },
+            {
+              "value": "light",
+              "label": "Light"
+            }
+          ],
+          "default": "violet"
+        },
+        {
+          "type": "select",
+          "id": "art",
+          "label": "Illustration",
+          "options": [
+            {
+              "value": "ill-devices",
+              "label": "Phone, watch and earbuds"
+            },
+            {
+              "value": "ill-offer",
+              "label": "Gift and price tag"
+            },
+            {
+              "value": "ill-charge",
+              "label": "Phone on wireless charger"
+            },
+            {
+              "value": "ill-buds",
+              "label": "Earbuds with sound waves"
+            },
+            {
+              "value": "ill-espresso",
+              "label": "Espresso machine and cup"
+            },
+            {
+              "value": "ill-watch",
+              "label": "Smartwatch"
+            },
+            {
+              "value": "ill-haircare",
+              "label": "Hair dryer and straightener"
+            },
+            {
+              "value": "ill-shipping",
+              "label": "Parcel"
+            },
+            {
+              "value": "ill-dept-audio",
+              "label": "Open earbuds case"
+            },
+            {
+              "value": "ill-dept-charging",
+              "label": "Earbuds case charging"
+            },
+            {
+              "value": "ill-dept-home",
+              "label": "Blender and ice cream maker"
+            },
+            {
+              "value": "ill-dept-accessories",
+              "label": "Fan and tracker"
+            },
+            {
+              "value": "ill-coupon",
+              "label": "10% coupon"
+            },
+            {
+              "value": "ill-col-audio",
+              "label": "Earbud and case"
+            },
+            {
+              "value": "ill-col-charging",
+              "label": "USB-C cable"
+            },
+            {
+              "value": "ill-col-home",
+              "label": "Espresso and blender"
+            },
+            {
+              "value": "ill-col-accessories",
+              "label": "Straightener and tracker"
+            },
+            {
+              "value": "ill-col-all",
+              "label": "Mixed tech"
+            },
+            {
+              "value": "ill-about",
+              "label": "Shopping bag"
+            },
+            {
+              "value": "ill-contact",
+              "label": "Chat bubbles"
+            },
+            {
+              "value": "ill-faq",
+              "label": "Question and lightbulb"
+            },
+            {
+              "value": "ill-delivery",
+              "label": "Delivery van"
+            },
+            {
+              "value": "ill-returns",
+              "label": "Returns box"
+            },
+            {
+              "value": "ill-track",
+              "label": "Map and pin"
+            },
+            {
+              "value": "ill-guides",
+              "label": "Open book"
+            },
+            {
+              "value": "ill-terms",
+              "label": "Document and shield"
+            },
+            {
+              "value": "ill-blog-charger",
+              "label": "Charger and cable"
+            },
+            {
+              "value": "ill-blog-earbuds",
+              "label": "Earbuds and brush"
+            },
+            {
+              "value": "ill-blog-espresso",
+              "label": "Coffee and beans"
+            },
+            {
+              "value": "ill-mega-audio",
+              "label": "Phone and earbud"
+            },
+            {
+              "value": "ill-mega-charging",
+              "label": "Power adapter"
+            },
+            {
+              "value": "ill-mega-home",
+              "label": "Ice cream maker"
+            },
+            {
+              "value": "ill-mega-accessories",
+              "label": "Hair dryer"
+            },
+            {
+              "value": "ill-about-audio",
+              "label": "Music phone and case"
+            },
+            {
+              "value": "ill-about-charging",
+              "label": "Adapter and pad"
+            },
+            {
+              "value": "ill-about-home",
+              "label": "Ice cream and coffee"
+            },
+            {
+              "value": "ill-about-accessories",
+              "label": "Watch and straightener"
+            },
+            {
+              "value": "ill-wishlist",
+              "label": "Heart"
+            }
+          ],
+          "default": "ill-buds"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Replaces the illustration."
+        },
+        {
+          "type": "text",
+          "id": "kicker",
+          "label": "Small line above heading"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Tile heading"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button",
+          "default": "Shop now"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_offer",
+          "label": "Opens welcome-offer popup",
+          "default": false
+        }
       ]
     }
   ],
-  "presets": [{ "name": "Promo bento" }]
+  "presets": [
+    {
+      "name": "Promo bento"
+    }
+  ]
 }
 {% endschema %}

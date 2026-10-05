@@ -248,7 +248,14 @@
     var total = 0;
     checked.forEach(function (c) { total += parseInt(c.dataset.price, 10) || 0; });
     var totalEl = wrap.querySelector('[data-bundle-total]');
-    if (totalEl) totalEl.textContent = formatMoney(total);
+    var pct = parseInt(wrap.dataset.bundlePct, 10) || 0;
+    if (totalEl) {
+      if (pct > 0 && checked.length >= 2) {
+        totalEl.innerHTML = escapeHTML(formatMoney(Math.round(total * (100 - pct) / 100))) + ' <s class="bundle-was">' + escapeHTML(formatMoney(total)) + '</s>';
+      } else {
+        totalEl.textContent = formatMoney(total);
+      }
+    }
     var countEl = wrap.querySelector('[data-bundle-count]');
     if (countEl) countEl.textContent = checked.length;
     var btn = wrap.querySelector('[data-bundle-add]');
@@ -375,7 +382,113 @@
     }
   });
 
+  /* ------------------------------------------------------------------ */
+  /* Dark mode toggle                                                   */
+  /* ------------------------------------------------------------------ */
+  function syncThemeButtons() {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (b) {
+      b.setAttribute('aria-pressed', dark ? 'true' : 'false');
+      if (b.classList.contains('header__icon')) b.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-theme-toggle]');
+    if (!btn) return;
+    var root = document.documentElement;
+    var dark = root.getAttribute('data-theme') !== 'dark';
+    if (dark) root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme');
+    try { localStorage.setItem('luxetech:theme', dark ? 'dark' : 'light'); } catch (err) {}
+    syncThemeButtons();
+  });
+
+  /* Currency / country selector submits on change */
+  document.addEventListener('change', function (e) {
+    var sel = e.target.closest('[data-autosubmit]');
+    if (sel && sel.form) sel.form.submit();
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Wishlist (stored on the shopper's device)                          */
+  /* ------------------------------------------------------------------ */
+  var WISH_KEY = 'luxetech:wishlist';
+  function getWishlist() { var l = read(WISH_KEY); return Array.isArray(l) ? l : []; }
+  function setWishlist(list) { write(WISH_KEY, list); syncWishlist(); document.dispatchEvent(new CustomEvent('wishlist:change')); }
+  function syncWishlist() {
+    var list = getWishlist();
+    var handles = list.map(function (p) { return p.handle; });
+    document.querySelectorAll('[data-wishlist-count]').forEach(function (el) {
+      el.textContent = list.length; el.hidden = list.length === 0;
+    });
+    document.querySelectorAll('[data-wishlist-toggle]').forEach(function (btn) {
+      var on = handles.indexOf(btn.dataset.handle) > -1;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var label = btn.querySelector('[data-wishlist-label]');
+      if (label) label.textContent = on ? 'Saved' : 'Save';
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-wishlist-toggle]');
+    if (!btn) return;
+    e.preventDefault(); e.stopPropagation();
+    var item;
+    try { item = JSON.parse(btn.dataset.product); } catch (err) { return; }
+    var list = getWishlist();
+    var idx = list.findIndex(function (p) { return p.handle === item.handle; });
+    if (idx > -1) list.splice(idx, 1); else list.unshift(item);
+    setWishlist(list.slice(0, 50));
+    btn.classList.add('is-pop'); setTimeout(function () { btn.classList.remove('is-pop'); }, 400);
+  });
+
+  class WishlistGrid extends HTMLElement {
+    connectedCallback() {
+      this.render();
+      document.addEventListener('wishlist:change', () => this.render());
+    }
+    render() {
+      var list = getWishlist();
+      var grid = this.querySelector('[data-wishlist-grid]');
+      var empty = this.querySelector('[data-wishlist-empty]');
+      var count = this.querySelector('[data-wishlist-total]');
+      if (count) count.textContent = list.length + (list.length === 1 ? ' saved item' : ' saved items');
+      if (!grid) return;
+      if (!list.length) { grid.innerHTML = ''; if (empty) empty.hidden = false; return; }
+      if (empty) empty.hidden = true;
+      grid.innerHTML = list.map(function (p) {
+        var img = p.image ? '<img src="' + escapeHTML(imageUrl(p.image, 500)) + '" alt="" loading="lazy" class="card__img card__img--primary" width="500" height="500">' : '';
+        var price = typeof p.price === 'number' ? formatMoney(p.price) : escapeHTML(p.price);
+        var action = p.single_variant
+          ? '<button type="button" class="btn btn--primary btn--sm btn--block" data-quick-variant="' + escapeHTML(p.variant) + '" data-fallback="' + escapeHTML(p.url) + '">Add to cart</button>'
+          : '<a href="' + escapeHTML(p.url) + '" class="btn btn--primary btn--sm btn--block">Choose options</a>';
+        return '<li><article class="card card--mini">' +
+          '<div class="card__media ratio ratio--square"><a href="' + escapeHTML(p.url) + '" class="card__media-link" tabindex="-1" aria-hidden="true">' + img + '</a>' +
+          '<button type="button" class="wish-btn is-active" data-wishlist-toggle data-handle="' + escapeHTML(p.handle) + '" data-product=\'' + escapeHTML(JSON.stringify(p)) + '\' aria-pressed="true" aria-label="Remove ' + escapeHTML(p.title) + ' from wishlist">' +
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.2-9.1C1.6 8.2 3.6 4.5 7.3 4.5c2 0 3.4 1.1 4.7 2.8 1.3-1.7 2.7-2.8 4.7-2.8 3.7 0 5.7 3.7 4.5 6.9-1.7 4.5-9.2 9.1-9.2 9.1z"/></svg></button></div>' +
+          '<div class="card__body">' + (p.category ? '<p class="card__label">' + escapeHTML(p.category) + '</p>' : '') +
+          '<h3 class="card__title"><a href="' + escapeHTML(p.url) + '" class="card__link">' + escapeHTML(p.title) + '</a></h3>' +
+          '<div class="price"><span class="price__current">' + (p.price_varies ? '<span class="price__from">From </span>' : '') + price + '</span></div>' +
+          '<div class="card__quick card__quick--button">' + action + '</div></div></article></li>';
+      }).join('');
+      syncWishlist();
+    }
+  }
+  customElements.define('wishlist-grid', WishlistGrid);
+
+  /* ------------------------------------------------------------------ */
+  /* Quantity break cards set the quantity on the product form          */
+  /* ------------------------------------------------------------------ */
+  document.addEventListener('change', function (e) {
+    var radio = e.target.closest('[data-qty-break]');
+    if (!radio) return;
+    var form = document.querySelector('product-info form[action*="/cart/add"], .pdp form[action*="/cart/add"]');
+    var input = (form && form.querySelector('input[name="quantity"]')) || document.querySelector('.pdp input[name="quantity"]');
+    if (input) { input.value = radio.value; input.dispatchEvent(new Event('change', { bubbles: true })); }
+  });
+
   function init() {
+    syncThemeButtons();
+    syncWishlist();
     recordView();
     initReveals();
     initEstimates();

@@ -12,7 +12,7 @@
           "type": "slide",
           "settings": {
             "tone": "violet",
-            "art": "art-hero",
+            "art": "ill-devices",
             "kicker": "New season tech",
             "heading": "Upgrade your everyday tech",
             "text": "Audio, charging, smart kitchen and wearables, chosen by people who use them every day.",
@@ -25,8 +25,8 @@
         "s2": {
           "type": "slide",
           "settings": {
-            "tone": "grape",
-            "art": "art-deals",
+            "tone": "light",
+            "art": "ill-offer",
             "kicker": "Welcome offer",
             "heading": "10% off your first order",
             "text": "Join the list and your code appears instantly. New subscribers only.",
@@ -38,7 +38,7 @@
           "type": "slide",
           "settings": {
             "tone": "ink",
-            "art": "art-charging",
+            "art": "ill-charge",
             "kicker": "Charging",
             "heading": "Power up, cable-free",
             "text": "Fast magnetic wireless charging for phones, earbuds and more.",
@@ -50,7 +50,7 @@
           "type": "tile",
           "settings": {
             "tone": "violet",
-            "art": "art-audio",
+            "art": "ill-buds",
             "kicker": "Audio",
             "heading": "Sound that goes everywhere",
             "text": "Wireless earbuds with charging case.",
@@ -61,8 +61,8 @@
         "t2": {
           "type": "tile",
           "settings": {
-            "tone": "ink",
-            "art": "art-home",
+            "tone": "light",
+            "art": "ill-espresso",
             "kicker": "Smart kitchen",
             "heading": "Café at home",
             "button_label": "Shop now",
@@ -72,8 +72,8 @@
         "t3": {
           "type": "tile",
           "settings": {
-            "tone": "grape",
-            "art": "art-accessories",
+            "tone": "ink",
+            "art": "ill-watch",
             "kicker": "Wearables",
             "heading": "Track every move",
             "button_label": "Shop accessories",
@@ -83,8 +83,8 @@
         "t4": {
           "type": "tile",
           "settings": {
-            "tone": "violet",
-            "art": "art-dryer",
+            "tone": "grape",
+            "art": "ill-haircare",
             "kicker": "Hair care",
             "heading": "Salon tools, home price",
             "button_label": "Shop now",
@@ -94,8 +94,8 @@
         "t5": {
           "type": "tile",
           "settings": {
-            "tone": "light",
-            "art": "art-bundle",
+            "tone": "violet",
+            "art": "ill-shipping",
             "kicker": "Shipping",
             "heading": "Dispatched in 3-4 business days",
             "button_label": "How delivery works",
@@ -139,8 +139,8 @@
             "kicker": "Listen",
             "tagline": "Wireless earbuds and true-wireless sound",
             "link": "/collections/audio",
-            "tone": "violet",
-            "art": "art-audio"
+            "tone": "ink",
+            "art": "ill-dept-audio"
           }
         },
         "d2": {
@@ -150,8 +150,8 @@
             "kicker": "Power",
             "tagline": "Magnetic wireless pads and USB-C",
             "link": "/collections/charging",
-            "tone": "ink",
-            "art": "art-charging"
+            "tone": "violet",
+            "art": "ill-dept-charging"
           }
         },
         "d3": {
@@ -161,8 +161,8 @@
             "kicker": "Kitchen",
             "tagline": "Espresso, blending and desserts",
             "link": "/collections/smart-home",
-            "tone": "violet",
-            "art": "art-home"
+            "tone": "light",
+            "art": "ill-dept-home"
           }
         },
         "d4": {
@@ -173,7 +173,7 @@
             "tagline": "Smartwatches, hair care and cooling",
             "link": "/collections/accessories",
             "tone": "grape",
-            "art": "art-accessories"
+            "art": "ill-dept-accessories"
           }
         }
       },

@@ -52,8 +52,8 @@
     "hero": {
       "type": "page-hero",
       "settings": {
-        "tone": "ink",
-        "art": "art-bundle",
+        "tone": "violet",
+        "art": "ill-track",
         "kicker": "Orders",
         "text": "<p>Find your tracking details in a few clicks.</p>",
         "heading": "Track my order"

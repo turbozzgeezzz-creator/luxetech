@@ -1,17 +1,26 @@
 <article class="container container--narrow page article">
   {%- liquid
     assign tags = article.tags | join: ' ' | downcase
-    assign art = 'art-guide'
-    if tags contains 'audio' or tags contains 'earbud'
-      assign art = 'art-audio'
-    elsif tags contains 'charg'
-      assign art = 'art-charging'
-    elsif tags contains 'kitchen' or tags contains 'coffee' or tags contains 'home'
-      assign art = 'art-home'
-    elsif tags contains 'wear' or tags contains 'watch'
-      assign art = 'art-accessories'
-    endif
-    assign words = article.content | strip_html | split: ' ' | size
+  case article.handle
+    when 'how-to-choose-a-wireless-charger-qi2-magsafe-and-watts-explained'
+      assign art = 'ill-blog-charger'
+    when 'wireless-earbuds-care-fit-cleaning-and-battery-tips'
+      assign art = 'ill-blog-earbuds'
+    when 'cafe-style-espresso-at-home-a-beginners-guide'
+      assign art = 'ill-blog-espresso'
+    else
+      assign art = 'ill-guides'
+      if tags contains 'audio' or tags contains 'earbud'
+        assign art = 'ill-buds'
+      elsif tags contains 'charg'
+        assign art = 'ill-charge'
+      elsif tags contains 'kitchen' or tags contains 'coffee' or tags contains 'home'
+        assign art = 'ill-espresso'
+      elsif tags contains 'wear' or tags contains 'watch'
+        assign art = 'ill-watch'
+      endif
+  endcase
+  assign words = article.content | strip_html | split: ' ' | size
     assign minutes = words | divided_by: 200 | at_least: 1
   -%}
   <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -31,7 +40,7 @@
     {%- if article.image -%}
       {{ article.image | image_url: width: 1400 | image_tag: loading: 'eager', widths: '600,900,1200,1400', sizes: '(min-width: 990px) 820px, 100vw' }}
     {%- else -%}
-      <img src="{{ art | append: '.svg' | asset_url }}" alt="" width="600" height="600" loading="eager">
+      <span class="art-box tone tone--violet">{% render 'ill', name: art, loading: 'eager' %}</span>
     {%- endif -%}
   </div>
   <div class="rte">{{ article.content }}</div>

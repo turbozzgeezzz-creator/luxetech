@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500"><defs>
+<radialGradient id="gillaboutch" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7D03FC" stop-opacity=".55"/><stop offset=".5" stop-color="#7D03FC" stop-opacity=".18"/><stop offset="1" stop-color="#7D03FC" stop-opacity="0"/></radialGradient>
+<linearGradient id="willaboutch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#E9ECF3"/><stop offset="1" stop-color="#B9C0CF"/></linearGradient>
+<linearGradient id="wsillaboutch" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C8CEDB"/><stop offset=".35" stop-color="#FFFFFF"/><stop offset="1" stop-color="#AEB6C6"/></linearGradient>
+<linearGradient id="millaboutch" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A5366"/><stop offset=".45" stop-color="#232A38"/><stop offset="1" stop-color="#0C1019"/></linearGradient>
+<linearGradient id="mhillaboutch" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#151A25"/><stop offset=".3" stop-color="#5A6478"/><stop offset=".55" stop-color="#262D3B"/><stop offset="1" stop-color="#0E121B"/></linearGradient>
+<linearGradient id="scillaboutch" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B4DFF"/><stop offset=".5" stop-color="#5B12E0"/><stop offset="1" stop-color="#1A0B5C"/></linearGradient>
+<linearGradient id="vlillaboutch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B57CFF"/><stop offset="1" stop-color="#7D03FC"/></linearGradient>
+<linearGradient id="tanillaboutch" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A88B62"/><stop offset=".5" stop-color="#D9C39C"/><stop offset="1" stop-color="#9B7E55"/></linearGradient>
+<linearGradient id="cardillaboutch" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4E1F5"/></linearGradient>
+<linearGradient id="kraftillaboutch" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8C79A"/><stop offset="1" stop-color="#B98B55"/></linearGradient>
+<filter id="billaboutch" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+<filter id="sillaboutch" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="dillaboutch" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#0B0620" flood-opacity=".35"/></filter>
+</defs><circle cx="300" cy="250" r="230" fill="url(#gillaboutch)"/><g transform="translate(330 390) rotate(0) scale(0.75)" filter="url(#dillaboutch)"><ellipse cx="0" cy="56" rx="230" ry="40" fill="#000" opacity=".25" filter="url(#billaboutch)"/>
+<ellipse cx="0" cy="28" rx="200" ry="60" fill="url(#mhillaboutch)"/><rect x="-200" y="0" width="400" height="28" fill="url(#mhillaboutch)"/>
+<ellipse cx="0" cy="0" rx="200" ry="60" fill="url(#millaboutch)"/>
+<ellipse cx="0" cy="0" rx="136" ry="40" fill="none" stroke="#7D03FC" stroke-width="6"/>
+<ellipse cx="0" cy="0" rx="136" ry="40" fill="none" stroke="#B57CFF" stroke-width="16" opacity=".5" filter="url(#sillaboutch)"/>
+<path d="M-190 -8 Q0 -60 190 -8" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="3"/></g><g transform="translate(200 230) rotate(-8) scale(0.7)" filter="url(#dillaboutch)"><rect x="-90" y="-90" width="180" height="180" rx="34" fill="url(#willaboutch)"/><rect x="-90" y="-90" width="180" height="180" rx="34" fill="none" stroke="#C8CEDB" stroke-width="3"/>
+<rect x="-24" y="-20" width="48" height="16" rx="8" fill="#1B1F2A"/><path d="M8 20 L-10 46 H4 L-2 66 L16 38 H2 Z" fill="#7D03FC"/>
+<rect x="-50" y="-140" width="16" height="54" rx="4" fill="#9AA3B5"/><rect x="34" y="-140" width="16" height="54" rx="4" fill="#9AA3B5"/></g><g transform="translate(470 140) rotate(0) scale(0.45)"><path d="M0 -40 Q6 -6 40 0 Q6 6 0 40 Q-6 6 -40 0 Q-6 -6 0 -40 Z" fill="#fff"/></g></svg>

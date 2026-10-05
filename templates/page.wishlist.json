@@ -1,0 +1,33 @@
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "tone": "grape",
+        "art": "ill-wishlist",
+        "kicker": "Saved for later",
+        "heading": "Your wishlist",
+        "text": "<p>Tap the heart on any product to save it here. Your list is kept on this device.</p>",
+        "button_label": "Keep shopping",
+        "button_link": "/collections/all"
+      }
+    },
+    "main": {
+      "type": "wishlist",
+      "settings": {}
+    },
+    "viewed": {
+      "type": "recently-viewed",
+      "settings": {
+        "heading": "Recently viewed",
+        "show_recommended": true,
+        "recommended_heading": "You might also like"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "main",
+    "viewed"
+  ]
+}

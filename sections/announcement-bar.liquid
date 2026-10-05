@@ -26,6 +26,8 @@
         {%- endfor -%}
       </ul>
     {%- endif -%}
+    <div class="utility-bar__end">
+    {% render 'currency-selector', id: 'bar', variant: 'bar' %}
     {%- if section.settings.menu != blank and section.settings.menu.links.size > 0 -%}
       <ul class="utility-bar__links" role="list">
         {%- for link in section.settings.menu.links -%}
@@ -37,6 +39,7 @@
         <a href="tel:{{ settings.support_phone | remove: ' ' }}">Support: {{ settings.support_phone }}</a>
       </p>
     {%- endif -%}
+    </div>
   </div>
 </div>
 

@@ -22,7 +22,8 @@
           class: 'header__logo-img'
         }}
       {%- else -%}
-        <img src="{{ 'logo-tech-luxedealers.png' | asset_url }}" width="653" height="178" alt="{{ shop.name | escape }}" class="header__logo-img" loading="eager">
+        <img src="{{ 'logo-tech-luxedealers.png' | asset_url }}" width="653" height="178" alt="{{ shop.name | escape }}" class="header__logo-img logo-dark" loading="eager">
+        <img src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="653" height="178" alt="" aria-hidden="true" class="header__logo-img logo-light" loading="lazy">
       {%- endif -%}
     </a>
 
@@ -51,6 +52,16 @@
     </predictive-search>
 
     <div class="header__actions">
+      {%- if settings.dark_mode != 'off' -%}
+        <button type="button" class="header__icon header__theme" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
+          {% render 'icon', name: 'moon', class: 'icon-when-light' %}
+          {% render 'icon', name: 'sun', class: 'icon-when-dark' %}
+        </button>
+      {%- endif -%}
+      <a href="{{ routes.root_url }}pages/wishlist" class="header__icon header__wishlist" aria-label="Wishlist">
+        {% render 'icon', name: 'heart' %}
+        <span class="cart-count wishlist-count" data-wishlist-count hidden>0</span>
+      </a>
       {%- if shop.customer_accounts_enabled -%}
         <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="header__icon header__account">
           {% render 'icon', name: 'user' %}
@@ -302,6 +313,16 @@
       {%- endif -%}
     </div>
     <div class="drawer__foot">
+      <div class="drawer__prefs">
+        {% render 'currency-selector', id: 'drawer', variant: 'drawer' %}
+        {%- if settings.dark_mode != 'off' -%}
+          <button type="button" class="btn btn--outline btn--sm" data-theme-toggle aria-pressed="false">
+            {% render 'icon', name: 'moon', class: 'icon--sm icon-when-light' %}{% render 'icon', name: 'sun', class: 'icon--sm icon-when-dark' %}
+            <span class="icon-when-light">Dark mode</span><span class="icon-when-dark">Light mode</span>
+          </button>
+        {%- endif -%}
+        <a href="{{ routes.root_url }}pages/wishlist" class="btn btn--outline btn--sm">{% render 'icon', name: 'heart', class: 'icon--sm' %} Wishlist</a>
+      </div>
       {%- if shop.customer_accounts_enabled -%}
         <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="btn btn--outline btn--block">
           {% render 'icon', name: 'user', class: 'icon--sm' %}

@@ -1,0 +1,69 @@
+{%- comment -%}
+  Customer reviews. Shows the product's real rating from the standard
+  reviews.rating / reviews.rating_count metafields (written by Shopify's
+  Product Reviews app and most review apps). Without reviews it shows an
+  honest empty state. Add your review app's block here in the theme editor
+  to show its reviews list and review form.
+{%- endcomment -%}
+{%- liquid
+  assign rating = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+  assign has_reviews = false
+  if rating != blank and rating_count > 0
+    assign has_reviews = true
+  endif
+-%}
+<section class="section product-reviews" id="reviews" aria-labelledby="ReviewsHeading-{{ section.id }}">
+  <div class="container">
+    <div class="reviews">
+      <div class="reviews__summary">
+        <p class="eyebrow eyebrow--muted">Reviews</p>
+        <h2 class="reviews__title" id="ReviewsHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+        {%- if has_reviews -%}
+          {%- assign avg = rating.rating | round: 1 -%}
+          {%- assign pct = rating.rating | divided_by: rating.scale_max | times: 100 -%}
+          <p class="reviews__score"><span class="reviews__avg">{{ avg }}</span><span class="reviews__of">/ {{ rating.scale_max }}</span></p>
+          <span class="rating__stars reviews__stars" style="--rating: {{ pct }}%;" aria-hidden="true">
+            <span class="rating__base">{%- for i in (1..5) -%}{% render 'icon', name: 'star' %}{%- endfor -%}</span>
+            <span class="rating__fill">{%- for i in (1..5) -%}{% render 'icon', name: 'star' %}{%- endfor -%}</span>
+          </span>
+          <p class="reviews__count">Based on {{ rating_count }} {{ rating_count | pluralize: 'review', 'reviews' }}</p>
+        {%- else -%}
+          <p class="reviews__empty">{{ section.settings.empty_text | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.button_label != blank -%}
+          <a href="{{ section.settings.button_link | default: pages.contact.url | default: routes.root_url }}" class="btn btn--outline">{{ section.settings.button_label | escape }}</a>
+        {%- endif -%}
+      </div>
+      <div class="reviews__list">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when '@app' -%}
+              {% render block %}
+          {%- endcase -%}
+        {%- endfor -%}
+        {%- if section.blocks.size == 0 -%}
+          <div class="reviews__placeholder">
+            <span class="reviews__placeholder-icon">{% render 'icon', name: 'chat' %}</span>
+            <p>{{ section.settings.placeholder_text | escape }}</p>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product reviews",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Customer reviews" },
+    { "type": "text", "id": "empty_text", "label": "No reviews text", "default": "No reviews yet. Bought this? We'd love to hear what you think." },
+    { "type": "text", "id": "placeholder_text", "label": "Placeholder text", "default": "Reviews from verified customers will appear here." },
+    { "type": "text", "id": "button_label", "label": "Button", "default": "Share your experience" },
+    { "type": "url", "id": "button_link", "label": "Button link", "info": "Defaults to your contact page. Point it at your review app's form once installed." }
+  ],
+  "blocks": [{ "type": "@app" }],
+  "presets": [{ "name": "Product reviews" }]
+}
+{% endschema %}

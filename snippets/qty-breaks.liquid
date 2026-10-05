@@ -1,0 +1,47 @@
+{%- comment -%}
+  Buy more, save more cards on the product page. Shown when Theme settings >
+  Volume and bundle deals is turned on (and as a preview in the theme editor).
+  The matching automatic discount must exist in Shopify for the saving to apply.
+  Params: variant
+{%- endcomment -%}
+{%- if settings.qty_breaks_enabled or request.design_mode -%}
+  {%- liquid
+    assign unit = variant.price
+    assign t1q = settings.tier1_qty
+    assign t1p = settings.tier1_pct
+    assign t2q = settings.tier2_qty
+    assign t2p = settings.tier2_pct
+  -%}
+  <fieldset class="qty-breaks{% unless settings.qty_breaks_enabled %} qty-breaks--preview{% endunless %}">
+    <legend class="qty-breaks__legend">Buy more, save more</legend>
+    {%- unless settings.qty_breaks_enabled -%}<p class="qty-breaks__note">Preview: turn on in Theme settings &gt; Volume and bundle deals after creating the discount.</p>{%- endunless -%}
+    <div class="qty-breaks__options">
+      <label class="qty-break">
+        <input type="radio" name="qty-break" value="1" data-qty-break checked>
+        <span class="qty-break__qty">1 item</span>
+        <span class="qty-break__price">{{ unit | money }}</span>
+        <span class="qty-break__save">Standard price</span>
+      </label>
+      {%- assign full1 = unit | times: t1q -%}
+      {%- assign off1 = full1 | times: t1p | divided_by: 100 -%}
+      <label class="qty-break">
+        <input type="radio" name="qty-break" value="{{ t1q }}" data-qty-break>
+        <span class="qty-break__qty">Buy {{ t1q }}</span>
+        <span class="qty-break__price">{{ full1 | minus: off1 | money }} <s>{{ full1 | money }}</s></span>
+        <span class="qty-break__save">Save {{ t1p }}%</span>
+      </label>
+      {%- if t2p > 0 and t2q > t1q -%}
+        {%- assign full2 = unit | times: t2q -%}
+        {%- assign off2 = full2 | times: t2p | divided_by: 100 -%}
+        <label class="qty-break qty-break--best">
+          <input type="radio" name="qty-break" value="{{ t2q }}" data-qty-break>
+          <span class="qty-break__badge">Best value</span>
+          <span class="qty-break__qty">Buy {{ t2q }}+</span>
+          <span class="qty-break__price">{{ full2 | minus: off2 | money }} <s>{{ full2 | money }}</s></span>
+          <span class="qty-break__save">Save {{ t2p }}%</span>
+        </label>
+      {%- endif -%}
+    </div>
+    <p class="qty-breaks__fine">Saving applied at checkout on quantities of the same item.</p>
+  </fieldset>
+{%- endif -%}

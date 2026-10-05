@@ -14,42 +14,49 @@
   {%- liquid
     case collection.handle
       when 'audio'
-        assign c_art = 'art-audio'
+        assign c_art = 'ill-col-audio'
         assign c_tone = 'violet'
         assign c_line = 'Wireless sound, sorted. Earbuds that pair fast and go everywhere.'
       when 'charging'
-        assign c_art = 'art-charging'
+        assign c_art = 'ill-col-charging'
         assign c_tone = 'ink'
         assign c_line = 'Fast, cable-free charging for your phone, earbuds and more.'
       when 'smart-home'
-        assign c_art = 'art-home'
+        assign c_art = 'ill-col-home'
         assign c_tone = 'violet'
         assign c_line = 'Café-style coffee, smoothies and desserts, made at home.'
       when 'accessories'
-        assign c_art = 'art-accessories'
+        assign c_art = 'ill-col-accessories'
         assign c_tone = 'grape'
         assign c_line = 'Smartwatches, hair care and personal cooling for every day.'
       else
-        assign c_art = 'art-hero'
+        assign c_art = 'ill-col-all'
         assign c_tone = 'violet'
         assign c_line = 'Hand-picked audio, charging, smart kitchen and wearable tech.'
     endcase
   -%}
-  <header class="collection-banner bento-tone--{{ c_tone }}">
-    <div class="collection-banner__art">
-      {%- if section.settings.show_image and collection.image -%}
-        {{ collection.image | image_url: width: 1600 | image_tag: loading: 'eager', widths: '600,1000,1600', sizes: '100vw', class: 'bento-art', alt: '' }}
-      {%- else -%}
-        <img src="{{ c_art | append: '.svg' | asset_url }}" alt="" class="bento-art" width="1200" height="600" loading="eager">
-      {%- endif -%}
-    </div>
+  {%- liquid
+    assign c_title = collection.title
+    if collection.handle == 'all'
+      assign c_title = 'Shop all'
+    endif
+  -%}
+  <header class="collection-banner tone tone--{{ c_tone }}">
     <div class="collection-banner__copy">
-      <p class="bento-kicker">Shop</p>
-      <h1 class="collection-banner__title">{{ collection.title | escape }}</h1>
+      <p class="tone-kicker">{% if collection.handle == 'all' %}Every department{% else %}Shop{% endif %}</p>
+      <h1 class="collection-banner__title">{{ c_title | escape }}</h1>
       {%- if section.settings.show_description and collection.description != blank -%}
         <div class="collection-banner__desc rte">{{ collection.description }}</div>
       {%- else -%}
         <p class="collection-banner__desc">{{ c_line }}</p>
+      {%- endif -%}
+      {% render 'department-chips', current: collection.handle %}
+    </div>
+    <div class="collection-banner__art art-box">
+      {%- if section.settings.show_image and collection.image -%}
+        {{ collection.image | image_url: width: 900 | image_tag: loading: 'eager', widths: '400,600,900', sizes: '(min-width: 750px) 35vw, 70vw', alt: '' }}
+      {%- else -%}
+        {% render 'ill', name: c_art, loading: 'eager' %}
       {%- endif -%}
     </div>
   </header>

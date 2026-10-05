@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500"><defs>
+<radialGradient id="gilldepthom" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7D03FC" stop-opacity=".55"/><stop offset=".5" stop-color="#7D03FC" stop-opacity=".18"/><stop offset="1" stop-color="#7D03FC" stop-opacity="0"/></radialGradient>
+<linearGradient id="willdepthom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#E9ECF3"/><stop offset="1" stop-color="#B9C0CF"/></linearGradient>
+<linearGradient id="wsilldepthom" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C8CEDB"/><stop offset=".35" stop-color="#FFFFFF"/><stop offset="1" stop-color="#AEB6C6"/></linearGradient>
+<linearGradient id="milldepthom" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A5366"/><stop offset=".45" stop-color="#232A38"/><stop offset="1" stop-color="#0C1019"/></linearGradient>
+<linearGradient id="mhilldepthom" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#151A25"/><stop offset=".3" stop-color="#5A6478"/><stop offset=".55" stop-color="#262D3B"/><stop offset="1" stop-color="#0E121B"/></linearGradient>
+<linearGradient id="scilldepthom" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B4DFF"/><stop offset=".5" stop-color="#5B12E0"/><stop offset="1" stop-color="#1A0B5C"/></linearGradient>
+<linearGradient id="vlilldepthom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B57CFF"/><stop offset="1" stop-color="#7D03FC"/></linearGradient>
+<linearGradient id="tanilldepthom" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A88B62"/><stop offset=".5" stop-color="#D9C39C"/><stop offset="1" stop-color="#9B7E55"/></linearGradient>
+<linearGradient id="cardilldepthom" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4E1F5"/></linearGradient>
+<linearGradient id="kraftilldepthom" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8C79A"/><stop offset="1" stop-color="#B98B55"/></linearGradient>
+<filter id="billdepthom" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+<filter id="silldepthom" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="dilldepthom" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#0B0620" flood-opacity=".35"/></filter>
+</defs><circle cx="300" cy="250" r="230" fill="url(#gilldepthom)"/><g transform="translate(200 260) rotate(0) scale(0.85)" filter="url(#dilldepthom)"><path d="M-80 -200 H80 L66 60 H-66 Z" fill="#fff" fill-opacity=".16" stroke="#fff" stroke-opacity=".75" stroke-width="5"/>
+<path d="M-62 -60 H62 L58 52 H-58 Z" fill="#7D03FC" opacity=".6"/><path d="M-58 -60 Q0 -84 62 -60" fill="#B57CFF" opacity=".75"/>
+<path d="M80 -170 h28 q14 0 14 14 v120 q0 14 -14 14 h-36" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="10"/>
+<rect x="-88" y="-218" width="176" height="24" rx="10" fill="#1B202C"/><path d="M-90 60 H90 L104 170 H-104 Z" fill="url(#milldepthom)"/>
+<circle cx="0" cy="118" r="22" fill="#0A0D14" stroke="#5A6478" stroke-width="4"/><circle cx="0" cy="96" r="4" fill="#7D03FC"/>
+<path d="M-50 -180 V30" stroke="#fff" stroke-opacity=".35" stroke-width="8" stroke-linecap="round"/></g><g transform="translate(410 290) rotate(0) scale(0.82)" filter="url(#dilldepthom)"><rect x="-110" y="-60" width="220" height="230" rx="30" fill="url(#milldepthom)"/><rect x="-90" y="-30" width="180" height="40" rx="10" fill="#0A0D14"/>
+<text x="0" y="-2" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#B57CFF" text-anchor="middle">2:00</text>
+<circle cx="-60" cy="40" r="10" fill="#7D03FC"/><rect x="-30" y="34" width="90" height="12" rx="6" fill="#2A3142"/>
+<path d="M-80 -60 C -80 -150, 80 -150, 80 -60 Z" fill="#fff" fill-opacity=".18" stroke="#fff" stroke-opacity=".7" stroke-width="5"/>
+<path d="M-60 -70 C -50 -120, 50 -120, 60 -70 Z" fill="#F7D2E4"/><path d="M-40 -90 q20 -20 40 0 q20 -20 40 0" fill="none" stroke="#E8A3C4" stroke-width="8" stroke-linecap="round"/>
+<rect x="-110" y="150" width="220" height="20" rx="8" fill="#151A25"/></g></svg>

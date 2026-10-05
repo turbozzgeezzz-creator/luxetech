@@ -110,6 +110,8 @@
     </div>
   {%- endunless -%}
 
+  {%- if mode == 'main' -%}{% render 'qty-breaks', variant: current_variant %}{%- endif -%}
+
   <product-form class="buybox__form" data-mode="{{ mode }}">
     {%- form 'product', product, id: form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
       <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
@@ -134,6 +136,7 @@
         </button>
       </div>
       <p class="form-error" role="alert" hidden></p>
+      {%- if mode == 'main' -%}<div class="buybox__save">{% render 'wishlist-button', product: product, style: 'button' %}</div>{%- endif -%}
       {%- if show_dynamic_checkout -%}
         <div class="buybox__dynamic">{{ form | payment_button }}</div>
       {%- endif -%}

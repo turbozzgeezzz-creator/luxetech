@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500"><defs>
+<radialGradient id="gilltrack" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7D03FC" stop-opacity=".55"/><stop offset=".5" stop-color="#7D03FC" stop-opacity=".18"/><stop offset="1" stop-color="#7D03FC" stop-opacity="0"/></radialGradient>
+<linearGradient id="willtrack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#E9ECF3"/><stop offset="1" stop-color="#B9C0CF"/></linearGradient>
+<linearGradient id="wsilltrack" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C8CEDB"/><stop offset=".35" stop-color="#FFFFFF"/><stop offset="1" stop-color="#AEB6C6"/></linearGradient>
+<linearGradient id="milltrack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A5366"/><stop offset=".45" stop-color="#232A38"/><stop offset="1" stop-color="#0C1019"/></linearGradient>
+<linearGradient id="mhilltrack" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#151A25"/><stop offset=".3" stop-color="#5A6478"/><stop offset=".55" stop-color="#262D3B"/><stop offset="1" stop-color="#0E121B"/></linearGradient>
+<linearGradient id="scilltrack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B4DFF"/><stop offset=".5" stop-color="#5B12E0"/><stop offset="1" stop-color="#1A0B5C"/></linearGradient>
+<linearGradient id="vlilltrack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B57CFF"/><stop offset="1" stop-color="#7D03FC"/></linearGradient>
+<linearGradient id="tanilltrack" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A88B62"/><stop offset=".5" stop-color="#D9C39C"/><stop offset="1" stop-color="#9B7E55"/></linearGradient>
+<linearGradient id="cardilltrack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4E1F5"/></linearGradient>
+<linearGradient id="kraftilltrack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8C79A"/><stop offset="1" stop-color="#B98B55"/></linearGradient>
+<filter id="billtrack" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+<filter id="silltrack" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="dilltrack" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#0B0620" flood-opacity=".35"/></filter>
+</defs><circle cx="300" cy="250" r="230" fill="url(#gilltrack)"/><g transform="translate(240 250) rotate(-6) scale(0.62)" filter="url(#dilltrack)"><rect x="-92" y="-180" width="184" height="360" rx="36" fill="#0B0F18"/>
+<rect x="-84" y="-172" width="168" height="344" rx="30" fill="url(#scilltrack)"/>
+<rect x="-30" y="-162" width="60" height="16" rx="8" fill="#0B0F18"/><path d="M-84 -60 L-30 -100 L30 -60 L84 -100 V120 L30 160 L-30 120 L-84 160 Z" fill="#fff" opacity=".12"/><path d="M-60 120 C -20 60, 10 40, 30 -20" fill="none" stroke="#fff" stroke-width="6" stroke-dasharray="4 10" stroke-linecap="round"/><path d="M30 -70 c-24 0 -38 18 -38 36 c0 28 38 60 38 60 s38 -32 38 -60 c0 -18 -14 -36 -38 -36z" fill="#fff"/><circle cx="30" cy="-34" r="12" fill="#7D03FC"/>
+<path d="M-84 -60 L84 -150 V-110 L-84 -20 Z" fill="#fff" opacity=".07"/></g><g transform="translate(440 210) rotate(0) scale(0.62)" filter="url(#dilltrack)"><ellipse cx="0" cy="170" rx="80" ry="18" fill="#000" opacity=".2" filter="url(#silltrack)"/><path d="M0 -160 c-80 0 -126 60 -126 120 c0 92 126 200 126 200 s126 -108 126 -200 c0 -60 -46 -120 -126 -120z" fill="url(#vlilltrack)"/><circle cx="0" cy="-40" r="46" fill="#fff"/></g></svg>

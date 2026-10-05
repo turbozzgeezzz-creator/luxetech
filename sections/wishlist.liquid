@@ -1,0 +1,31 @@
+{%- comment -%}
+  Wishlist grid, filled in the browser from the shopper's saved items
+  (assets/experience.js). Nothing is stored on the server.
+{%- endcomment -%}
+<section class="section wishlist">
+  <div class="container">
+    <wishlist-grid class="wishlist__wrap">
+      <div class="section-head">
+        <p class="wishlist__total" data-wishlist-total></p>
+      </div>
+      <ul class="wishlist__grid" role="list" data-wishlist-grid></ul>
+      <div class="wishlist__empty" data-wishlist-empty hidden>
+        <span class="wishlist__empty-icon">{% render 'icon', name: 'heart' %}</span>
+        <h2 class="wishlist__empty-title">{{ section.settings.empty_heading | escape }}</h2>
+        <p>{{ section.settings.empty_text | escape }}</p>
+        <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Shop all</a>
+      </div>
+    </wishlist-grid>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Wishlist",
+  "settings": [
+    { "type": "text", "id": "empty_heading", "label": "Empty heading", "default": "Nothing saved yet" },
+    { "type": "text", "id": "empty_text", "label": "Empty text", "default": "Tap the heart on any product and it will be waiting for you here." }
+  ],
+  "presets": [{ "name": "Wishlist" }]
+}
+{% endschema %}

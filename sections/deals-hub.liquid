@@ -44,19 +44,19 @@
       </div>
     </div>
     <div class="deals__grid" data-stagger>
-      <a href="#" class="deal-offer bento-tone--grape" data-open-popup>
-        <img src="{{ 'art-deals.svg' | asset_url }}" alt="" class="bento-art" width="800" height="600" loading="lazy">
+      <a href="#" class="deal-offer tone tone--violet" data-open-popup>
+        <span class="deal-offer__art art-box">{% render 'ill', name: 'ill-coupon' %}</span>
         <span class="deal-offer__copy">
-          <span class="bento-kicker">{{ section.settings.offer_kicker | escape }}</span>
+          <span class="tone-kicker">{{ section.settings.offer_kicker | escape }}</span>
           <span class="deal-offer__big">{{ section.settings.offer_heading | escape }}</span>
           <span class="deal-offer__text">{{ section.settings.offer_text | escape }}</span>
-          <span class="btn btn--white">{{ section.settings.offer_button | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</span>
+          <span class="btn tone-btn">{{ section.settings.offer_button | escape }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</span>
           {%- if section.settings.offer_fine != blank -%}<span class="deal-offer__fine">{{ section.settings.offer_fine | escape }}</span>{%- endif -%}
         </span>
       </a>
 
       {%- if pair_a != blank and pair_b != blank -%}
-        <div class="deal-pair" data-bundle>
+        <div class="deal-pair" data-bundle{% if settings.bundle_enabled %} data-bundle-pct="{{ settings.bundle_pct }}"{% endif %}>
           <p class="bento-kicker">{{ section.settings.pair_kicker | escape }}</p>
           <h3 class="deal-pair__title">{{ section.settings.pair_heading | escape }}</h3>
           <ul class="deal-pair__items" role="list">
@@ -84,7 +84,7 @@
             <div>
               <span class="deal-pair__label">Together</span>
               <span class="deal-pair__total" data-bundle-total>{{ pair_a.selected_or_first_available_variant.price | plus: pair_b.selected_or_first_available_variant.price | money }}</span>
-              {%- if section.settings.pair_note != blank -%}<span class="deal-pair__note">{{ section.settings.pair_note | escape }}</span>{%- endif -%}
+              {%- if settings.bundle_enabled -%}<span class="deal-pair__note">Save {{ settings.bundle_pct }}% as a bundle</span>{%- elsif section.settings.pair_note != blank -%}<span class="deal-pair__note">{{ section.settings.pair_note | escape }}</span>{%- endif -%}
             </div>
             <button type="button" class="btn btn--primary" data-bundle-add>{% render 'icon', name: 'cart', class: 'icon--sm' %} Add both</button>
           </div>

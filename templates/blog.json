@@ -3,8 +3,8 @@
     "hero": {
       "type": "page-hero",
       "settings": {
-        "tone": "violet",
-        "art": "art-guide",
+        "tone": "ink",
+        "art": "ill-guides",
         "kicker": "From the tech desk",
         "heading": "Guides and news",
         "text": "<p>Buying guides, how-tos and care tips from our team, so you get more from your tech.</p>",

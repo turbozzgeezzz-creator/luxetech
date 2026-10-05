@@ -99,9 +99,18 @@
             "icon": "sparkle",
             "link": "/blogs/news"
           }
+        },
+        "c0": {
+          "type": "link",
+          "settings": {
+            "title": "Shop all",
+            "icon": "grid",
+            "link": "/collections/all"
+          }
         }
       },
       "block_order": [
+        "c0",
         "c1",
         "c2",
         "c3",

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500"><defs>
+<radialGradient id="gillblogear" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7D03FC" stop-opacity=".55"/><stop offset=".5" stop-color="#7D03FC" stop-opacity=".18"/><stop offset="1" stop-color="#7D03FC" stop-opacity="0"/></radialGradient>
+<linearGradient id="willblogear" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#E9ECF3"/><stop offset="1" stop-color="#B9C0CF"/></linearGradient>
+<linearGradient id="wsillblogear" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C8CEDB"/><stop offset=".35" stop-color="#FFFFFF"/><stop offset="1" stop-color="#AEB6C6"/></linearGradient>
+<linearGradient id="millblogear" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A5366"/><stop offset=".45" stop-color="#232A38"/><stop offset="1" stop-color="#0C1019"/></linearGradient>
+<linearGradient id="mhillblogear" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#151A25"/><stop offset=".3" stop-color="#5A6478"/><stop offset=".55" stop-color="#262D3B"/><stop offset="1" stop-color="#0E121B"/></linearGradient>
+<linearGradient id="scillblogear" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B4DFF"/><stop offset=".5" stop-color="#5B12E0"/><stop offset="1" stop-color="#1A0B5C"/></linearGradient>
+<linearGradient id="vlillblogear" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B57CFF"/><stop offset="1" stop-color="#7D03FC"/></linearGradient>
+<linearGradient id="tanillblogear" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A88B62"/><stop offset=".5" stop-color="#D9C39C"/><stop offset="1" stop-color="#9B7E55"/></linearGradient>
+<linearGradient id="cardillblogear" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4E1F5"/></linearGradient>
+<linearGradient id="kraftillblogear" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8C79A"/><stop offset="1" stop-color="#B98B55"/></linearGradient>
+<filter id="billblogear" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+<filter id="sillblogear" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="dillblogear" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#0B0620" flood-opacity=".35"/></filter>
+</defs><circle cx="300" cy="250" r="230" fill="url(#gillblogear)"/><g transform="translate(260 220) rotate(0) scale(0.85)" filter="url(#dillblogear)"><g transform="translate(-80 -40)"><g transform="rotate(-18) scale(1 1)">
+<rect x="-16" y="10" width="32" height="128" rx="16" fill="url(#wsillblogear)"/>
+<rect x="-6" y="22" width="5" height="100" rx="2.5" fill="#fff" opacity=".8"/>
+<ellipse cx="6" cy="0" rx="50" ry="42" fill="url(#willblogear)"/>
+<ellipse cx="34" cy="-4" rx="18" ry="22" fill="#1B1F2A"/><ellipse cx="36" cy="-6" rx="10" ry="13" fill="#2C3242"/>
+<ellipse cx="-14" cy="-18" rx="20" ry="10" fill="#fff" opacity=".9"/></g></g><g transform="translate(90 -70)"><g transform="rotate(16) scale(-1 1)">
+<rect x="-16" y="10" width="32" height="128" rx="16" fill="url(#wsillblogear)"/>
+<rect x="-6" y="22" width="5" height="100" rx="2.5" fill="#fff" opacity=".8"/>
+<ellipse cx="6" cy="0" rx="50" ry="42" fill="url(#willblogear)"/>
+<ellipse cx="34" cy="-4" rx="18" ry="22" fill="#1B1F2A"/><ellipse cx="36" cy="-6" rx="10" ry="13" fill="#2C3242"/>
+<ellipse cx="-14" cy="-18" rx="20" ry="10" fill="#fff" opacity=".9"/></g></g></g><g transform="translate(420 360) rotate(0) scale(0.8)" filter="url(#dillblogear)"><g transform="rotate(-35)"><rect x="-180" y="-14" width="280" height="28" rx="14" fill="url(#vlillblogear)"/><rect x="100" y="-22" width="80" height="44" rx="10" fill="#fff"/><g stroke="#E3E7EE" stroke-width="5"><path d="M108 -22 v-30"/><path d="M118 -22 v-30"/><path d="M128 -22 v-30"/><path d="M138 -22 v-30"/><path d="M148 -22 v-30"/><path d="M158 -22 v-30"/><path d="M168 -22 v-30"/><path d="M178 -22 v-30"/></g></g></g></svg>

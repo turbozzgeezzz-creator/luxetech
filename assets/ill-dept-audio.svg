@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500"><defs>
+<radialGradient id="gilldeptaud" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7D03FC" stop-opacity=".55"/><stop offset=".5" stop-color="#7D03FC" stop-opacity=".18"/><stop offset="1" stop-color="#7D03FC" stop-opacity="0"/></radialGradient>
+<linearGradient id="willdeptaud" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#E9ECF3"/><stop offset="1" stop-color="#B9C0CF"/></linearGradient>
+<linearGradient id="wsilldeptaud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C8CEDB"/><stop offset=".35" stop-color="#FFFFFF"/><stop offset="1" stop-color="#AEB6C6"/></linearGradient>
+<linearGradient id="milldeptaud" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A5366"/><stop offset=".45" stop-color="#232A38"/><stop offset="1" stop-color="#0C1019"/></linearGradient>
+<linearGradient id="mhilldeptaud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#151A25"/><stop offset=".3" stop-color="#5A6478"/><stop offset=".55" stop-color="#262D3B"/><stop offset="1" stop-color="#0E121B"/></linearGradient>
+<linearGradient id="scilldeptaud" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B4DFF"/><stop offset=".5" stop-color="#5B12E0"/><stop offset="1" stop-color="#1A0B5C"/></linearGradient>
+<linearGradient id="vlilldeptaud" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B57CFF"/><stop offset="1" stop-color="#7D03FC"/></linearGradient>
+<linearGradient id="tanilldeptaud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A88B62"/><stop offset=".5" stop-color="#D9C39C"/><stop offset="1" stop-color="#9B7E55"/></linearGradient>
+<linearGradient id="cardilldeptaud" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4E1F5"/></linearGradient>
+<linearGradient id="kraftilldeptaud" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8C79A"/><stop offset="1" stop-color="#B98B55"/></linearGradient>
+<filter id="billdeptaud" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+<filter id="silldeptaud" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="dilldeptaud" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#0B0620" flood-opacity=".35"/></filter>
+</defs><circle cx="300" cy="250" r="230" fill="url(#gilldeptaud)"/><g transform="translate(300 290) rotate(0) scale(1.05)" filter="url(#dilldeptaud)"><g transform="translate(0 -95) rotate(-24)"><rect x="-130" y="-80" width="260" height="90" rx="44" fill="url(#wsilldeptaud)"/><rect x="-108" y="-60" width="216" height="50" rx="25" fill="#DDE2EB"/></g>
+<rect x="-130" y="-40" width="260" height="150" rx="70" fill="url(#willdeptaud)"/>
+<ellipse cx="-50" cy="-36" rx="44" ry="16" fill="#C3C9D6"/><ellipse cx="50" cy="-36" rx="44" ry="16" fill="#C3C9D6"/>
+<g transform="translate(-50 -60) scale(.55)"><g transform="rotate(0) scale(1 1)">
+<rect x="-16" y="10" width="32" height="128" rx="16" fill="url(#wsilldeptaud)"/>
+<rect x="-6" y="22" width="5" height="100" rx="2.5" fill="#fff" opacity=".8"/>
+<ellipse cx="6" cy="0" rx="50" ry="42" fill="url(#willdeptaud)"/>
+<ellipse cx="34" cy="-4" rx="18" ry="22" fill="#1B1F2A"/><ellipse cx="36" cy="-6" rx="10" ry="13" fill="#2C3242"/>
+<ellipse cx="-14" cy="-18" rx="20" ry="10" fill="#fff" opacity=".9"/></g></g><g transform="translate(50 -60) scale(.55)"><g transform="rotate(0) scale(-1 1)">
+<rect x="-16" y="10" width="32" height="128" rx="16" fill="url(#wsilldeptaud)"/>
+<rect x="-6" y="22" width="5" height="100" rx="2.5" fill="#fff" opacity=".8"/>
+<ellipse cx="6" cy="0" rx="50" ry="42" fill="url(#willdeptaud)"/>
+<ellipse cx="34" cy="-4" rx="18" ry="22" fill="#1B1F2A"/><ellipse cx="36" cy="-6" rx="10" ry="13" fill="#2C3242"/>
+<ellipse cx="-14" cy="-18" rx="20" ry="10" fill="#fff" opacity=".9"/></g></g>
+<circle cx="0" cy="62" r="7" fill="#7D03FC"/><circle cx="0" cy="62" r="18" fill="#7D03FC" opacity=".35" filter="url(#silldeptaud)"/></g><g transform="translate(480 120) rotate(0) scale(0.5)"><path d="M0 -40 Q6 -6 40 0 Q6 6 0 40 Q-6 6 -40 0 Q-6 -6 0 -40 Z" fill="#fff"/></g></svg>

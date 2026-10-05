@@ -4,16 +4,25 @@
 {%- endcomment -%}
 {%- liquid
   assign tags = article.tags | join: ' ' | downcase
-  assign art = 'art-guide'
-  if tags contains 'audio' or tags contains 'earbud'
-    assign art = 'art-audio'
-  elsif tags contains 'charg'
-    assign art = 'art-charging'
-  elsif tags contains 'kitchen' or tags contains 'coffee' or tags contains 'home'
-    assign art = 'art-home'
-  elsif tags contains 'wear' or tags contains 'watch'
-    assign art = 'art-accessories'
-  endif
+  case article.handle
+    when 'how-to-choose-a-wireless-charger-qi2-magsafe-and-watts-explained'
+      assign art = 'ill-blog-charger'
+    when 'wireless-earbuds-care-fit-cleaning-and-battery-tips'
+      assign art = 'ill-blog-earbuds'
+    when 'cafe-style-espresso-at-home-a-beginners-guide'
+      assign art = 'ill-blog-espresso'
+    else
+      assign art = 'ill-guides'
+      if tags contains 'audio' or tags contains 'earbud'
+        assign art = 'ill-buds'
+      elsif tags contains 'charg'
+        assign art = 'ill-charge'
+      elsif tags contains 'kitchen' or tags contains 'coffee' or tags contains 'home'
+        assign art = 'ill-espresso'
+      elsif tags contains 'wear' or tags contains 'watch'
+        assign art = 'ill-watch'
+      endif
+  endcase
   assign words = article.content | strip_html | split: ' ' | size
   assign minutes = words | divided_by: 200 | at_least: 1
 -%}
@@ -23,7 +32,7 @@
       {%- assign post_alt = article.image.alt | default: article.title -%}
       {{ article.image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '400,600,900', sizes: '(min-width: 990px) 33vw, 100vw', alt: post_alt }}
     {%- else -%}
-      <img src="{{ art | append: '.svg' | asset_url }}" alt="" width="600" height="600" loading="lazy">
+      <span class="art-box tone tone--violet">{% render 'ill', name: art %}</span>
     {%- endif -%}
   </span>
   <span class="post__body">

@@ -22,6 +22,8 @@
     --c-warning-soft: {{ settings.color_warning | color_modify: 'alpha', 0.12 }};
     --c-error: {{ settings.color_error }};
     --c-error-soft: {{ settings.color_error | color_modify: 'alpha', 0.1 }};
+    --c-night: {{ settings.color_ink }};
+    --c-photo: {{ settings.color_subtle }};
     --c-on-ink: #FFFFFF;
     --c-on-ink-muted: {{ settings.color_ink | color_mix: '#FFFFFF', 35 }};
     --c-primary-on-ink: {{ settings.color_primary | color_mix: '#FFFFFF', 55 }};
@@ -29,5 +31,25 @@
     --font-body: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
     --logo-width: {{ settings.logo_width }}px;
+  }
+  /* Dark mode: surfaces go dark, text goes light. --c-night stays dark for bands
+     that are always dark, and product photos keep a light frame (--c-photo). */
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --c-bg: #0A0E17;
+    --c-subtle: #151C2B;
+    --c-surface: #111827;
+    --c-ink: #EDEFF5;
+    --c-muted: #A1A9BA;
+    --c-border: #263046;
+    --c-accent: #261447;
+    --c-accent-text: #CDB0FF;
+    --c-on-ink-muted: #A1A9BA;
+    --c-photo: #E9EBF0;
+    --c-success: #3FBF6E;
+    --c-success-soft: rgba(63, 191, 110, .16);
+    --c-warning: #E0A43A;
+    --c-warning-soft: rgba(224, 164, 58, .16);
+    --c-error: #F0645A;
   }
 </style>

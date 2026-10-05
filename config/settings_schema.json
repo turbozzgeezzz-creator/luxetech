@@ -42,6 +42,26 @@
         "content": "Tech.LuxeDealers palette: cool paper and white surfaces, near-black ink from the logo, and the logo violet for primary actions, links, sale prices and the signal dot. Stock colors carry meaning on every product card, so keep them distinguishable from the brand color."
       },
       {
+        "type": "select",
+        "id": "dark_mode",
+        "label": "Dark mode",
+        "options": [
+          {
+            "value": "device",
+            "label": "Follow the device, with a toggle"
+          },
+          {
+            "value": "toggle",
+            "label": "Start light, with a toggle"
+          },
+          {
+            "value": "off",
+            "label": "Off"
+          }
+        ],
+        "default": "device"
+      },
+      {
         "type": "header",
         "content": "Base"
       },
@@ -281,6 +301,85 @@
         "id": "welcome_label",
         "label": "Offer in one line",
         "default": "10% off your first order"
+      }
+    ]
+  },
+  {
+    "name": "Volume and bundle deals",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "These only change what the store shows. Create the matching automatic discounts in Shopify admin > Discounts first, then turn them on here, so the saving shown is the saving customers get at checkout."
+      },
+      {
+        "type": "header",
+        "content": "Buy more, save more"
+      },
+      {
+        "type": "checkbox",
+        "id": "qty_breaks_enabled",
+        "label": "Show quantity discounts on product pages",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "tier1_qty",
+        "label": "Tier 1 quantity",
+        "min": 2,
+        "max": 10,
+        "step": 1,
+        "default": 2
+      },
+      {
+        "type": "range",
+        "id": "tier1_pct",
+        "label": "Tier 1 saving",
+        "min": 1,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "tier2_qty",
+        "label": "Tier 2 quantity",
+        "min": 2,
+        "max": 10,
+        "step": 1,
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "tier2_pct",
+        "label": "Tier 2 saving",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "default": 10,
+        "info": "Set to 0% to show only tier 1."
+      },
+      {
+        "type": "header",
+        "content": "Bundles"
+      },
+      {
+        "type": "checkbox",
+        "id": "bundle_enabled",
+        "label": "Show bundle saving",
+        "default": false,
+        "info": "Shown on Complete the set and the pair builder."
+      },
+      {
+        "type": "range",
+        "id": "bundle_pct",
+        "label": "Bundle saving",
+        "min": 1,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "default": 10
       }
     ]
   },

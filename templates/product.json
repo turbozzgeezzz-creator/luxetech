@@ -44,10 +44,23 @@
         "heading": "Recently viewed",
         "show_recommended": false
       }
+    },
+    "overview": {
+      "type": "product-overview",
+      "settings": {
+        "dispatch": "3-4 business days",
+        "returns": "30-day change of mind"
+      }
+    },
+    "reviews": {
+      "type": "product-reviews",
+      "settings": {}
     }
   },
   "order": [
     "main",
+    "overview",
+    "reviews",
     "related",
     "viewed"
   ]

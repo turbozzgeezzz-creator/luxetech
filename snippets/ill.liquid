@@ -1,0 +1,14 @@
+{%- comment -%}
+  Renders a theme illustration (assets/ill-*.svg) or, when an image is given,
+  that image instead. Illustrations have transparent backgrounds and sit in their
+  own area next to or above the copy, never behind text.
+  Params: name (illustration file name without .svg), image (optional image),
+  sizes (for uploaded images), loading ('lazy' default), class
+{%- endcomment -%}
+{%- assign ill_loading = loading | default: 'lazy' -%}
+{%- if image != blank -%}
+  {%- assign ill_alt = image.alt | default: '' -%}
+  {{ image | image_url: width: 1400 | image_tag: loading: ill_loading, widths: '400,700,1000,1400', sizes: sizes, alt: ill_alt, class: class }}
+{%- else -%}
+  <img src="{{ name | default: 'ill-devices' | append: '.svg' | asset_url }}" alt="" width="600" height="500" loading="{{ ill_loading }}" class="{{ class }}">
+{%- endif -%}
