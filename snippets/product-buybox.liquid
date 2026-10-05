@@ -154,6 +154,7 @@
           "available": {{ v.available | json }},
           "sku": {{ v.sku | json }},
           "media": {{ v.featured_media.id | json }},
+          "position": {{ forloop.index }},
           "priceHtml": {{ v_price | strip_newlines | json }},
           "stockHtml": {{ v_stock | strip_newlines | json }}
         }{% unless forloop.last %},{% endunless %}

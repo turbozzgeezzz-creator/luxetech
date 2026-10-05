@@ -203,7 +203,10 @@
   <div class="drawer__overlay" data-drawer-close></div>
   <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu" tabindex="-1">
     <div class="drawer__head">
-      <span class="drawer__title">Shop by category</span>
+      <a href="{{ routes.root_url }}" class="drawer__logo" aria-label="{{ shop.name | escape }} home">
+        <img src="{{ 'logo-tech-luxedealers.png' | asset_url }}" width="653" height="178" alt="" class="logo-dark" loading="lazy">
+        <img src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="653" height="178" alt="" class="logo-light" loading="lazy">
+      </a>
       <button type="button" class="header__icon" data-drawer-close aria-label="Close menu">{% render 'icon', name: 'close' %}</button>
     </div>
     <div class="drawer__body">

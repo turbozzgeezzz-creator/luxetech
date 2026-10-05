@@ -526,6 +526,17 @@
       var next = this.querySelector('[data-gallery-next]');
       if (prev) prev.addEventListener('click', () => this.show(Math.max(0, this.index - 1)));
       if (next) next.addEventListener('click', () => this.show(Math.min(this.slides.length - 1, this.index + 1)));
+      /* Mouse users can drag the photo sideways to change it, like swiping on a phone. */
+      var dragX = null, dragged = false;
+      this.main.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse' && e.button === 0) { dragX = e.clientX; dragged = false; } });
+      this.main.addEventListener('pointermove', (e) => { if (dragX !== null && Math.abs(e.clientX - dragX) > 6) dragged = true; });
+      window.addEventListener('pointerup', (e) => {
+        if (dragX === null) return;
+        var dx = e.clientX - dragX; dragX = null;
+        if (Math.abs(dx) > 40) this.show(Math.max(0, Math.min(this.slides.length - 1, this.index + (dx < 0 ? 1 : -1))));
+      });
+      this.main.addEventListener('click', (e) => { if (dragged) { e.preventDefault(); e.stopPropagation(); dragged = false; } }, true);
+      this.main.addEventListener('dragstart', (e) => e.preventDefault());
       this.main.addEventListener('scroll', debounce(() => {
         var i = Math.round(this.main.scrollLeft / this.main.clientWidth);
         if (i !== this.index) this.setActive(i);
@@ -713,8 +724,13 @@
       if (addBtn) addBtn.disabled = !variant.available;
       if (addLabel) addLabel.textContent = variant.available ? 'Add to cart' : 'Sold out';
 
+      var variantGallery = this.querySelector('media-gallery');
+      /* Variants without their own photo: show the photo in the same position (variant 2 shows photo 2). */
+      if (!variant.media && variant.position && variantGallery && variantGallery.slides && variantGallery.slides.length > 1) {
+        variantGallery.show(Math.min(variant.position - 1, variantGallery.slides.length - 1));
+      }
       if (variant.media) {
-        var gallery = this.querySelector('media-gallery');
+        var gallery = variantGallery;
         if (gallery && gallery.showMedia) gallery.showMedia(variant.media);
         var quickImg = this.querySelector('.quick-add__img');
         var mediaJson = this.querySelector('[data-media-json]');

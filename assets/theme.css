@@ -2155,3 +2155,31 @@ html[data-theme="dark"] .gallery__thumb { border-color: rgba(255, 255, 255, .14)
 .pair__check input:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
 /* Leave room for the sticky add-to-cart bar so the end of the footer is not hidden behind it. */
 @media (max-width: 749px) { body:has(.sticky-atc) .footer { padding-bottom: calc(76px + env(safe-area-inset-bottom)); } }
+
+/* ---------- Footer bottom bar: copyright and links left, payments right, fine print below ---------- */
+.footer__bottom { align-items: center; padding-block: 20px; }
+.footer__legal { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; flex: 1 1 auto; font-size: 13.5px; }
+.footer__copy { color: #C9CFDA !important; }
+.footer__policies { gap: 6px 18px; }
+.footer__policies a { color: #A7AFBF; font-size: 13.5px; }
+.footer__policies a:hover { color: #fff; }
+.footer__end { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.footer__fine { display: grid; gap: 4px; padding-bottom: 18px; font-size: 12px; line-height: 1.5; color: #6F7787; }
+.footer__fine p { margin: 0; }
+.footer__fine a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.footer__fine a:hover { color: #fff; }
+@media (max-width: 749px) {
+  .footer__legal { flex-direction: column; align-items: flex-start; }
+  .footer__end { width: 100%; }
+}
+
+/* Menu drawer shows the logo instead of a heading. */
+.drawer__logo { display: block; width: 150px; }
+.drawer__logo img { width: 100%; height: auto; }
+
+/* Dynamic checkout (PayPal and friends): no white box behind the rounded button in dark mode. */
+.shopify-payment-button, .shopify-payment-button iframe, .shopify-payment-button__button { color-scheme: light; background: transparent !important; }
+.shopify-payment-button { border-radius: 12px; overflow: hidden; }
+@media (pointer: fine) { .gallery__main { cursor: grab; user-select: none; } .gallery__main:active { cursor: grabbing; } }
+/* Swipes on touch screens move one photo at a time without getting stuck. */
+.gallery__slide { scroll-snap-stop: normal; }
