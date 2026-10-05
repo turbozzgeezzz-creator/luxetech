@@ -2081,3 +2081,10 @@ html[data-theme="dark"] .news-card__panel-title { color: #C9A5FF; }
 .tracker__account { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 10px; font-weight: 700; color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 .tracker__account:hover { color: #C9A5FF; }
 html[data-theme="dark"] .tracker__card--lookup .input { background: #fff; color: var(--c-night); }
+
+/* Footer sign-up: tighter padding so the full placeholder fits beside the button. */
+.footer .newsletter-form__row .input { padding-inline: 16px 8px; text-overflow: ellipsis; }
+.footer .newsletter-form__row .btn { padding-inline: 20px; flex: none; }
+/* Only the active slide (and its neighbours while dragging) is visible, so no hairline of the next slide shows. */
+.bento-slide { visibility: hidden; transition: visibility 0s linear .65s; }
+.bento-slide.is-active, .bento__track.is-dragging .bento-slide { visibility: visible; transition: none; }

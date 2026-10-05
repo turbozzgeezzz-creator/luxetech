@@ -109,7 +109,7 @@
             <div class="footer__col footer__col--newsletter" {{ block.shopify_attributes }}>
               <h2 class="footer__deal-title">{{ block.settings.heading | escape }}</h2>
               {%- if block.settings.text != blank -%}<p class="footer__text">{{ block.settings.text | escape }}</p>{%- endif -%}
-              {% render 'newsletter-form', id: block.id, button_label: block.settings.button_label, discount_code: settings.welcome_code, tags: 'newsletter,footer' %}
+              {% render 'newsletter-form', id: block.id, placeholder: 'Your email', button_label: block.settings.button_label, discount_code: settings.welcome_code, tags: 'newsletter,footer' %}
               {%- if block.settings.fine_print != blank -%}<p class="footer__fine">{{ block.settings.fine_print | escape }}</p>{%- endif -%}
               {%- if has_social -%}
                 <ul class="social" role="list" aria-label="Follow us">

@@ -1,6 +1,6 @@
 {%- comment -%}
   Shopify customer newsletter signup (adds the email to Customers with
-  marketing consent). Params: id (unique), button_label, tags (optional),
+  marketing consent). Params: id (unique), button_label, tags (optional), placeholder (optional),
   discount_code (optional; shown with an apply link after a successful signup)
 {%- endcomment -%}
 {%- assign form_id = 'Newsletter-' | append: id -%}
@@ -28,7 +28,7 @@
         id="{{ form_id }}-email"
         name="contact[email]"
         class="input"
-        placeholder="Email address"
+        placeholder="{{ placeholder | default: 'Email address' | escape }}"
         autocomplete="email"
         required
         {% if form.errors %}aria-invalid="true" aria-describedby="{{ form_id }}-error"{% endif %}
