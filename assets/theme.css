@@ -1449,8 +1449,8 @@ a:hover > .art-box img, a:hover .dept__art img, .bento-slide.is-active .art-box 
 .bento-section { padding-block: 16px 8px; }
 @media (min-width: 990px) { .bento-section { padding-block: 24px 12px; } }
 .bento { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.bento__main { grid-column: 1 / -1; position: relative; display: flex; min-height: 520px; border-radius: var(--radius-xl); overflow: hidden; background: #0F0832; isolation: isolate; }
-@media (min-width: 750px) { .bento__main { min-height: 420px; } }
+.bento__main { grid-column: 1 / -1; position: relative; display: flex; flex-direction: column; min-width: 0; isolation: isolate; }
+@media (min-width: 750px) { .bento__main { min-height: 420px; border-radius: var(--radius-xl); overflow: hidden; background: #0F0832; } }
 @media (min-width: 990px) {
   .bento { gap: 16px; grid-template-columns: minmax(0, .95fr) repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(440px, auto) minmax(230px, auto); }
   .bento__main { grid-column: 2 / 5; grid-row: 1; min-height: 0; }
@@ -1460,12 +1460,21 @@ a:hover > .art-box img, a:hover .dept__art img, .bento-slide.is-active .art-box 
   .bento-tile--4 { grid-column: 3; grid-row: 2; }
   .bento-tile--5 { grid-column: 4; grid-row: 2; }
 }
-/* Slides sit side by side on a track that moves with the finger or mouse. */
-.bento__track { display: flex; flex: 1 1 auto; width: 100%; min-width: 0; transition: transform .65s var(--ease); touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; will-change: transform; }
-.bento__track.is-dragging { transition: none; cursor: grabbing; }
-.bento__track img { -webkit-user-drag: none; pointer-events: none; }
+/* Slides scroll natively with snap points, like the product rows: swipe and they follow the finger.
+   On phones the next slide peeks in from the right so it is obvious you can swipe. */
+.bento__track {
+  display: flex; flex: 1 1 auto; gap: 10px; width: 100%; min-width: 0;
+  overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.bento__track::-webkit-scrollbar { display: none; }
 .bento-slide {
-  position: relative; flex: 0 0 100%; min-width: 0; display: grid; grid-template-rows: 200px auto; align-content: start; gap: 8px; padding: 20px 24px 84px;
+  position: relative; flex: 0 0 86%; min-width: 0; min-height: 480px; scroll-snap-align: start; scroll-snap-stop: always;
+  display: grid; grid-template-rows: 190px auto; align-content: start; gap: 8px; padding: 20px 22px 28px; border-radius: var(--radius-xl);
+}
+@media (min-width: 750px) {
+  .bento__track { gap: 0; }
+  .bento-slide { flex-basis: 100%; min-height: 0; border-radius: 0; }
 }
 .bento-slide__art { grid-row: 1; }
 .bento-slide__copy { grid-row: 2; display: grid; justify-items: start; gap: 12px; align-content: start; }
@@ -1475,7 +1484,9 @@ a:hover > .art-box img, a:hover .dept__art img, .bento-slide.is-active .art-box 
   .bento-slide__copy { grid-row: 1; grid-column: 1; }
 }
 @media (min-width: 1200px) { .bento-slide { padding: 48px 56px 96px; } }
-.bento-slide__copy > * { opacity: 0; transform: translateY(14px); transition: opacity .5s var(--ease), transform .6s var(--ease); }
+@media (min-width: 750px) {
+  .bento-slide__copy > * { opacity: 0; transform: translateY(14px); transition: opacity .5s var(--ease), transform .6s var(--ease); }
+}
 .bento-slide.is-active .bento-slide__copy > * { opacity: 1; transform: none; }
 .bento-slide.is-active .bento-slide__copy > :nth-child(2) { transition-delay: .08s; }
 .bento-slide.is-active .bento-slide__copy > :nth-child(3) { transition-delay: .16s; }
@@ -1499,10 +1510,8 @@ a:hover > .art-box img, a:hover .dept__art img, .bento-slide.is-active .art-box 
 @keyframes dotFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (max-width: 749px) {
   .bento__arrow { display: none; }
-  .bento__dots { padding: 6px 8px; }
-  .bento__main { min-height: 540px; }
-  .bento-slide { padding-bottom: 76px; }
-  .bento__controls { bottom: 20px; }
+  /* Dots sit under the slides on phones instead of on top of them. */
+  .bento__controls { position: static; align-self: center; margin-top: 12px; padding: 8px 10px; }
 }
 @media (max-width: 480px) { .bento-slide__actions .tone-btn-2 { display: none; } }
 
@@ -2085,6 +2094,11 @@ html[data-theme="dark"] .tracker__card--lookup .input { background: #fff; color:
 /* Footer sign-up: tighter padding so the full placeholder fits beside the button. */
 .footer .newsletter-form__row .input { padding-inline: 16px 8px; text-overflow: ellipsis; }
 .footer .newsletter-form__row .btn { padding-inline: 20px; flex: none; }
-/* Only the active slide (and its neighbours while dragging) is visible, so no hairline of the next slide shows. */
-.bento-slide { visibility: hidden; transition: visibility 0s linear .65s; }
-.bento-slide.is-active, .bento__track.is-dragging .bento-slide { visibility: visible; transition: none; }
+
+/* Hide the floating hCaptcha badge (bottom-right) so a chat widget can sit there.
+   Bot protection still runs, and any challenge still opens normally; the footer
+   carries the hCaptcha notice that its terms ask for when the badge is hidden. */
+iframe[src*="hcaptcha.com"][src*="checkbox-invisible"],
+div:has(> iframe[src*="hcaptcha.com"][src*="checkbox-invisible"]) { display: none !important; }
+.footer__captcha { margin-top: 6px; font-size: 12px; color: var(--c-on-ink-muted); }
+.footer__captcha a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }

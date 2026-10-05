@@ -85,93 +85,78 @@
   /* ------------------------------------------------------------------ */
   class BentoCarousel extends HTMLElement {
     connectedCallback() {
+      this.track = this.querySelector('[data-bento-track]');
       this.slides = Array.prototype.slice.call(this.querySelectorAll('[data-slide]'));
       this.dots = Array.prototype.slice.call(this.querySelectorAll('[data-dot]'));
-      if (this.slides.length < 2) return;
+      if (!this.track || this.slides.length < 2) return;
       this.index = 0;
       this.dots.forEach((dot, i) => dot.addEventListener('click', () => { this.go(i); this.restart(); }));
       var prev = this.querySelector('[data-prev]'); var next = this.querySelector('[data-next]');
       if (prev) prev.addEventListener('click', () => { this.go(this.index - 1); this.restart(); });
       if (next) next.addEventListener('click', () => { this.go(this.index + 1); this.restart(); });
-      this.addEventListener('mouseenter', () => this.stop());
+      /* Native scrolling does the swiping; we only keep the dots in sync with where it lands. */
+      var ticking = false;
+      this.track.addEventListener('scroll', () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { ticking = false; this.sync(); });
+      }, { passive: true });
+      /* Pause autoplay while someone is touching or hovering, resume after. */
+      var pause = () => this.stop();
+      var resume = () => { clearTimeout(this.resumeTimer); this.resumeTimer = setTimeout(() => this.start(), 4000); };
+      this.track.addEventListener('touchstart', pause, { passive: true });
+      this.track.addEventListener('touchend', resume, { passive: true });
+      this.track.addEventListener('wheel', () => { pause(); resume(); }, { passive: true });
+      this.addEventListener('mouseenter', pause);
       this.addEventListener('mouseleave', () => this.start());
-      this.addEventListener('focusin', () => this.stop());
-      this.track = this.querySelector('[data-bento-track]');
-      this.bindSwipe();
-      this.go(0);
-      this.start();
-    }
-    disconnectedCallback() { this.stop(); }
-    /* Drag or swipe the slides with a finger, pen or mouse; the slide follows the pointer. */
-    bindSwipe() {
-      var track = this.track; if (!track) return;
-      var startX = null, startY = 0, dx = 0, dragging = false, moved = false;
-      var width = function () { return track.offsetWidth || 1; };
-      var onDown = (e) => {
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-        if (e.target.closest('.bento__controls')) return;
-        startX = e.clientX; startY = e.clientY; dx = 0; dragging = false; moved = false;
-      };
-      var onMove = (e) => {
-        if (startX === null) return;
-        var x = e.clientX - startX, y = e.clientY - startY;
-        if (!dragging) {
-          if (Math.abs(x) < 8) return;
-          if (Math.abs(y) > Math.abs(x)) { startX = null; return; }
-          dragging = true; moved = true; this.stop();
-          track.classList.add('is-dragging');
-          try { track.setPointerCapture(e.pointerId); } catch (err) {}
-        }
-        dx = x;
-        var edge = (this.index === 0 && dx > 0) || (this.index === this.slides.length - 1 && dx < 0);
-        track.style.transform = 'translate3d(' + (-this.index * width() + (edge ? dx * 0.35 : dx)) + 'px,0,0)';
-      };
-      var onUp = () => {
-        if (startX === null) return;
-        startX = null;
-        if (!dragging) return;
-        dragging = false;
-        track.classList.remove('is-dragging');
-        var threshold = Math.min(80, width() * 0.15);
-        var target = this.index;
-        if (dx < -threshold && this.index < this.slides.length - 1) target = this.index + 1;
-        if (dx > threshold && this.index > 0) target = this.index - 1;
-        this.go(target);
-        this.restart();
-      };
-      track.addEventListener('pointerdown', onDown);
-      track.addEventListener('pointermove', onMove);
-      track.addEventListener('pointerup', onUp);
-      track.addEventListener('pointercancel', onUp);
-      track.addEventListener('lostpointercapture', onUp);
-      /* A drag never counts as a click on the slide's buttons. */
-      track.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
-      track.addEventListener('dragstart', function (e) { e.preventDefault(); });
+      this.addEventListener('focusin', pause);
       this.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') { this.go(this.index - 1); this.restart(); }
         if (e.key === 'ArrowRight') { this.go(this.index + 1); this.restart(); }
       });
+      this.mark(0);
+      this.start();
     }
-    go(i) {
-      var n = this.slides.length;
-      this.index = (i + n) % n;
+    disconnectedCallback() { this.stop(); clearTimeout(this.resumeTimer); }
+    sync() {
+      var left = this.track.scrollLeft;
+      var best = 0, bestDist = Infinity;
       this.slides.forEach((s, k) => {
-        var active = k === this.index;
+        var d = Math.abs(s.offsetLeft - this.track.offsetLeft - left);
+        if (d < bestDist) { bestDist = d; best = k; }
+      });
+      /* At the far end the last slide may not reach the left edge, so treat the end as the last slide. */
+      if (left + this.track.clientWidth >= this.track.scrollWidth - 4) best = this.slides.length - 1;
+      if (best !== this.index) this.mark(best);
+    }
+    mark(i) {
+      this.index = i;
+      this.slides.forEach((s, k) => {
+        var active = k === i;
         s.classList.toggle('is-active', active);
         s.setAttribute('aria-hidden', active ? 'false' : 'true');
         s.querySelectorAll('a, button').forEach(function (el) { el.tabIndex = active ? 0 : -1; });
       });
-      this.dots.forEach((d, k) => d.setAttribute('aria-current', k === this.index ? 'true' : 'false'));
-      this.style.setProperty('--progress-key', this.index);
-      if (this.track) this.track.style.transform = 'translate3d(' + (-this.index * 100) + '%,0,0)';
-      this.dataset.tone = (this.slides[this.index].className.match(/tone--([a-z]+)/) || [])[1] || '';
+      this.dots.forEach((d, k) => d.setAttribute('aria-current', k === i ? 'true' : 'false'));
+    }
+    go(i) {
+      var n = this.slides.length;
+      i = (i + n) % n;
+      var target = this.slides[i].offsetLeft - this.track.offsetLeft;
+      this.track.scrollTo({ left: target, behavior: reduceMotion ? 'auto' : 'smooth' });
+      this.mark(i);
     }
     start() {
       if (reduceMotion || this.dataset.autoplay !== 'true') return;
       this.stop();
       var ms = (parseInt(this.dataset.speed, 10) || 6) * 1000;
       this.classList.add('is-playing');
-      this.timer = setInterval(() => this.go(this.index + 1), ms);
+      this.timer = setInterval(() => {
+        /* Do not move a slide the visitor cannot see. */
+        var r = this.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight) return;
+        this.go(this.index + 1);
+      }, ms);
     }
     stop() { clearInterval(this.timer); this.classList.remove('is-playing'); }
     restart() { this.stop(); this.start(); }

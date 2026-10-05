@@ -141,6 +141,7 @@
       {%- endif -%}
       <div class="footer__legal">
         <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name | escape }}. All rights reserved.{% if section.settings.small_print != blank %} {{ section.settings.small_print | escape }}{% endif %}</p>
+        <p class="footer__captcha">This site is protected by hCaptcha and its <a href="https://www.hcaptcha.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="https://www.hcaptcha.com/terms" target="_blank" rel="noopener">Terms of Service</a> apply.</p>
         {%- if section.settings.show_policies -%}
           <ul class="footer__policies" role="list">
             {%- if terms_url != blank -%}<li><a href="{{ terms_url }}">Terms and conditions</a></li>{%- endif -%}
