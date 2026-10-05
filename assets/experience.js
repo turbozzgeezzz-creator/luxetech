@@ -324,6 +324,8 @@
     }
     var countEl = wrap.querySelector('[data-bundle-count]');
     if (countEl) countEl.textContent = checked.length;
+    var nounEl = wrap.querySelector('[data-bundle-noun]');
+    if (nounEl) nounEl.textContent = checked.length === 1 ? 'item' : 'items';
     var btn = wrap.querySelector('[data-bundle-add]');
     if (btn) btn.disabled = checked.length === 0;
     wrap.querySelectorAll('[data-bundle-card]').forEach(function (card) {
@@ -332,6 +334,15 @@
     });
   }
   document.querySelectorAll('[data-bundle]').forEach(updateBundle);
+  /* Tapping anywhere on a bundle card (except its links) ticks or unticks it. */
+  document.addEventListener('click', function (e) {
+    var card = e.target.closest('[data-bundle-card]');
+    if (!card || e.target.closest('a, button, input, label, select')) return;
+    var input = card.querySelector('[data-bundle-item]');
+    if (!input || input.disabled) return;
+    input.checked = !input.checked;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-bundle-add]');
     if (!btn) return;

@@ -243,7 +243,7 @@
               {%- endfor -%}
             </ul>
             <div class="pair__total">
-              <p class="pair__total-label"><span data-bundle-count>{{ pick_count | plus: 1 }}</span> items selected</p>
+              <p class="pair__total-label"><span data-bundle-count>{{ pick_count | plus: 1 }}</span> <span data-bundle-noun>items</span> selected</p>
               <p class="pair__total-value" data-bundle-total></p>
               <button type="button" class="btn btn--primary btn--lg btn--block" data-bundle-add>{% render 'icon', name: 'cart', class: 'icon--sm' %} Add selected to cart</button>
               <p class="form-error" data-bundle-error role="alert" hidden></p>

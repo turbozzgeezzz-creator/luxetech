@@ -511,6 +511,16 @@
 
       if (this.index > 0) this.show(this.index, true);
 
+      /* Dots under the main image show where you are when swiping on phones. */
+      if (this.slides.length > 1) {
+        this.dots = document.createElement('div');
+        this.dots.className = 'gallery__dots';
+        this.dots.setAttribute('aria-hidden', 'true');
+        this.dots.innerHTML = this.slides.map(function () { return '<span></span>'; }).join('');
+        (this.main.closest('.gallery__wrap') || this.main).insertAdjacentElement('afterend', this.dots);
+        this.dots.children[this.index].classList.add('is-active');
+      }
+
       this.thumbs.forEach((t) => t.addEventListener('click', () => this.show(parseInt(t.dataset.thumb, 10))));
       var prev = this.querySelector('[data-gallery-prev]');
       var next = this.querySelector('[data-gallery-next]');
@@ -536,6 +546,7 @@
     setActive(i) {
       this.index = i;
       this.slides.forEach(function (s, n) { s.classList.toggle('is-active', n === i); });
+      if (this.dots) Array.prototype.forEach.call(this.dots.children, function (d, n) { d.classList.toggle('is-active', n === i); });
       this.thumbs.forEach(function (t, n) {
         t.classList.toggle('is-active', n === i);
         if (n === i) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current');

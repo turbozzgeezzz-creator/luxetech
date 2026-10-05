@@ -2102,3 +2102,56 @@ iframe[src*="hcaptcha.com"][src*="checkbox-invisible"],
 div:has(> iframe[src*="hcaptcha.com"][src*="checkbox-invisible"]) { display: none !important; }
 .footer__captcha { margin-top: 6px; font-size: 12px; color: var(--c-on-ink-muted); }
 .footer__captcha a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Round 7 fixes ---------- */
+/* Page overscroll at the bottom shows the footer colour instead of a white strip. */
+html { background: #07090F; }
+.footer { padding-bottom: env(safe-area-inset-bottom); }
+.footer__wordmark { margin-bottom: 0; padding-block: .04em .12em; }
+
+/* Smoother swiping: rows glide freely and settle near a card instead of snapping hard. */
+.rail__track { scroll-snap-type: x proximity; overscroll-behavior-x: contain; scrollbar-width: none; }
+.rail__track::-webkit-scrollbar { display: none; }
+.bento-slide { scroll-snap-stop: normal; }
+
+/* "Shop everything" style links stay readable in dark mode. */
+html[data-theme="dark"] .section-head__link { background: rgba(255, 255, 255, .08); color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16); }
+html[data-theme="dark"] .section-head__link:hover { background: var(--c-primary); box-shadow: none; }
+html[data-theme="dark"] .rail-arrow { background: transparent; border-color: rgba(255, 255, 255, .22); color: #fff; }
+html[data-theme="dark"] .rail-arrow:hover:not([disabled]) { border-color: #fff; }
+
+/* Product photos fill the whole card and gallery, no frame around them. */
+.card__media-link { padding: 0; }
+.card__img:not(.card__img--art) { inset: 0; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: normal; }
+.card:hover .card__img--primary:only-child { transform: scale(1.04); }
+.card__media { overflow: hidden; }
+.gallery__main { border: 0; overflow-y: hidden; overscroll-behavior-x: contain; scroll-behavior: auto; }
+.gallery__slide { scroll-snap-stop: always; overflow: hidden; }
+.gallery__zoom { padding: 0; }
+.gallery__img { object-fit: cover; }
+.gallery__zoom .gallery__img, .gallery__thumb img { mix-blend-mode: normal; }
+.gallery__thumbs { scrollbar-width: none; padding: 2px; }
+.gallery__thumbs::-webkit-scrollbar { display: none; }
+.gallery__thumb { padding: 0; overflow: hidden; }
+.gallery__thumb img { object-fit: cover; }
+.gallery__thumb.is-active { border-color: var(--c-primary); box-shadow: 0 0 0 2px var(--c-primary); }
+html[data-theme="dark"] .gallery__thumb { border-color: rgba(255, 255, 255, .14); }
+/* Slide counter dots under the main image on phones. */
+.gallery__dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+.gallery__dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--c-border); transition: width .25s var(--ease), background-color .25s; }
+.gallery__dots span.is-active { width: 22px; border-radius: 999px; background: var(--c-primary); }
+@media (min-width: 990px) { .gallery__dots { display: none; } }
+
+/* Bundle picks: a big round tick, and tapping anywhere on the card toggles it. */
+[data-bundle-card] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.pair__check { top: 4px; left: 4px; padding: 6px; cursor: pointer; }
+.pair__check input {
+  appearance: none; -webkit-appearance: none; display: block; width: 30px; height: 30px; margin: 0; border-radius: 50%;
+  border: 2px solid var(--c-primary); background: #fff no-repeat center / 16px 16px; box-shadow: 0 4px 10px -4px rgba(6, 4, 20, .4); cursor: pointer;
+  transition: background-color .15s, transform .15s;
+}
+.pair__check input:checked { background-color: var(--c-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
+.pair__check input:active { transform: scale(.92); }
+.pair__check input:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+/* Leave room for the sticky add-to-cart bar so the end of the footer is not hidden behind it. */
+@media (max-width: 749px) { body:has(.sticky-atc) .footer { padding-bottom: calc(76px + env(safe-area-inset-bottom)); } }
