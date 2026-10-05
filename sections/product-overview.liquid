@@ -72,7 +72,7 @@
                 <span class="feature__icon">{% render 'icon', name: icon_name, class: 'icon--sm' %}</span>
                 <span class="feature__body">
                   {%- if f_title != blank -%}<span class="feature__title">{{ f_title | escape }}</span>{%- endif -%}
-                  <span class="feature__text">{{ f_text | capitalize | escape }}</span>
+                  <span class="feature__text">{{ f_text | escape }}</span>
                 </span>
               </li>
             {%- endfor -%}
