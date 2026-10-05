@@ -2,9 +2,6 @@
   {%- liquid
   assign tags = article.tags | join: ' ' | downcase
   assign art = ''
-  comment
-    article.handle is 'blog-handle/article-handle'; compare on the article part.
-  endcomment
   assign post_handle = article.handle | split: '/' | last
   if post_handle == 'how-to-choose-a-wireless-charger-qi2-magsafe-and-watts-explained'
     assign art = 'ill-blog-charger'
