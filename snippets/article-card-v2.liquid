@@ -4,29 +4,30 @@
 {%- endcomment -%}
 {%- liquid
   assign tags = article.tags | join: ' ' | downcase
-  case article.handle
-    when 'how-to-choose-a-wireless-charger-qi2-magsafe-and-watts-explained'
-      assign art = 'ill-blog-charger'
-    when 'wireless-earbuds-care-fit-cleaning-and-battery-tips'
-      assign art = 'ill-blog-earbuds'
-    when 'cafe-style-espresso-at-home-a-beginners-guide'
-      assign art = 'ill-blog-espresso'
-    when 'heat-styling-without-the-damage-hair-dryer-and-straightener-tips'
-      assign art = 'ill-blog-haircare'
-    when 'never-lose-your-keys-again-getting-the-most-from-an-item-tracker'
-      assign art = 'ill-blog-tracker'
-    else
-      assign art = 'ill-guides'
-      if tags contains 'audio' or tags contains 'earbud'
-        assign art = 'ill-buds'
-      elsif tags contains 'charg'
-        assign art = 'ill-charge'
-      elsif tags contains 'kitchen' or tags contains 'coffee' or tags contains 'home'
-        assign art = 'ill-espresso'
-      elsif tags contains 'wear' or tags contains 'watch'
-        assign art = 'ill-watch'
-      endif
-  endcase
+  assign art = ''
+  if article.handle == 'how-to-choose-a-wireless-charger-qi2-magsafe-and-watts-explained'
+    assign art = 'ill-blog-charger'
+  elsif article.handle == 'wireless-earbuds-care-fit-cleaning-and-battery-tips'
+    assign art = 'ill-blog-earbuds'
+  elsif article.handle == 'cafe-style-espresso-at-home-a-beginners-guide'
+    assign art = 'ill-blog-espresso'
+  elsif article.handle == 'heat-styling-without-the-damage-hair-dryer-and-straightener-tips'
+    assign art = 'ill-blog-haircare'
+  elsif article.handle == 'never-lose-your-keys-again-getting-the-most-from-an-item-tracker'
+    assign art = 'ill-blog-tracker'
+  elsif tags contains 'audio' or tags contains 'earbud'
+    assign art = 'ill-buds'
+  elsif tags contains 'charg'
+    assign art = 'ill-charge'
+  elsif tags contains 'kitchen' or tags contains 'coffee'
+    assign art = 'ill-espresso'
+  elsif tags contains 'hair'
+    assign art = 'ill-haircare'
+  elsif tags contains 'wear' or tags contains 'watch'
+    assign art = 'ill-watch'
+  else
+    assign art = 'ill-guides'
+  endif
   assign words = article.content | strip_html | split: ' ' | size
   assign minutes = words | divided_by: 200 | at_least: 1
 -%}
