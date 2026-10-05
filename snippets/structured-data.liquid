@@ -40,7 +40,7 @@
         "publisher": { "@id": {{ request.origin | append: '/#organization' | json }} },
         "potentialAction": {
           "@type": "SearchAction",
-          "target": { "@type": "EntryPoint", "urlTemplate": {{ request.origin | append: routes.search_url | append: '?q={search_term_string}' | json }} },
+          "target": { "@type": "EntryPoint", "urlTemplate": "{{ request.origin }}{{ routes.search_url }}?q={search_term_string}" },
           "query-input": "required name=search_term_string"
         }
       }
