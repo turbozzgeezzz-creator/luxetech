@@ -25,12 +25,44 @@
     "support_email": "support@luxedealers.com",
     "social_instagram": "https://www.instagram.com/tech.luxedealers/",
     "social_facebook": "https://www.facebook.com/profile.php?id=61595062625090",
+    "sections": {
+      "cart-drawer": {
+        "type": "cart-drawer",
+        "settings": {}
+      },
+      "newsletter-popup": {
+        "type": "newsletter-popup",
+        "settings": {
+          "enabled": true,
+          "trigger": "delay",
+          "delay": 9,
+          "repeat_days": 0,
+          "preview": false,
+          "discount_code": "",
+          "offer_kicker": "Welcome offer",
+          "offer_heading": "Take 10% off your first order",
+          "offer_text": "<p>Join our email list and we'll show your code straight away. One use per customer.</p>",
+          "heading": "Hear about deals first",
+          "text": "<p>Occasional emails with restocks, new products and subscriber offers.</p>",
+          "button_label": "Sign up",
+          "decline_label": "No thanks",
+          "fine_print": "Unsubscribe any time. We never share your email."
+        }
+      }
+    },
     "content_for_index": [],
     "blocks": {
       "14060646107696862457": {
         "type": "shopify://apps/judge-me-reviews/blocks/judgeme_core/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
         "disabled": false,
         "settings": {}
+      },
+      "13047258039897440615": {
+        "type": "shopify://apps/judge-me-reviews/blocks/cart_drawer_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+        "disabled": false,
+        "settings": {
+          "widget_type": "review-widget"
+        }
       }
     }
   },

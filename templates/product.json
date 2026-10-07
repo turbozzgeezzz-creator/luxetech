@@ -1,8 +1,16 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "main-product",
-      "settings": {},
       "blocks": {
         "overview": {
           "type": "description",
@@ -20,7 +28,8 @@
           "type": "custom",
           "settings": {
             "title": "Shipping and returns",
-            "content": "<p><strong>Dispatch:</strong> orders are dispatched within 3-4 business days, with a tracking number emailed when they ship.</p><p><strong>Returns:</strong> changed your mind? Unused items in their original packaging can be returned within 30 days.</p><p><strong>Faulty items:</strong> if something arrives faulty or develops a fault, contact us with your order number and we'll arrange a repair, replacement or refund.</p>"
+            "content": "<p><strong>Dispatch:</strong> orders are dispatched within 3-4 business days, with a tracking number emailed when they ship.</p><p><strong>Returns:</strong> changed your mind? Unused items in their original packaging can be returned within 30 days.</p><p><strong>Faulty items:</strong> if something arrives faulty or develops a fault, contact us with your order number and we'll arrange a repair, replacement or refund.</p>",
+            "page": ""
           }
         }
       },
@@ -28,7 +37,42 @@
         "overview",
         "specs",
         "shipping"
-      ]
+      ],
+      "settings": {
+        "show_sku": true,
+        "show_dynamic_checkout": true,
+        "sticky_atc": true,
+        "show_trust": true,
+        "trust_secure": "Secure, encrypted checkout",
+        "trust_warranty": "Faulty? We make it right",
+        "trust_returns": "30-day returns",
+        "show_dispatch": true,
+        "dispatch_label": "Dispatched in 3-4 business days",
+        "dispatch_min": 3,
+        "dispatch_max": 4,
+        "show_bundle": true,
+        "bundle_heading": "Often added together",
+        "bundle_note": "",
+        "specs_namespace": "custom",
+        "specs_key": "specs"
+      }
+    },
+    "overview": {
+      "type": "product-overview",
+      "settings": {
+        "dispatch": "3-4 business days",
+        "returns": "30-day change of mind"
+      }
+    },
+    "reviews": {
+      "type": "product-reviews",
+      "settings": {
+        "heading": "Customer reviews",
+        "empty_text": "No reviews yet. Bought this? We'd love to hear what you think.",
+        "placeholder_text": "Reviews from verified customers will appear here.",
+        "button_label": "Share your experience",
+        "button_link": ""
+      }
     },
     "related": {
       "type": "product-recommendations",
@@ -42,18 +86,26 @@
       "type": "recently-viewed",
       "settings": {
         "heading": "Recently viewed",
-        "show_recommended": false
+        "show_recommended": false,
+        "recommended_heading": "Recommended for you"
       }
     },
-    "overview": {
-      "type": "product-overview",
-      "settings": {
-        "dispatch": "3-4 business days",
-        "returns": "30-day change of mind"
-      }
-    },
-    "reviews": {
-      "type": "product-reviews",
+    "1791348033456af6b6": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_review_widget_eRJnEX": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "review_data": "sample_data",
+            "max_width": 1200,
+            "show_shop_reviews": false,
+            "empty_state": "empty_widget"
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_review_widget_eRJnEX"
+      ],
       "settings": {}
     }
   },
@@ -62,6 +114,7 @@
     "overview",
     "reviews",
     "related",
-    "viewed"
+    "viewed",
+    "1791348033456af6b6"
   ]
 }
