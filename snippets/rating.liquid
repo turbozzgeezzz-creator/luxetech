@@ -29,6 +29,9 @@
       <span class="rating__count" aria-hidden="true">({{ rating_count }})</span>
     {%- endif -%}
   </div>
-{%- elsif settings.judgeme_enabled and product.metafields.judgeme.badge != blank -%}
+{%- elsif settings.judgeme_enabled and product.metafields.judgeme.badge contains 'data-number-of-reviews' -%}
+  {%- assign jm_badge = product.metafields.judgeme.badge | append: '' -%}
+  {%- unless jm_badge contains "data-number-of-reviews='0'" or jm_badge contains 'data-number-of-reviews="0"' -%}
   <div class="jdgm-widget jdgm-preview-badge" data-id="{{ product.id }}"{% if template.name == 'product' %} data-template="product"{% endif %}>{{ product.metafields.judgeme.badge }}</div>
+  {%- endunless -%}
 {%- endif -%}

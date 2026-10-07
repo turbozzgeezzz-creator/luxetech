@@ -59,7 +59,7 @@
       },
       "13047258039897440615": {
         "type": "shopify://apps/judge-me-reviews/blocks/cart_drawer_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-        "disabled": false,
+        "disabled": true,
         "settings": {
           "widget_type": "review-widget"
         }
@@ -68,13 +68,13 @@
         "type": "shopify://apps/inbox/blocks/chat/841fc607-4181-4ad1-842d-e24d7f8bad6b",
         "disabled": false,
         "settings": {
-          "greeting_message": "",
+          "greeting_message": "Hi! 👋 Questions about a product, delivery or your order? Ask away. We usually reply within one business day.",
           "show_featured_products": true,
           "featured_products": [],
           "background_color": "#FFFFFF",
-          "font_color": "#000000",
+          "font_color": "#0B1220",
           "agent_invert_activator_colors": true,
-          "button_color": "#000000",
+          "button_color": "#7D03FC",
           "button_icon": "chat_bubble",
           "button_text": "chat_with_us",
           "button_horizontal_position": "bottom_right",

@@ -1,10 +1,9 @@
 {%- comment -%}
-  Customer reviews. Shows the product's real rating from the standard
-  reviews.rating / reviews.rating_count metafields (written by Shopify's
-  Product Reviews app and most review apps). Without reviews it shows an
-  honest empty state. Add your review app's block here in the theme editor
-  to show its reviews list and review form. With Judge.me enabled in theme
-  settings, its review widget loads here automatically.
+  Customer reviews. Shows nothing at all until the product has real reviews,
+  so shoppers never see an empty "no reviews" block. The rating comes from the
+  standard reviews.rating / reviews.rating_count metafields (Judge.me keeps
+  these in sync) or Judge.me's own badge data. With reviews, Judge.me's widget
+  loads inside this section, including its "Write a review" button.
 {%- endcomment -%}
 {%- liquid
   assign rating = product.metafields.reviews.rating.value
@@ -13,14 +12,24 @@
   if rating != blank and rating_count > 0
     assign has_reviews = true
   endif
+  assign jm_badge = product.metafields.judgeme.badge | append: ''
+  if has_reviews == false and settings.judgeme_enabled and jm_badge contains 'data-number-of-reviews'
+    unless jm_badge contains "data-number-of-reviews='0'" or jm_badge contains 'data-number-of-reviews="0"'
+      assign has_reviews = true
+    endunless
+  endif
+  if request.design_mode and section.settings.preview
+    assign has_reviews = true
+  endif
 -%}
+{%- if has_reviews -%}
 <section class="section product-reviews" id="reviews" aria-labelledby="ReviewsHeading-{{ section.id }}">
   <div class="container">
     <div class="reviews">
       <div class="reviews__summary">
         <p class="eyebrow eyebrow--muted">Reviews</p>
         <h2 class="reviews__title" id="ReviewsHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
-        {%- if has_reviews -%}
+        {%- if rating != blank and rating_count > 0 -%}
           {%- assign avg = rating.rating | round: 1 -%}
           {%- assign pct = rating.rating | divided_by: rating.scale_max | times: 100 -%}
           <p class="reviews__score"><span class="reviews__avg">{{ avg }}</span><span class="reviews__of">/ {{ rating.scale_max }}</span></p>
@@ -46,16 +55,11 @@
         {%- if settings.judgeme_enabled and section.blocks.size == 0 -%}
           <div id="judgeme_product_reviews" class="jdgm-widget jdgm-review-widget jdgm-outside-widget" data-id="{{ product.id }}">{{ product.metafields.judgeme.widget }}</div>
         {%- endif -%}
-        {%- if section.blocks.size == 0 -%}
-          <div class="reviews__placeholder">
-            <span class="reviews__placeholder-icon">{% render 'icon', name: 'chat' %}</span>
-            <p>{{ section.settings.placeholder_text | escape }}</p>
-          </div>
-        {%- endif -%}
       </div>
     </div>
   </div>
 </section>
+{%- endif -%}
 
 {% schema %}
 {
@@ -63,7 +67,7 @@
   "settings": [
     { "type": "text", "id": "heading", "label": "Heading", "default": "Customer reviews" },
     { "type": "text", "id": "empty_text", "label": "No reviews text", "default": "No reviews yet. Bought this? We'd love to hear what you think." },
-    { "type": "text", "id": "placeholder_text", "label": "Placeholder text", "default": "Reviews from verified customers will appear here." },
+    { "type": "checkbox", "id": "preview", "label": "Preview in the editor", "info": "The section is hidden on the live store until a product has reviews. Tick to see it while editing.", "default": false },
     { "type": "text", "id": "button_label", "label": "Button", "default": "Share your experience" },
     { "type": "url", "id": "button_link", "label": "Button link", "info": "Defaults to your contact page. Hidden while Judge.me reviews are showing." }
   ],

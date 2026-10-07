@@ -69,8 +69,7 @@
       "settings": {
         "heading": "Customer reviews",
         "empty_text": "No reviews yet. Bought this? We'd love to hear what you think.",
-        "placeholder_text": "Reviews from verified customers will appear here.",
-        "button_label": "Share your experience",
+        "button_label": "",
         "button_link": ""
       }
     },
@@ -89,24 +88,6 @@
         "show_recommended": false,
         "recommended_heading": "Recommended for you"
       }
-    },
-    "1791348033456af6b6": {
-      "type": "apps",
-      "blocks": {
-        "judge_me_reviews_review_widget_eRJnEX": {
-          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-          "settings": {
-            "review_data": "sample_data",
-            "max_width": 1200,
-            "show_shop_reviews": false,
-            "empty_state": "empty_widget"
-          }
-        }
-      },
-      "block_order": [
-        "judge_me_reviews_review_widget_eRJnEX"
-      ],
-      "settings": {}
     }
   },
   "order": [
@@ -114,7 +95,6 @@
     "overview",
     "reviews",
     "related",
-    "viewed",
-    "1791348033456af6b6"
+    "viewed"
   ]
 }

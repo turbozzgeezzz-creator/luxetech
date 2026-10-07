@@ -2178,8 +2178,11 @@ html[data-theme="dark"] .gallery__thumb { border-color: rgba(255, 255, 255, .14)
 .drawer__logo img { width: 100%; height: auto; }
 
 /* Dynamic checkout (PayPal and friends): no white box behind the rounded button in dark mode. */
-.shopify-payment-button, .shopify-payment-button iframe, .shopify-payment-button__button { color-scheme: light; background: transparent !important; }
-.shopify-payment-button { border-radius: 12px; overflow: hidden; }
+.shopify-payment-button iframe { color-scheme: light; background: transparent; }
+.shopify-payment-button__button--branded { border-radius: 12px; overflow: hidden; }
+.shopify-payment-button__button--unbranded { background: var(--c-night) !important; color: #fff !important; font-weight: 700; }
+.shopify-payment-button__button--unbranded:hover:not([disabled]) { background: var(--c-primary) !important; }
+html[data-theme="dark"] .shopify-payment-button__button--unbranded { background: #fff !important; color: var(--c-night) !important; }
 @media (pointer: fine) { .gallery__main { cursor: grab; user-select: none; } .gallery__main:active { cursor: grabbing; } }
 /* Swipes on touch screens move one photo at a time without getting stuck. */
 .gallery__slide { scroll-snap-stop: normal; }
@@ -2219,4 +2222,28 @@ html[data-theme="dark"] .mega-all__new { color: var(--c-primary-on-ink); }
   .collection-banner .dept-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -4px; padding: 2px 4px 4px; }
   .collection-banner .dept-chips::-webkit-scrollbar { display: none; }
   .collection-banner .dept-chip { white-space: nowrap; }
+}
+
+
+/* ---------- Judge.me: on-brand, and nothing shows until there are real reviews ---------- */
+:root {
+  --jdgm-primary-color: #7D03FC !important;
+  --jdgm-secondary-color: rgba(125, 3, 252, .1) !important;
+  --jdgm-star-color: #F5A524 !important;
+  --jdgm-write-review-text-color: #fff !important;
+  --jdgm-write-review-bg-color: #7D03FC !important;
+  --jdgm-paginate-color: #7D03FC !important;
+}
+.jdgm-prev-badge[data-number-of-reviews="0"],
+.jdgm-widget:has(> .jdgm-prev-badge[data-number-of-reviews="0"]),
+.jdgm-rev-widg[data-number-of-reviews="0"],
+.jdgm-review-widget:has(.jdgm-rev-widg[data-number-of-reviews="0"]),
+.jdgm-revs-tab-btn, .jdgm-revs-tab, .jdgm-all-reviews-rating-wrapper:has([data-number-of-reviews="0"]) { display: none !important; }
+.jdgm-rev-widg { font-family: var(--font-body) !important; }
+.jdgm-write-rev-link, .jdgm-ask-question-btn, .jdgm-submit-rev { border-radius: var(--radius-pill) !important; font-weight: 700 !important; }
+.jdgm-star { color: #F5A524 !important; }
+
+/* ---------- Shopify Inbox chat bubble: keep it clear of the sticky add-to-cart bar ---------- */
+@media (max-width: 749px) {
+  body:has(shopify-chat) .sticky-atc { padding-right: 84px; }
 }
