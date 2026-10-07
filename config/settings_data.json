@@ -1,5 +1,39 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
-  "current": "Default",
+  "current": {
+    "color_background": "#F2F3F5",
+    "color_subtle": "#E7E9ED",
+    "color_surface": "#FFFFFF",
+    "color_ink": "#0B1220",
+    "color_muted": "#586072",
+    "color_border": "#D3D7DE",
+    "color_primary": "#7D03FC",
+    "color_accent": "#EFE6FF",
+    "color_success": "#1E7A3C",
+    "color_warning": "#8F5B00",
+    "color_error": "#B42318",
+    "cart_type": "drawer",
+    "free_shipping_threshold": 0,
+    "support_email": "support@luxedealers.com",
+    "social_instagram": "https://www.instagram.com/tech.luxedealers/",
+    "social_facebook": "https://www.facebook.com/profile.php?id=61595062625090",
+    "content_for_index": [],
+    "blocks": {
+      "14060646107696862457": {
+        "type": "shopify://apps/judge-me-reviews/blocks/judgeme_core/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+        "disabled": false,
+        "settings": {}
+      }
+    }
+  },
   "presets": {
     "Default": {
       "color_background": "#F2F3F5",
