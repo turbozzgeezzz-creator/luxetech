@@ -2256,3 +2256,21 @@ html[data-theme="dark"] .mega-all__new { color: var(--c-primary-on-ink); }
 .cart-trust .icon { color: var(--c-primary); flex: none; }
 .cart-pay { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
 .cart-pay .payment-icon { width: 38px; height: 24px; }
+
+/* Country/currency picker: lives in the top bar on desktop only; phones use the menu and footer copies. */
+.currency-form__select { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background-color: transparent; color-scheme: dark; -webkit-text-fill-color: currentColor; }
+.currency-form--drawer .currency-form__select { color-scheme: light; max-width: none; }
+@media (max-width: 989px) {
+  .currency-form--bar { display: none !important; }
+}
+@media (max-width: 749px) {
+  .utility-bar__end { display: none !important; }
+}
+
+/* Captcha badges (Google reCAPTCHA and hCaptcha) stay hidden so the chat bubble has the corner.
+   Protection still runs and challenges still open; the footer carries the required notice. */
+.grecaptcha-badge { visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
+iframe[src*="captcha"][src*="invisible"],
+iframe[title*="hCaptcha" i][title*="checkbox" i],
+body > div:has(> iframe[src*="captcha"][src*="invisible"]),
+body > div:has(> div > iframe[title*="checkbox" i][src*="captcha"]) { display: none !important; }
