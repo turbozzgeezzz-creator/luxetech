@@ -10,5 +10,5 @@
   {%- assign ill_alt = image.alt | default: '' -%}
   {{ image | image_url: width: 1400 | image_tag: loading: ill_loading, widths: '400,700,1000,1400', sizes: sizes, alt: ill_alt, class: class }}
 {%- else -%}
-  <img src="{{ name | default: 'ill-devices' | append: '.svg' | asset_url }}" alt="" width="600" height="500" loading="{{ ill_loading }}" class="{{ class }}">
+  <img src="{{ name | default: 'ill-devices' | append: '.svg' | asset_url }}" alt="" width="600" height="500" loading="{{ ill_loading }}"{% if ill_loading == 'eager' %} fetchpriority="high"{% else %} decoding="async"{% endif %} class="{{ class }}">
 {%- endif -%}

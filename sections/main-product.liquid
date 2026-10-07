@@ -28,10 +28,12 @@
                 {%- liquid
                   assign is_featured = false
                   assign img_loading = 'lazy'
+                  assign img_priority = 'auto'
                   assign img_alt = media.alt | default: product.title
                   if media.id == featured_media.id
                     assign is_featured = true
                     assign img_loading = 'eager'
+                    assign img_priority = 'high'
                   endif
                 -%}
                 <li class="gallery__slide{% if is_featured %} is-active{% endif %}" data-media-id="{{ media.id }}" data-index="{{ forloop.index0 }}">
@@ -40,6 +42,7 @@
                       <button type="button" class="gallery__zoom" data-lightbox-open="{{ forloop.index0 }}" aria-label="Open image {{ forloop.index }} of {{ product.media.size }} full screen">
                         {{ media | image_url: width: 1400 | image_tag:
                           loading: img_loading,
+                          fetchpriority: img_priority,
                           widths: '400,600,800,1000,1200,1400',
                           sizes: '(min-width: 990px) 52vw, 100vw',
                           alt: img_alt,

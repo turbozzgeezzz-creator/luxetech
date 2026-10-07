@@ -1,0 +1,12 @@
+{%- comment -%}
+  Self-hosted fonts (Latin subset), served from Shopify's CDN with the rest of
+  the theme, so pages don't wait on a separate request to Google Fonts.
+  Archivo is a variable font (weights 400-900, widths 100-125%).
+{%- endcomment -%}
+<link rel="preload" href="{{ 'archivo.woff2' | asset_url }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ 'archivo-italic.woff2' | asset_url }}" as="font" type="font/woff2" crossorigin>
+<style>
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400 900; font-stretch: 100% 125%; font-display: swap; src: url({{ 'archivo.woff2' | asset_url }}) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'Archivo'; font-style: italic; font-weight: 400 900; font-stretch: 100% 125%; font-display: swap; src: url({{ 'archivo-italic.woff2' | asset_url }}) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400 700; font-display: swap; src: url({{ 'jetbrains-mono.woff2' | asset_url }}) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+</style>
