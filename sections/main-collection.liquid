@@ -31,9 +31,20 @@
         assign c_line = 'Smartwatches, hair care and personal cooling for every day.'
       else
         assign c_art = 'ill-col-all'
-        assign c_tone = 'violet'
-        assign c_line = 'Hand-picked audio, charging, smart kitchen and wearable tech.'
+        assign tones = 'violet,ink,grape,violet' | split: ','
+        assign tone_index = collection.handle.size | modulo: 4
+        assign c_tone = tones[tone_index]
+        assign c_line = 'Hand-picked tech, home and lifestyle gear, ready to ship in 3-4 business days.'
+        if collection.handle != 'all' and collection.description != blank
+          assign c_line = collection.description | strip_html | truncatewords: 24
+        endif
     endcase
+    assign use_image = false
+    if collection.image != blank
+      if section.settings.show_image or c_art == 'ill-col-all' and collection.handle != 'all'
+        assign use_image = true
+      endif
+    endif
   -%}
   {%- liquid
     assign c_title = collection.title
@@ -53,7 +64,7 @@
       {% render 'department-chips', current: collection.handle %}
     </div>
     <div class="collection-banner__art art-box">
-      {%- if section.settings.show_image and collection.image -%}
+      {%- if use_image -%}
         {{ collection.image | image_url: width: 900 | image_tag: loading: 'eager', widths: '400,600,900', sizes: '(min-width: 750px) 35vw, 70vw', alt: '' }}
       {%- else -%}
         {% render 'ill', name: c_art, loading: 'eager' %}

@@ -101,7 +101,7 @@
           }
         },
         "c0": {
-          "type": "link",
+          "type": "mega",
           "settings": {
             "title": "Shop all",
             "icon": "grid",

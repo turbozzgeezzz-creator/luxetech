@@ -1,0 +1,34 @@
+{%- comment -%}
+  "Shop all" mega panel: every department with products, built automatically
+  from the store's collections, so new collections appear here on their own.
+  Params: block (header block)
+{%- endcomment -%}
+<div class="mega-panel__inner container mega-all">
+  <div class="mega-all__head">
+    <p class="mega-all__title">Every department</p>
+    <div class="mega-all__links">
+      <a href="{{ block.settings.link | default: routes.all_products_collection_url }}" class="mega-panel__all">Shop everything</a>
+      <a href="{{ routes.all_products_collection_url }}?sort_by=created-descending" class="mega-all__new">New arrivals {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</a>
+    </div>
+  </div>
+  <ul class="mega-all__grid" role="list">
+    {%- for c in collections -%}
+      {%- if c.handle == 'all' or c.handle == 'frontpage' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
+      {%- liquid
+        assign thumb = c.image
+        if thumb == blank
+          assign thumb = c.products.first.featured_media.preview_image
+        endif
+      -%}
+      <li>
+        <a href="{{ c.url }}" class="mega-all__item">
+          <span class="mega-all__thumb">
+            {%- if thumb != blank -%}{{ thumb | image_url: width: 160 | image_tag: loading: 'lazy', alt: '', width: 56, height: 56 }}{%- endif -%}
+          </span>
+          <span class="mega-all__name">{{ c.title | escape }}</span>
+          {% render 'icon', name: 'arrow-right', class: 'icon--xs mega-all__arrow' %}
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>

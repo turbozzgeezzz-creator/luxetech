@@ -2189,3 +2189,34 @@ html[data-theme="dark"] .gallery__thumb { border-color: rgba(255, 255, 255, .14)
 .social--contact a, .social--drawer a { border-color: var(--c-border); color: var(--c-ink); }
 .social--contact a:hover, .social--drawer a:hover { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
 .social--drawer { padding: 0 20px 20px; margin-top: 0; }
+
+/* ---------- "Shop all" mega panel: every department, built automatically ---------- */
+.mega-all { display: grid; gap: 18px; }
+.mega-all__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.mega-all__title { font-family: var(--font-display); font-style: italic; font-weight: 900; font-stretch: var(--stretch-display); font-size: 24px; letter-spacing: -.02em; }
+.mega-all__links { display: flex; align-items: center; gap: 18px; }
+.mega-all__new { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--c-primary); text-decoration: none; }
+.mega-all__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.mega-all__item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-lg); background: var(--c-subtle); text-decoration: none; color: var(--c-ink); transition: background-color .2s, transform .2s var(--ease); }
+.mega-all__item:hover { background: var(--c-accent); transform: translateY(-2px); }
+.mega-all__thumb { flex: none; width: 48px; height: 48px; border-radius: 12px; overflow: hidden; background: var(--c-surface); }
+.mega-all__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.mega-all__name { flex: 1; min-width: 0; font-weight: 700; }
+.mega-all__arrow { color: var(--c-primary); opacity: 0; transform: translateX(-4px); transition: opacity .2s, transform .2s; }
+.mega-all__item:hover .mega-all__arrow { opacity: 1; transform: none; }
+html[data-theme="dark"] .mega-all__item { background: rgba(255, 255, 255, .05); color: #fff; }
+html[data-theme="dark"] .mega-all__item:hover { background: rgba(var(--c-primary-rgb), .25); }
+html[data-theme="dark"] .mega-all__new { color: var(--c-primary-on-ink); }
+.drawer-depts { display: grid; margin: 0; padding: 0; list-style: none; }
+.mega-all .mega-panel__all { margin: 0; }
+.showcase__more { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 18px; }
+.showcase__more-label { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--c-muted); }
+.showcase__more .dept-chips { margin: 0; }
+.showcase__more .dept-chip { border-color: var(--c-border); color: var(--c-ink); background: var(--c-surface); }
+.showcase__more .dept-chip:hover { border-color: var(--c-primary); background: var(--c-primary); color: #fff; }
+/* Many departments: chips in the collection banner scroll sideways on phones instead of piling up. */
+@media (max-width: 749px) {
+  .collection-banner .dept-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -4px; padding: 2px 4px 4px; }
+  .collection-banner .dept-chips::-webkit-scrollbar { display: none; }
+  .collection-banner .dept-chip { white-space: nowrap; }
+}

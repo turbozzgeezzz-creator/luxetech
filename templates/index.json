@@ -15,7 +15,7 @@
             "art": "ill-devices",
             "kicker": "New season tech",
             "heading": "Upgrade your everyday tech",
-            "text": "Audio, charging, smart kitchen and wearables, chosen by people who use them every day.",
+            "text": "Tech, home and lifestyle gear, hand-picked by people who use it every day.",
             "button_label": "Shop now",
             "link": "/collections/all",
             "button_label_2": "Explore guides",
@@ -126,7 +126,7 @@
       "settings": {
         "eyebrow": "Departments",
         "heading": "Shop by department",
-        "subheading": "Four departments we know inside out, so every product earns its place.",
+        "subheading": "Every department, hand-picked, so every product earns its place.",
         "link_label": "All departments",
         "link": "/collections",
         "show_products": true
@@ -215,7 +215,7 @@
       "settings": {
         "eyebrow": "Why shop with us",
         "heading": "Tech, chosen by people who know it",
-        "statement": "<p>We focus on the gear that earns a daily place in your life: audio, charging, smart kitchen and wearables. Every product is picked by our team, and we'll give you a straight answer on any of them.</p>",
+        "statement": "<p>We focus on the gear that earns a daily place in your life, from audio and charging to the kitchen, home and beyond. Every product is picked by our team, and we'll give you a straight answer on any of them.</p>",
         "link_label": "About us",
         "link": "/pages/about-us"
       },

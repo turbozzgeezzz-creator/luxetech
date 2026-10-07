@@ -114,6 +114,10 @@
                 assign has_panel = true
               endif
             endif
+            assign all_depts = false
+            if auto_c != blank and auto_handle == 'all'
+              assign all_depts = true
+            endif
           -%}
           <li class="mega-nav__item{% if block.type == 'link' and block.settings.highlight %} mega-nav__item--highlight{% endif %}" {{ block.shopify_attributes }}>
             {%- if has_panel -%}
@@ -123,7 +127,9 @@
                 {% render 'icon', name: 'chevron-down', class: 'icon--xs mega-nav__chevron' %}
               </button>
               <div class="mega-panel" id="{{ panel_id }}" hidden>
-                {%- if panel_links == blank and auto_c != blank -%}
+                {%- if all_depts -%}
+                  {% render 'mega-all-panel', block: block %}
+                {%- elsif panel_links == blank and auto_c != blank -%}
                   {% render 'mega-auto-panel', block: block, c: auto_c, all_blocks: section.blocks %}
                 {%- else -%}
                 <div class="mega-panel__inner container">
@@ -244,6 +250,10 @@
                 assign has_panel = true
               endif
             endif
+            assign all_depts = false
+            if auto_c != blank and auto_handle == 'all'
+              assign all_depts = true
+            endif
             -%}
             <li>
               {%- if has_panel -%}
@@ -255,10 +265,17 @@
                   </summary>
                   <div class="drawer-cat__panel">
                     {%- if block.settings.link != blank -%}
-                      <a href="{{ block.settings.link }}" class="drawer-tree__link drawer-tree__link--all">Shop all {{ block.settings.title | escape }}</a>
+                      <a href="{{ block.settings.link }}" class="drawer-tree__link drawer-tree__link--all">{% if all_depts %}Shop everything{% else %}Shop all {{ block.settings.title | escape }}{% endif %}</a>
                     {%- endif -%}
                     {%- if panel_links.size > 0 -%}
                       {% render 'menu-drawer-links', links: panel_links %}
+                    {%- elsif all_depts -%}
+                      <ul class="drawer-depts" role="list">
+                        {%- for c in collections -%}
+                          {%- if c.handle == 'all' or c.handle == 'frontpage' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
+                          <li><a href="{{ c.url }}" class="drawer-tree__link">{{ c.title | escape }}</a></li>
+                        {%- endfor -%}
+                      </ul>
                     {%- elsif auto_c != blank -%}
                       <ul class="drawer-products" role="list">
                         {%- for p in auto_c.products limit: 6 -%}

@@ -47,6 +47,35 @@
         </li>
       {%- endfor -%}
     </ul>
+    {%- if section.settings.show_more -%}
+      {%- liquid
+        assign shown = ''
+        for block in section.blocks
+          assign b = block.settings.collection
+          if b == blank and block.settings.link contains '/collections/'
+            assign b_handle = block.settings.link | split: '/collections/' | last | split: '?' | first | split: '/' | first
+            assign shown = shown | append: '|' | append: b_handle | append: '|'
+          elsif b != blank
+            assign shown = shown | append: '|' | append: b.handle | append: '|'
+          endif
+        endfor
+        assign more_count = 0
+      -%}
+      {%- capture more_items -%}
+        {%- for c in collections -%}
+          {%- assign key = '|' | append: c.handle | append: '|' -%}
+          {%- if c.handle == 'all' or c.handle == 'frontpage' or c.products_count == 0 or shown contains key -%}{%- continue -%}{%- endif -%}
+          {%- assign more_count = more_count | plus: 1 -%}
+          <li><a href="{{ c.url }}" class="dept-chip">{{ c.title | escape }}</a></li>
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- if more_count > 0 -%}
+        <div class="showcase__more">
+          <p class="showcase__more-label">More departments</p>
+          <ul class="dept-chips" role="list">{{ more_items }}</ul>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
   </div>
 </section>
 
@@ -87,6 +116,13 @@
       "type": "checkbox",
       "id": "show_products",
       "label": "Show product photos on cards",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_more",
+      "label": "List other collections below the cards",
+      "info": "New collections appear here automatically until you give them their own card.",
       "default": true
     }
   ],

@@ -129,7 +129,8 @@
             {%- if terms_url != blank -%}<li><a href="{{ terms_url }}">Terms</a></li>{%- endif -%}
             {%- if privacy_url != blank -%}<li><a href="{{ privacy_url }}">Privacy</a></li>{%- endif -%}
             {%- for policy in shop.policies -%}
-              {%- if policy.url == terms_url or policy.url == privacy_url -%}{%- continue -%}{%- endif -%}
+              {%- comment -%} Our own Terms and Privacy pages replace Shopify's built-in versions, so skip those. {%- endcomment -%}
+              {%- if policy.url == terms_url or policy.url == privacy_url or policy.url contains 'privacy-policy' or policy.url contains 'terms-of-service' -%}{%- continue -%}{%- endif -%}
               <li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>
             {%- endfor -%}
           </ul>
@@ -175,7 +176,7 @@
       "limit": 1,
       "settings": [
         { "type": "checkbox", "id": "show_logo", "label": "Use uploaded logo", "default": false, "info": "Off uses the white version of the Tech.LuxeDealers logo." },
-        { "type": "richtext", "id": "text", "label": "About text", "default": "<p>Everyday tech, chosen by people who use it. Audio, charging, smart kitchen and wearables, with straight answers and tracked delivery.</p>" },
+        { "type": "richtext", "id": "text", "label": "About text", "default": "<p>Everyday tech, chosen by people who use it. Tech, home and lifestyle gear, with straight answers and tracked delivery.</p>" },
         { "type": "text", "id": "service_heading", "label": "Customer service heading", "default": "Customer service" },
         { "type": "text", "id": "service_text", "label": "Customer service text", "default": "Send us a message any time. We aim to reply within one business day.", "info": "Replaced by Support hours from Theme settings > Store details when those are filled in." }
       ]
