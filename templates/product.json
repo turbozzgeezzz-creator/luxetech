@@ -27,8 +27,8 @@
         "shipping": {
           "type": "custom",
           "settings": {
-            "title": "Shipping and returns",
-            "content": "<p><strong>Dispatch:</strong> orders are dispatched within 3-4 business days, with a tracking number emailed when they ship.</p><p><strong>Returns:</strong> changed your mind? Unused items in their original packaging can be returned within 30 days.</p><p><strong>Faulty items:</strong> if something arrives faulty or develops a fault, contact us with your order number and we'll arrange a repair, replacement or refund.</p>",
+            "title": "Shipping and refunds",
+            "content": "<p><strong>Dispatch:</strong> orders are dispatched within 3-4 business days, with a tracking number emailed when they ship.</p><p><strong>Refunds:</strong> if your item arrives damaged, is the wrong item or isn't up to quality standards, send us a photo and we'll refund you in full. We don't accept change-of-mind returns.</p><p>See our <a href=\"/pages/returns-warranty\">return and refund policy</a> for details.</p>",
             "page": ""
           }
         }
@@ -45,7 +45,7 @@
         "show_trust": true,
         "trust_secure": "Secure, encrypted checkout",
         "trust_warranty": "Faulty? We make it right",
-        "trust_returns": "30-day returns",
+        "trust_returns": "Refund if damaged or wrong",
         "show_dispatch": true,
         "dispatch_label": "Dispatched in 3-4 business days",
         "dispatch_min": 3,
@@ -61,7 +61,7 @@
       "type": "product-overview",
       "settings": {
         "dispatch": "3-4 business days",
-        "returns": "30-day change of mind"
+        "returns": "Refund if damaged or wrong"
       }
     },
     "reviews": {

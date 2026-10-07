@@ -24,7 +24,7 @@
           "type": "question",
           "settings": {
             "question": "Can I change or cancel my order?",
-            "answer": "<p>Contact us as soon as possible with your order number. If your order hasn't shipped yet, we can usually change the items or address, or cancel it. Once it has shipped, you can return it under our returns policy instead.</p>"
+            "answer": "<p>Contact us as soon as possible with your order number. If your order hasn't shipped yet, we can usually change the items or address, or cancel it. Once it has shipped we can't cancel it, and we don't accept change-of-mind returns.</p>"
           }
         },
         "q3": {
@@ -87,15 +87,15 @@
     "returns": {
       "type": "faq",
       "settings": {
-        "heading": "Returns and faulty items",
+        "heading": "Refunds and damaged items",
         "open_first": false
       },
       "blocks": {
         "q1": {
           "type": "question",
           "settings": {
-            "question": "What is your return policy?",
-            "answer": "<p>You can return unused items in their original packaging within 30 days of delivery. See <a href=\"/pages/returns-warranty\">Returns and refunds</a> for the full details.</p>"
+            "question": "What is your refund policy?",
+            "answer": "<p>We don't accept change-of-mind returns. If your item arrives damaged, is the wrong item or isn't up to quality standards, contact us within 7 days of delivery with your order number and a photo, and we'll refund you in full. See our <a href=\"/pages/returns-warranty\">return and refund policy</a>.</p>"
           }
         },
         "q2": {
@@ -125,7 +125,7 @@
         "tone": "ink",
         "art": "ill-faq",
         "kicker": "Help centre",
-        "text": "<p>Orders, delivery, returns and compatibility, answered. Can't find what you need? Ask us directly.</p>",
+        "text": "<p>Orders, delivery, refunds and compatibility, answered. Can't find what you need? Ask us directly.</p>",
         "heading": "Frequently asked questions",
         "button_label": "Contact us",
         "button_link": "/pages/contact"

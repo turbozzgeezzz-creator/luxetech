@@ -65,7 +65,7 @@
           "type": "principle",
           "settings": {
             "title": "Looked after after you buy",
-            "text": "30-day change-of-mind returns on unused items, and faulty items repaired, replaced or refunded."
+            "text": "Full refunds if an item arrives damaged, is the wrong item or isn't up to standard."
           }
         }
       },
@@ -158,8 +158,8 @@
           "type": "item",
           "settings": {
             "icon": "repeat",
-            "title": "30-day returns",
-            "text": "Change of mind on unused items.",
+            "title": "Refunds that are fair",
+            "text": "Damaged, wrong or not up to standard? Full refund.",
             "link": "/pages/returns-warranty"
           }
         },
@@ -229,8 +229,8 @@
           "settings": {
             "when": "After delivery",
             "title": "Looked after",
-            "text": "30-day returns on unused items, and faulty items put right.",
-            "link_label": "Returns and refunds",
+            "text": "Damaged, wrong or not up to standard? We refund you in full.",
+            "link_label": "Refund policy",
             "link": "/pages/returns-warranty"
           }
         }
@@ -281,9 +281,9 @@
         "q3": {
           "type": "question",
           "settings": {
-            "question": "Can I return something?",
-            "answer": "Unused items in their original packaging can be returned within 30 days.",
-            "link_label": "Returns and refunds",
+            "question": "What if something is wrong with my order?",
+            "answer": "If it arrives damaged, is the wrong item or isn't up to standard, send us a photo and we'll refund you. We don't accept change-of-mind returns.",
+            "link_label": "Refund policy",
             "link": "/pages/returns-warranty"
           }
         },

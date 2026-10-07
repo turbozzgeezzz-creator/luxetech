@@ -9,31 +9,31 @@
     "summary": {
       "type": "trust-band",
       "settings": {
-        "label": "Returns and refunds at a glance"
+        "label": "Refunds at a glance"
       },
       "blocks": {
         "i1": {
           "type": "item",
           "settings": {
-            "icon": "repeat",
-            "title": "30-day returns",
-            "text": "On unused items in original packaging."
+            "icon": "shield",
+            "title": "Damaged or faulty",
+            "text": "Full refund if it arrives damaged or isn't up to standard."
           }
         },
         "i2": {
           "type": "item",
           "settings": {
-            "icon": "shield",
-            "title": "Faulty items put right",
-            "text": "Repair, replacement or refund."
+            "icon": "box",
+            "title": "Wrong item",
+            "text": "Full refund if we sent the wrong thing."
           }
         },
         "i3": {
           "type": "item",
           "settings": {
             "icon": "chat",
-            "title": "Start with a message",
-            "text": "Contact us with your order number to begin."
+            "title": "Photo, not postage",
+            "text": "Send a photo or video. In most cases you won't need to post it back."
           }
         },
         "i4": {
@@ -41,7 +41,7 @@
           "settings": {
             "icon": "check-circle",
             "title": "Refund to original payment",
-            "text": "Once we've received and checked the item."
+            "text": "Usually within 5-10 business days once approved."
           }
         }
       },
@@ -55,18 +55,18 @@
     "returns": {
       "type": "rich-text",
       "settings": {
-        "heading": "Returns",
-        "text": "<p>If you change your mind, you can return an item within 30 days of delivery as long as it is unused, in its original packaging and with all accessories included.</p><h3>How to return an item</h3><ol><li>Contact us with your order number and the item you'd like to return.</li><li>We'll reply with return instructions and the address to send it to.</li><li>Pack the item securely and send it back. We recommend a tracked service.</li></ol><p>Once we receive and check the return, we refund the item to your original payment method and email you to confirm. Unless the item was faulty or we sent the wrong thing, return shipping costs are not refunded.</p>",
+        "heading": "When we refund",
+        "text": "<p>We offer <strong>refunds only</strong>, and only when there is a problem with what you received:</p><ul><li><strong>Damaged:</strong> the item arrived broken, cracked or damaged in transit.</li><li><strong>Wrong item:</strong> you received a different product, model or colour from what you ordered.</li><li><strong>Not up to quality standards:</strong> the item is faulty, doesn't work as described, or isn't of acceptable quality.</li></ul><p><strong>We don't accept change-of-mind returns.</strong> We can't refund items because you changed your mind, ordered the wrong size or model, or found it cheaper elsewhere. Please check the product details carefully, and ask us before you buy if you're not sure.</p><h3>How to request a refund</h3><ol><li>Contact us within 7 days of delivery at <a href=\"mailto:support@luxedealers.com\">support@luxedealers.com</a> or through our <a href=\"/pages/contact\">contact form</a>.</li><li>Include your order number and clear photos or a short video showing the problem, plus the packaging if it was damaged in transit.</li><li>We'll review your request, usually within 1-2 business days, and confirm by email.</li></ol><p>In most cases you won't need to send the item back. If we do need it back, we'll tell you how and cover the return postage.</p><p>Approved refunds go back to your original payment method. Depending on your bank or PayPal, it usually appears within 5-10 business days.</p>",
         "align": "left"
       }
     },
     "warranty": {
       "type": "rich-text",
       "settings": {
-        "heading": "Faulty or damaged items",
-        "text": "<p>If an item arrives damaged, stops working or isn't what you ordered, contact us with your order number and a short description, photo or video of the problem. We'll assess it and arrange a repair, replacement or refund, and we cover the return shipping for faulty items.</p><p>Damage caused by accidents, misuse, liquid or normal wear and tear isn't a fault.</p><p>Nothing in this policy limits your rights under the Australian Consumer Law. Our goods come with guarantees that cannot be excluded under the Australian Consumer Law. You are entitled to a replacement or refund for a major failure and compensation for any other reasonably foreseeable loss or damage. You are also entitled to have the goods repaired or replaced if the goods fail to be of acceptable quality and the failure does not amount to a major failure.</p>",
+        "heading": "What isn't covered",
+        "text": "<ul><li>Change of mind, including items that are unwanted, no longer needed, or bought by mistake.</li><li>Damage caused after delivery by accidents, drops, liquid, misuse or not following the instructions.</li><li>Normal wear and tear.</li></ul><h3>Your rights under Australian Consumer Law</h3><p>Nothing in this policy limits your rights under the Australian Consumer Law. If a fault only shows up after the first 7 days, contact us and we'll still help. Our goods come with guarantees that cannot be excluded under the Australian Consumer Law. You are entitled to a replacement or refund for a major failure and compensation for any other reasonably foreseeable loss or damage. You are also entitled to have the goods repaired or replaced if the goods fail to be of acceptable quality and the failure does not amount to a major failure.</p>",
         "align": "left",
-        "button_label": "Contact us",
+        "button_label": "Request a refund",
         "button_link": "/pages/contact"
       }
     },
@@ -75,10 +75,10 @@
       "settings": {
         "tone": "ink",
         "art": "ill-returns",
-        "kicker": "Returns",
-        "text": "<p>30-day change-of-mind returns on unused items, and faulty items repaired, replaced or refunded.</p>",
-        "heading": "Returns and refunds",
-        "button_label": "Start a return",
+        "kicker": "Refund policy",
+        "text": "<p>We don't accept change-of-mind returns. If your item arrives damaged, is the wrong item, or isn't up to quality standards, we'll refund you in full.</p>",
+        "heading": "Return and refund policy",
+        "button_label": "Request a refund",
         "button_link": "/pages/contact"
       }
     }

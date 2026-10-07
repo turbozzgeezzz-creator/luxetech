@@ -32,7 +32,7 @@
         "m3": {
           "type": "message",
           "settings": {
-            "text": "30-day change-of-mind returns",
+            "text": "Damaged or wrong item? Full refund",
             "icon": "repeat",
             "link": "/pages/returns-warranty"
           }

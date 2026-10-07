@@ -127,7 +127,7 @@
       "type": "marquee",
       "settings": {
         "tone": "ink",
-        "items": "Dispatched in 3-4 business days\nTracked delivery on every order\n10% off your first order\nSecure, encrypted checkout\nReal people answer your questions\n30-day change-of-mind returns"
+        "items": "Dispatched in 3-4 business days\nTracked delivery on every order\n10% off your first order\nSecure, encrypted checkout\nReal people answer your questions\nFull refund if it arrives damaged or wrong"
       }
     },
     "departments": {
@@ -298,7 +298,7 @@
           "settings": {
             "question": "What if it arrives faulty?",
             "answer": "Send your order number and a photo or video of the problem and we'll arrange a repair, replacement or refund.",
-            "link_label": "Returns and refunds",
+            "link_label": "Refund policy",
             "link": "/pages/returns-warranty"
           }
         },

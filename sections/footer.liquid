@@ -68,9 +68,9 @@
                       {%- if pages.contact.url != blank -%}<li><a href="{{ pages.contact.url }}">Contact us</a></li>{%- endif -%}
                       {%- if pages['shipping-delivery'].url != blank -%}<li><a href="{{ pages['shipping-delivery'].url }}">Shipping and delivery</a></li>{%- endif -%}
                       {%- if pages['returns-warranty'].url != blank -%}
-                        <li><a href="{{ pages['returns-warranty'].url }}">Returns and refunds</a></li>
+                        <li><a href="{{ pages['returns-warranty'].url }}">Refund policy</a></li>
                       {%- elsif shop.refund_policy != blank -%}
-                        <li><a href="{{ shop.refund_policy.url }}">Returns and refunds</a></li>
+                        <li><a href="{{ shop.refund_policy.url }}">Refund policy</a></li>
                       {%- endif -%}
                       {%- if pages.faq.url != blank -%}<li><a href="{{ pages.faq.url }}">FAQs</a></li>{%- endif -%}
                       {%- if pages['track-order'].url != blank -%}<li><a href="{{ pages['track-order'].url }}">Track my order</a></li>{%- endif -%}

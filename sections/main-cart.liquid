@@ -40,7 +40,7 @@
         <ul class="cart-summary__trust" role="list">
           <li>{% render 'icon', name: 'shield', class: 'icon--sm' %} Encrypted, secure payment</li>
           {%- if shop.refund_policy != blank -%}
-            <li>{% render 'icon', name: 'repeat', class: 'icon--sm' %} <a href="{{ shop.refund_policy.url }}">Returns policy</a></li>
+            <li>{% render 'icon', name: 'repeat', class: 'icon--sm' %} <a href="{{ pages['returns-warranty'].url | default: shop.refund_policy.url }}">Refund policy</a></li>
           {%- endif -%}
         </ul>
         <div class="payment-icons payment-icons--cart" aria-label="Accepted payment methods">
