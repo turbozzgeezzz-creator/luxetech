@@ -2183,3 +2183,9 @@ html[data-theme="dark"] .gallery__thumb { border-color: rgba(255, 255, 255, .14)
 @media (pointer: fine) { .gallery__main { cursor: grab; user-select: none; } .gallery__main:active { cursor: grabbing; } }
 /* Swipes on touch screens move one photo at a time without getting stuck. */
 .gallery__slide { scroll-snap-stop: normal; }
+
+/* Social icons outside the footer (contact page, phone menu). */
+.social--contact, .social--drawer { margin-top: 2px; }
+.social--contact a, .social--drawer a { border-color: var(--c-border); color: var(--c-ink); }
+.social--contact a:hover, .social--drawer a:hover { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.social--drawer { padding: 0 20px 20px; margin-top: 0; }

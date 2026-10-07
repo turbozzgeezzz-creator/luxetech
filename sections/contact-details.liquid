@@ -18,6 +18,9 @@
         {%- if settings.support_hours != blank -%}
           <li class="contact-card">{% render 'icon', name: 'clock' %}<span class="contact-card__label">Support hours</span><span>{{ settings.support_hours | escape | newline_to_br }}</span></li>
         {%- endif -%}
+        {%- if settings.social_instagram != blank or settings.social_facebook != blank or settings.social_tiktok != blank or settings.social_youtube != blank or settings.social_x != blank or settings.social_pinterest != blank -%}
+          <li class="contact-card">{% render 'icon', name: 'chat' %}<span class="contact-card__label">Follow us</span>{% render 'social-links', class: 'social--contact' %}</li>
+        {%- endif -%}
         {%- if settings.store_address != blank -%}
           <li class="contact-card">{% render 'icon', name: 'map-pin' %}<span class="contact-card__label">Address</span><address>{{ settings.store_address | escape | newline_to_br }}</address></li>
         {%- endif -%}

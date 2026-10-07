@@ -1,0 +1,23 @@
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "tone": "ink",
+        "art": "ill-privacy",
+        "kicker": "Your information",
+        "text": "<p>What we collect, why we collect it, and how you stay in control. Written in plain English.</p>"
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "show_title": false
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "main"
+  ]
+}

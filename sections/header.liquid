@@ -339,6 +339,7 @@
           {% if settings.support_email != blank %}<a href="mailto:{{ settings.support_email }}">{{ settings.support_email }}</a>{% endif %}
         </p>
       {%- endif -%}
+      {% render 'social-links', class: 'social--drawer' %}
     </div>
   </div>
 </menu-drawer>

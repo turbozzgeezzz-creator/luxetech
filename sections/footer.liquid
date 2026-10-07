@@ -11,7 +11,7 @@
     assign has_social = true
   endif
   assign terms_url = pages['terms-conditions'].url | default: shop.terms_of_service.url
-  assign privacy_url = pages['privacy'].url | default: shop.privacy_policy.url
+  assign privacy_url = pages['privacy-policy'].url | default: pages['privacy'].url | default: shop.privacy_policy.url
 -%}
 <footer class="footer">
   <div class="container">
@@ -112,14 +112,7 @@
               {% render 'newsletter-form', id: block.id, placeholder: 'Your email', button_label: block.settings.button_label, discount_code: settings.welcome_code, tags: 'newsletter,footer' %}
               {%- if block.settings.fine_print != blank -%}<p class="footer__fine">{{ block.settings.fine_print | escape }}</p>{%- endif -%}
               {%- if has_social -%}
-                <ul class="social" role="list" aria-label="Follow us">
-                  {%- if settings.social_facebook != blank -%}<li><a href="{{ settings.social_facebook }}" target="_blank" rel="noopener" aria-label="Facebook (opens in a new tab)">{% render 'icon', name: 'facebook' %}</a></li>{%- endif -%}
-                  {%- if settings.social_instagram != blank -%}<li><a href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram (opens in a new tab)">{% render 'icon', name: 'instagram' %}</a></li>{%- endif -%}
-                  {%- if settings.social_youtube != blank -%}<li><a href="{{ settings.social_youtube }}" target="_blank" rel="noopener" aria-label="YouTube (opens in a new tab)">{% render 'icon', name: 'youtube' %}</a></li>{%- endif -%}
-                  {%- if settings.social_tiktok != blank -%}<li><a href="{{ settings.social_tiktok }}" target="_blank" rel="noopener" aria-label="TikTok (opens in a new tab)">{% render 'icon', name: 'tiktok' %}</a></li>{%- endif -%}
-                  {%- if settings.social_x != blank -%}<li><a href="{{ settings.social_x }}" target="_blank" rel="noopener" aria-label="X (opens in a new tab)">{% render 'icon', name: 'x' %}</a></li>{%- endif -%}
-                  {%- if settings.social_pinterest != blank -%}<li><a href="{{ settings.social_pinterest }}" target="_blank" rel="noopener" aria-label="Pinterest (opens in a new tab)">{% render 'icon', name: 'pinterest' %}</a></li>{%- endif -%}
-                </ul>
+                {% render 'social-links' %}
               {%- endif -%}
             </div>
         {%- endcase -%}
