@@ -61,7 +61,7 @@
         {%- when 'product' -%}
           {%- assign crumb = collection -%}
           {%- if crumb == blank -%}
-            {%- for c in product.collections -%}{%- if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking' -%}{%- assign crumb = c -%}{%- break -%}{%- endif -%}{%- endfor -%}
+            {%- for c in product.collections -%}{%- if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking' and c.handle != 'new-arrivals' and c.handle != 'best-sellers' -%}{%- assign crumb = c -%}{%- break -%}{%- endif -%}{%- endfor -%}
           {%- endif -%}
           {%- if crumb != blank -%}
             ,{ "@type": "ListItem", "position": 2, "name": {{ crumb.title | json }}, "item": {{ request.origin | append: crumb.url | json }} }

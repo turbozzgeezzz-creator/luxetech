@@ -6,7 +6,7 @@
   assign wv = product.selected_or_first_available_variant
   assign wcat = ''
   for c in product.collections
-    if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking'
+    if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking' and c.handle != 'new-arrivals' and c.handle != 'best-sellers'
       assign wcat = c.title
       break
     endif

@@ -96,7 +96,7 @@
                     {%- else -%}
                       <li><a href="{{ routes.all_products_collection_url }}?sort_by=created-descending">New arrivals</a></li>
                       {%- for c in collections -%}
-                        {%- if c.handle == 'all' or c.handle == 'frontpage' or c.handle contains 'performance' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
+                        {%- if c.handle == 'all' or c.handle == 'frontpage' or c.handle contains 'performance' or c.handle == 'new-arrivals' or c.handle == 'best-sellers' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
                         <li><a href="{{ c.url }}">{{ c.title | escape }}</a></li>
                       {%- endfor -%}
                       <li><a href="{{ routes.all_products_collection_url }}">Shop everything</a></li>

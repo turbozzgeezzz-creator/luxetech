@@ -13,7 +13,7 @@
   </div>
   <ul class="mega-all__grid" role="list">
     {%- for c in collections -%}
-      {%- if c.handle == 'all' or c.handle == 'frontpage' or c.handle contains 'performance' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
+      {%- if c.handle == 'all' or c.handle == 'frontpage' or c.handle contains 'performance' or c.handle == 'new-arrivals' or c.handle == 'best-sellers' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
       {%- liquid
         assign thumb = c.image
         if thumb == blank

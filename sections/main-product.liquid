@@ -172,7 +172,7 @@
       {%- liquid
         assign pool = blank
         for c in product.collections
-          if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking'
+          if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking' and c.handle != 'new-arrivals' and c.handle != 'best-sellers'
             assign pool = c
             break
           endif
@@ -338,7 +338,7 @@
 {%- liquid
   assign view_cat = ''
   for c in product.collections
-    if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking'
+    if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking' and c.handle != 'new-arrivals' and c.handle != 'best-sellers'
       assign view_cat = c.title
       break
     endif

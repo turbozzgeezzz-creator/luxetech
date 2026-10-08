@@ -272,7 +272,7 @@
                     {%- elsif all_depts -%}
                       <ul class="drawer-depts" role="list">
                         {%- for c in collections -%}
-                          {%- if c.handle == 'all' or c.handle == 'frontpage' or c.handle contains 'performance' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
+                          {%- if c.handle == 'all' or c.handle == 'frontpage' or c.handle contains 'performance' or c.handle == 'new-arrivals' or c.handle == 'best-sellers' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
                           <li><a href="{{ c.url }}" class="drawer-tree__link">{{ c.title | escape }}</a></li>
                         {%- endfor -%}
                       </ul>
