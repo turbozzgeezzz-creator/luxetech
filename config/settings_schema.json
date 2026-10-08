@@ -523,5 +523,32 @@
         "default": true
       }
     ]
+  },
+  {
+    "name": "Search engines",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Used in page titles and Google results. Individual pages, products and collections still use their own SEO title and description when set in Shopify admin."
+      },
+      {
+        "type": "text",
+        "id": "seo_brand",
+        "label": "Brand name in titles",
+        "default": "Tech.LuxeDealers"
+      },
+      {
+        "type": "text",
+        "id": "seo_home_title",
+        "label": "Homepage title",
+        "default": "Tech.LuxeDealers | Everyday Tech, Home & Lifestyle Gear in Australia"
+      },
+      {
+        "type": "textarea",
+        "id": "seo_home_description",
+        "label": "Homepage description",
+        "default": "Shop hand-picked tech, home and lifestyle gear at Tech.LuxeDealers. Wireless earbuds, chargers, smart kitchen and hair care, dispatched in 3-4 business days with tracking."
+      }
+    ]
   }
 ]

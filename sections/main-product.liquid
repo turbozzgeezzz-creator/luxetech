@@ -170,7 +170,13 @@
 
     {%- if section.settings.show_bundle -%}
       {%- liquid
-        assign pool = product.collections.first
+        assign pool = blank
+        for c in product.collections
+          if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking'
+            assign pool = c
+            break
+          endif
+        endfor
         if pool == blank or pool.products_count < 2
           assign pool = collections.all
         endif
@@ -317,6 +323,9 @@
 
   {%- if section.settings.sticky_atc and product.available -%}
     <sticky-atc class="sticky-atc" hidden>
+      {%- if product.featured_media -%}
+        <span class="sticky-atc__media">{{ product.featured_media.preview_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 44, height: 44 }}</span>
+      {%- endif -%}
       <div class="sticky-atc__info">
         <span class="sticky-atc__title">{{ product.title | escape }}</span>
         <span class="sticky-atc__price" data-sticky-price>{{ current_variant.price | money }}</span>
@@ -329,7 +338,7 @@
 {%- liquid
   assign view_cat = ''
   for c in product.collections
-    if c.handle != 'all' and c.handle != 'frontpage'
+    if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking'
       assign view_cat = c.title
       break
     endif

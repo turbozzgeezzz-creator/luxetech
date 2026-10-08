@@ -37,9 +37,12 @@
     </p>
   {%- endif -%}
 
-  <{{ heading_tag }} class="buybox__title">
-    {%- if mode == 'quick' -%}<a href="{{ product.url }}">{{ product.title | escape }}</a>{%- else -%}{{ product.title | escape }}{%- endif -%}
-  </{{ heading_tag }}>
+  <div class="buybox__title-row">
+    <{{ heading_tag }} class="buybox__title">
+      {%- if mode == 'quick' -%}<a href="{{ product.url }}">{{ product.title | escape }}</a>{%- else -%}{{ product.title | escape }}{%- endif -%}
+    </{{ heading_tag }}>
+    {%- if mode == 'main' -%}{% render 'wishlist-button', product: product, style: 'inline' %}{%- endif -%}
+  </div>
 
   <div class="buybox__meta">
     {% render 'rating', product: product %}
@@ -136,7 +139,7 @@
         </button>
       </div>
       <p class="form-error" role="alert" hidden></p>
-      {%- if mode == 'main' -%}<div class="buybox__save">{% render 'wishlist-button', product: product, style: 'button' %}</div>{%- endif -%}
+
       {%- if show_dynamic_checkout -%}
         <div class="buybox__dynamic">{{ form | payment_button }}</div>
       {%- endif -%}

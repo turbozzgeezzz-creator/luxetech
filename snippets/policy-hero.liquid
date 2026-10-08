@@ -1,0 +1,48 @@
+{%- comment -%}
+  Banner for Shopify's built-in policy pages (/policies/...), matching the
+  page banners used on our own pages. Shopify's plain title is hidden in CSS.
+{%- endcomment -%}
+{%- liquid
+  assign p_path = request.path
+  assign p_title = 'Store policy'
+  assign p_text = 'The details, in plain English. Questions? Email support@luxedealers.com.'
+  assign p_art = 'ill-terms'
+  assign p_tone = 'ink'
+  if p_path contains 'refund-policy'
+    assign p_title = 'Return and refund policy'
+    assign p_text = "Damaged, wrong or not up to standard? We'll refund you in full. No change-of-mind returns."
+    assign p_art = 'ill-returns'
+    assign p_tone = 'ink'
+  elsif p_path contains 'shipping-policy'
+    assign p_title = 'Shipping policy'
+    assign p_text = 'Every order is dispatched within 3-4 business days and ships with tracking.'
+    assign p_art = 'ill-delivery'
+    assign p_tone = 'violet'
+  elsif p_path contains 'contact-information'
+    assign p_title = 'Contact information'
+    assign p_text = 'Real people, real answers. We aim to reply within one business day.'
+    assign p_art = 'ill-contact'
+    assign p_tone = 'grape'
+  elsif p_path contains 'privacy-policy'
+    assign p_title = 'Privacy policy'
+    assign p_text = 'What we collect, why, and how you stay in control.'
+    assign p_art = 'ill-privacy'
+    assign p_tone = 'ink'
+  elsif p_path contains 'terms-of-service'
+    assign p_title = 'Terms of service'
+    assign p_art = 'ill-terms'
+    assign p_tone = 'violet'
+  endif
+-%}
+<section class="page-hero-section policy-hero">
+  <div class="container">
+    <div class="page-hero tone tone--{{ p_tone }}">
+      <div class="page-hero__copy">
+        <p class="tone-kicker">Store policies</p>
+        <h1 class="page-hero__heading">{{ p_title | escape }}</h1>
+        <div class="page-hero__text"><p>{{ p_text | escape }}</p></div>
+      </div>
+      <div class="page-hero__art art-box">{% render 'ill', name: p_art, loading: 'eager' %}</div>
+    </div>
+  </div>
+</section>

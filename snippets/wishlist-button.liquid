@@ -1,12 +1,12 @@
 {%- comment -%}
   Heart button that saves a product to the wishlist (stored on the shopper's
-  device by assets/experience.js). Params: product, style ('icon' | 'button')
+  device by assets/experience.js). Params: product, style ('icon' | 'inline' | 'button')
 {%- endcomment -%}
 {%- liquid
   assign wv = product.selected_or_first_available_variant
   assign wcat = ''
   for c in product.collections
-    if c.handle != 'all' and c.handle != 'frontpage'
+    if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking'
       assign wcat = c.title
       break
     endif
@@ -22,7 +22,7 @@
     {% render 'icon', name: 'heart', class: 'icon--sm' %}<span data-wishlist-label>Save</span><span class="visually-hidden"> {{ product.title | escape }} to wishlist</span>
   </button>
 {%- else -%}
-  <button type="button" class="wish-btn" data-wishlist-toggle data-handle="{{ product.handle }}" data-product="{{ wdata | escape }}" aria-pressed="false" aria-label="Save {{ product.title | escape }} to wishlist">
+  <button type="button" class="wish-btn{% if style == 'inline' %} wish-btn--inline{% endif %}" data-wishlist-toggle data-handle="{{ product.handle }}" data-product="{{ wdata | escape }}" aria-pressed="false" aria-label="Save {{ product.title | escape }} to wishlist">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.2-9.1C1.6 8.2 3.6 4.5 7.3 4.5c2 0 3.4 1.1 4.7 2.8 1.3-1.7 2.7-2.8 4.7-2.8 3.7 0 5.7 3.7 4.5 6.9-1.7 4.5-9.2 9.1-9.2 9.1z"/></svg>
   </button>
 {%- endif -%}

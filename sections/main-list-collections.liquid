@@ -3,6 +3,7 @@
   {%- if collections.size > 0 -%}
     <ul class="collection-list" role="list">
       {%- for c in collections -%}
+        {%- if c.handle == 'frontpage' or c.handle contains 'performance' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
         <li>
           <a href="{{ c.url }}" class="collection-tile">
             <span class="collection-tile__media ratio ratio--landscape">

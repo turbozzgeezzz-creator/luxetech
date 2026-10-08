@@ -14,17 +14,49 @@
     {%- endif -%}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ 'apple-touch-icon.png' | asset_url }}">
 
+    {%- liquid
+      assign seo_brand = settings.seo_brand | default: shop.name
+      assign seo_title = page_title
+      if request.page_type == 'index' and settings.seo_home_title != blank
+        assign seo_title = settings.seo_home_title
+      endif
+      assign seo_desc = page_description
+      if request.page_type == 'index' and settings.seo_home_description != blank
+        assign seo_desc = settings.seo_home_description
+      endif
+      if seo_desc == blank
+        case request.page_type
+          when 'product'
+            assign seo_desc = product.description | strip_html | strip_newlines | truncate: 155
+          when 'collection'
+            assign seo_desc = collection.description | strip_html | strip_newlines | truncate: 155
+            if seo_desc == blank
+              assign seo_desc = 'Shop ' | append: collection.title | append: ' at ' | append: seo_brand | append: '. Hand-picked, dispatched in 3-4 business days with tracking.'
+            endif
+          when 'article'
+            assign seo_desc = article.excerpt_or_content | strip_html | strip_newlines | truncate: 155
+          when 'blog'
+            assign seo_desc = 'Buying guides, care tips and news from the ' | append: seo_brand | append: ' team.'
+          when 'page'
+            assign seo_desc = page.content | strip_html | strip_newlines | truncate: 155
+        endcase
+      endif
+      if seo_desc == blank
+        assign seo_desc = settings.seo_home_description
+      endif
+    -%}
     <title>
-      {{ page_title }}
+      {{ seo_title }}
       {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
       {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+      {%- unless seo_title contains seo_brand or seo_title contains shop.name %} &ndash; {{ seo_brand }}{% endunless -%}
     </title>
-    {%- if page_description -%}
-      <meta name="description" content="{{ page_description | escape }}">
+    <meta name="description" content="{{ seo_desc | escape }}">
+    {%- if template.suffix == 'wishlist' or request.page_type == 'search' or request.page_type == 'cart' -%}
+      <meta name="robots" content="noindex, follow">
     {%- endif -%}
 
-    {% render 'meta-tags' %}
+    {% render 'meta-tags', seo_title: seo_title, seo_desc: seo_desc, seo_brand: seo_brand %}
     {% render 'structured-data' %}
     {% render 'fonts' %}
 
@@ -72,6 +104,7 @@
 
     <main id="MainContent" class="main-content" role="main" tabindex="-1">
       {%- if request.page_type == 'index' -%}<h1 class="visually-hidden">{{ shop.name | escape }}: tech, home and lifestyle gear</h1>{%- endif -%}
+      {%- if request.page_type == 'policy' -%}{% render 'policy-hero' %}{%- endif -%}
       {{ content_for_layout }}
     </main>
 

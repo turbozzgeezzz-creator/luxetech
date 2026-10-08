@@ -38,7 +38,7 @@
 
   assign category = blank
   for c in product.collections
-    if c.handle != 'all' and c.handle != 'frontpage'
+    if c.handle != 'all' and c.handle != 'frontpage' and c.handle != 'for-shopify-performance-tracking'
       assign category = c
       break
     endif

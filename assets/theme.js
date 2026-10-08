@@ -511,8 +511,14 @@
 
       if (this.index > 0) this.show(this.index, true);
 
-      /* Dots under the main image show where you are when swiping on phones. */
-      if (this.slides.length > 1) {
+      /* Up to 7 photos: dots under the image. More than that: a "3 / 24" counter on the image. */
+      if (this.slides.length > 7) {
+        this.counter = document.createElement('span');
+        this.counter.className = 'gallery__counter';
+        this.counter.setAttribute('aria-hidden', 'true');
+        this.counter.textContent = (this.index + 1) + ' / ' + this.slides.length;
+        (this.main.closest('.gallery__wrap') || this.main.parentElement).appendChild(this.counter);
+      } else if (this.slides.length > 1) {
         this.dots = document.createElement('div');
         this.dots.className = 'gallery__dots';
         this.dots.setAttribute('aria-hidden', 'true');
@@ -558,6 +564,7 @@
       this.index = i;
       this.slides.forEach(function (s, n) { s.classList.toggle('is-active', n === i); });
       if (this.dots) Array.prototype.forEach.call(this.dots.children, function (d, n) { d.classList.toggle('is-active', n === i); });
+      if (this.counter) this.counter.textContent = (i + 1) + ' / ' + this.slides.length;
       this.thumbs.forEach(function (t, n) {
         t.classList.toggle('is-active', n === i);
         if (n === i) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current');

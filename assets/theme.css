@@ -2274,3 +2274,46 @@ iframe[src*="captcha"][src*="invisible"],
 iframe[title*="hCaptcha" i][title*="checkbox" i],
 body > div:has(> iframe[src*="captcha"][src*="invisible"]),
 body > div:has(> div > iframe[title*="checkbox" i][src*="captcha"]) { display: none !important; }
+
+/* ---------- Product page tidy-up ---------- */
+/* Save (wishlist) is a heart beside the product title. */
+.buybox__title-row { display: flex; align-items: flex-start; gap: 12px; }
+.buybox__title-row .buybox__title { flex: 1; min-width: 0; }
+.wish-btn--inline { position: static; flex: none; width: 44px; height: 44px; margin-top: 2px; }
+.wish-btn--inline svg { width: 21px; height: 21px; }
+
+/* Many photos: a "3 / 24" counter replaces the row of dots. */
+.gallery__counter { position: absolute; left: 12px; bottom: 12px; z-index: 2; padding: 5px 11px; border-radius: var(--radius-pill); background: rgba(11, 18, 32, .72); color: #fff; font-size: 12.5px; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; pointer-events: none; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+@media (min-width: 990px) { .gallery__counter { display: none; } }
+
+/* Sticky add to cart on phones: a floating card with the product photo, sitting above the chat button. */
+@media (max-width: 749px) {
+  .sticky-atc {
+    left: 10px; right: 10px; bottom: calc(78px + env(safe-area-inset-bottom)); gap: 10px; padding: 8px 8px 8px 8px;
+    border: 1px solid var(--c-border); border-radius: 18px; box-shadow: 0 16px 36px -14px rgba(var(--c-ink-rgb), .45);
+  }
+  body:has(shopify-chat) .sticky-atc { padding-right: 8px; }
+  .sticky-atc__media { flex: none; width: 44px; height: 44px; border-radius: 12px; overflow: hidden; background: var(--c-subtle); }
+  .sticky-atc__media img { width: 100%; height: 100%; object-fit: cover; }
+  .sticky-atc .btn { min-height: 44px; padding-inline: 18px; white-space: nowrap; }
+  body:has(.sticky-atc) .footer { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
+}
+html[data-theme="dark"] .sticky-atc { border-color: rgba(255, 255, 255, .12); }
+
+/* ---------- Shopify policy pages (/policies/...): same look as our own pages ---------- */
+.shopify-policy__container { max-width: 820px !important; margin: 0 auto; padding: 32px var(--gutter) 72px !important; }
+.shopify-policy__title { display: none; }
+.shopify-policy__body { line-height: 1.75; font-size: 16px; color: var(--c-ink); }
+.shopify-policy__body .rte, .shopify-policy__body > div { display: block; }
+.shopify-policy__body p, .shopify-policy__body ul, .shopify-policy__body ol { margin: 0 0 1em; }
+.shopify-policy__body ul, .shopify-policy__body ol { padding-left: 1.3em; }
+.shopify-policy__body li { margin-bottom: .4em; }
+.shopify-policy__body h1, .shopify-policy__body h2, .shopify-policy__body h3, .shopify-policy__body strong:only-child {
+  font-family: var(--font-display);
+}
+.shopify-policy__body h2, .shopify-policy__body h3 { margin: 1.8em 0 .6em; font-weight: 800; font-stretch: var(--stretch-heading); letter-spacing: -.01em; line-height: 1.2; }
+.shopify-policy__body h2 { font-size: 24px; }
+.shopify-policy__body h3 { font-size: 19px; }
+.shopify-policy__body p > strong:only-child { display: block; margin-top: 1.4em; font-size: 18px; font-weight: 800; }
+.shopify-policy__body a { color: var(--c-primary); text-decoration: underline; text-underline-offset: 3px; }
+html[data-theme="dark"] .shopify-policy__body a { color: var(--c-primary-on-ink); }

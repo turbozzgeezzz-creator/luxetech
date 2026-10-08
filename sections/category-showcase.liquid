@@ -64,7 +64,7 @@
       {%- capture more_items -%}
         {%- for c in collections -%}
           {%- assign key = '|' | append: c.handle | append: '|' -%}
-          {%- if c.handle == 'all' or c.handle == 'frontpage' or c.products_count == 0 or shown contains key -%}{%- continue -%}{%- endif -%}
+          {%- if c.handle == 'all' or c.handle == 'frontpage' or c.handle contains 'performance' or c.products_count == 0 or shown contains key -%}{%- continue -%}{%- endif -%}
           {%- assign more_count = more_count | plus: 1 -%}
           <li><a href="{{ c.url }}" class="dept-chip">{{ c.title | escape }}</a></li>
         {%- endfor -%}
