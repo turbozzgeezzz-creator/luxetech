@@ -1,0 +1,44 @@
+{%- comment -%}
+  "Spend more, save more" progress bar for the cart. Matches the automatic
+  discounts in Shopify (Discounts > Spend $100 save 5%, Spend $150 save 10%).
+  Change the amounts in Theme settings > Spend and save if the discounts change.
+{%- endcomment -%}
+{%- if settings.spend_bar_enabled and cart.item_count > 0 and settings.spend_tier1_amount > 0 -%}
+  {%- liquid
+    assign spent = cart.items_subtotal_price
+    assign t1 = settings.spend_tier1_amount | times: 100
+    assign t2 = settings.spend_tier2_amount | times: 100
+    if spent < t1
+      assign target = t1
+      assign target_pct = settings.spend_tier1_pct
+    elsif settings.spend_tier2_amount > 0 and spent < t2
+      assign target = t2
+      assign target_pct = settings.spend_tier2_pct
+    else
+      assign target = 0
+    endif
+    if target > 0
+      assign remaining = target | minus: spent
+      assign pct = spent | times: 100 | divided_by: target
+    else
+      assign pct = 100
+    endif
+  -%}
+  <div class="ship-bar spend-bar{% if target == 0 %} ship-bar--done{% endif %}">
+    <p class="ship-bar__text" role="status">
+      {%- render 'icon', name: 'percent', class: 'icon--sm' -%}
+      {%- if target > 0 -%}
+        <span>{% if spent >= t1 %}<strong>{{ settings.spend_tier1_pct }}% off</strong> applied. {% endif %}Spend <strong>{{ remaining | money }}</strong> more to save <strong>{{ target_pct }}%</strong></span>
+      {%- else -%}
+        {%- if settings.spend_tier2_amount > 0 -%}
+          <span>You've unlocked <strong>{{ settings.spend_tier2_pct }}% off</strong>, applied at checkout</span>
+        {%- else -%}
+          <span>You've unlocked <strong>{{ settings.spend_tier1_pct }}% off</strong>, applied at checkout</span>
+        {%- endif -%}
+      {%- endif -%}
+    </p>
+    <div class="ship-bar__track" role="progressbar" aria-label="Progress to your next discount" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct }}">
+      <span class="ship-bar__fill" style="width: {{ pct }}%;"></span>
+    </div>
+  </div>
+{%- endif -%}

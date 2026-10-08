@@ -36,10 +36,19 @@
             "icon": "repeat",
             "link": "/pages/returns-warranty"
           }
+        },
+        "m4": {
+          "type": "message",
+          "settings": {
+            "text": "Spend $100 save 5% · $150 save 10%",
+            "icon": "gift",
+            "link": "/collections/all"
+          }
         }
       },
       "block_order": [
         "m1",
+        "m4",
         "m2",
         "m3"
       ],

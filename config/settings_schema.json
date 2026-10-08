@@ -550,5 +550,45 @@
         "default": "Shop hand-picked tech, home and lifestyle gear at Tech.LuxeDealers. Wireless earbuds, chargers, smart kitchen and hair care, dispatched in 3-4 business days with tracking."
       }
     ]
+  },
+  {
+    "name": "Spend and save",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Shows a progress bar in the cart. Keep these in line with your automatic discounts in Shopify (Discounts)."
+      },
+      {
+        "type": "checkbox",
+        "id": "spend_bar_enabled",
+        "label": "Show spend-and-save bar in cart",
+        "default": true
+      },
+      {
+        "type": "number",
+        "id": "spend_tier1_amount",
+        "label": "Tier 1: spend (dollars)",
+        "default": 100
+      },
+      {
+        "type": "number",
+        "id": "spend_tier1_pct",
+        "label": "Tier 1: percent off",
+        "default": 5
+      },
+      {
+        "type": "number",
+        "id": "spend_tier2_amount",
+        "label": "Tier 2: spend (dollars)",
+        "info": "0 turns tier 2 off.",
+        "default": 150
+      },
+      {
+        "type": "number",
+        "id": "spend_tier2_pct",
+        "label": "Tier 2: percent off",
+        "default": 10
+      }
+    ]
   }
 ]

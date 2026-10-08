@@ -10,6 +10,7 @@
       {%- if cart.item_count > 0 -%}
         <div class="drawer__body">
           {% render 'free-shipping-bar' %}
+          {% render 'spend-bar' %}
           <cart-items data-context="drawer">
             <ul class="cart-lines" role="list">
               {%- for item in cart.items -%}
