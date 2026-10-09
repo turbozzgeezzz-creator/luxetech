@@ -590,5 +590,20 @@
         "default": 10
       }
     ]
+  },
+  {
+    "name": "Email tracking",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Connects the store to LuxeMail, our own email automation. For shoppers who've given us their email, it records product views, add-to-cart and wishlist saves so emails can recommend the right products. Leave empty to turn it off."
+      },
+      {
+        "type": "text",
+        "id": "luxemail_endpoint",
+        "label": "LuxeMail tracking URL",
+        "info": "For example https://luxemail.your-account.workers.dev/t"
+      }
+    ]
   }
 ]

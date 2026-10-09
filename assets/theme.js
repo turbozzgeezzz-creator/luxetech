@@ -843,6 +843,7 @@
             return;
           }
           drawer.renderFromHTML(data.sections['cart-drawer']);
+          document.dispatchEvent(new CustomEvent('luxe:cart-added', { detail: data }));
           var modal = this.closest('dialog');
           if (modal && modal.open) modal.close();
           announce((data.product_title || 'Item') + ' added to cart');

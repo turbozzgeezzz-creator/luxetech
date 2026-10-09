@@ -88,6 +88,7 @@
           recommendations: {{ routes.product_recommendations_url | json }}
         },
         cartType: {{ settings.cart_type | json }},
+        mail: {{ settings.luxemail_endpoint | json }} ? { endpoint: {{ settings.luxemail_endpoint | json }}, email: {{ customer.email | json }}, firstName: {{ customer.first_name | json }} } : null,
         moneyFormat: {{ shop.money_format | json }}
       };
     </script>

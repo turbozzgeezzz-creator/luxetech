@@ -214,6 +214,7 @@
     var list = getViewed().filter(function (p) { return p.handle !== data.handle; });
     list.unshift(data);
     write(VIEWED_KEY, list.slice(0, 12));
+    mailTrack({ t: 'view', h: data.handle, p: data.id, ti: data.title });
   }
 
   function cardHTML(p) {
@@ -287,6 +288,7 @@
     }).then(function (res) {
       return res.json().then(function (data) {
         if (!res.ok) throw new Error(data.description || data.message || 'Could not add to cart');
+        (data.items || []).forEach(function (line) { document.dispatchEvent(new CustomEvent('luxe:cart-added', { detail: line })); });
         return data;
       });
     }).then(function (data) {
@@ -486,6 +488,48 @@
   });
 
   /* ------------------------------------------------------------------ */
+  /* LuxeMail tracking (only when Theme settings > Email tracking is set) */
+  /* Records views, cart adds and wishlist saves so emails can recommend  */
+  /* the right products. Emails only go to people subscribed in Shopify.  */
+  /* ------------------------------------------------------------------ */
+  function mailClientId() {
+    var id = read('luxetech:cid');
+    if (typeof id === 'string' && id.length > 8) return id;
+    id = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+    write('luxetech:cid', id);
+    return id;
+  }
+  function mailTrack(body) {
+    var mail = config.mail;
+    if (!mail || !mail.endpoint) return;
+    try {
+      body.cid = mailClientId();
+      var payload = JSON.stringify(body);
+      var sent = navigator.sendBeacon && navigator.sendBeacon(mail.endpoint, new Blob([payload], { type: 'text/plain' }));
+      if (!sent) fetch(mail.endpoint, { method: 'POST', body: payload, keepalive: true, mode: 'no-cors' });
+    } catch (e) { /* tracking must never break the page */ }
+  }
+  /* Signed-in customers: link this browser to their email once per session. */
+  (function () {
+    var mail = config.mail;
+    if (!mail || !mail.email) return;
+    try { if (sessionStorage.getItem('luxetech:identified')) return; sessionStorage.setItem('luxetech:identified', '1'); } catch (e) {}
+    mailTrack({ e: mail.email, fn: mail.firstName || null });
+  })();
+  /* Newsletter sign-ups identify the browser too. */
+  document.addEventListener('submit', function (e) {
+    var form = e.target;
+    if (!form || !form.querySelector) return;
+    var tags = form.querySelector('input[name="contact[tags]"]');
+    var email = form.querySelector('input[name="contact[email]"]');
+    if (tags && email && /newsletter/.test(tags.value) && email.value) mailTrack({ e: email.value });
+  }, true);
+  document.addEventListener('luxe:cart-added', function (e) {
+    var d = e.detail || {};
+    if (d.handle) mailTrack({ t: 'cart', h: d.handle, p: d.product_id, ti: d.product_title || d.title });
+  });
+
+  /* ------------------------------------------------------------------ */
   /* Wishlist (stored on the shopper's device)                          */
   /* ------------------------------------------------------------------ */
   var WISH_KEY = 'luxetech:wishlist';
@@ -515,6 +559,7 @@
     var idx = list.findIndex(function (p) { return p.handle === item.handle; });
     if (idx > -1) list.splice(idx, 1); else list.unshift(item);
     setWishlist(list.slice(0, 50));
+    mailTrack({ t: idx > -1 ? 'unwishlist' : 'wishlist', h: item.handle, ti: item.title });
     btn.classList.add('is-pop'); setTimeout(function () { btn.classList.remove('is-pop'); }, 400);
   });
 
