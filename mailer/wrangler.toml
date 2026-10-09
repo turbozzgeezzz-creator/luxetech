@@ -1,0 +1,35 @@
+# LuxeMail: Tech.LuxeDealers' own email automation (Cloudflare Worker + D1 + Resend).
+name = "luxemail"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+[assets]
+directory = "./public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "luxemail"
+database_id = "REPLACE_WITH_D1_ID"
+
+[triggers]
+# Every 30 minutes: process reminders and drain the outbox. Daily and fortnightly jobs gate themselves on time.
+crons = ["*/30 * * * *"]
+
+[vars]
+SHOP_DOMAIN = "vyc3tw-gf.myshopify.com"
+STORE_URL = "https://tech.luxedealers.com"
+# Set after the first deploy to the Worker's address, e.g. https://luxemail.<account>.workers.dev
+PUBLIC_URL = "https://luxemail.example.workers.dev"
+BRAND = "Tech.LuxeDealers"
+FROM_EMAIL = "Tech.LuxeDealers <hello@send.luxedealers.com>"
+REPLY_TO = "support@luxedealers.com"
+ADMIN_EMAIL = "support@luxedealers.com"
+TIMEZONE_OFFSET_HOURS = "10"
+DAILY_SEND_LIMIT = "95"
+SHOPIFY_API_VERSION = "2025-10"
+VIP_SEGMENT_NAME = "LX · VIP (spent $250+)"
+LAPSED_SEGMENT_NAME = "LX · Lapsed (no order in 60 days)"
+SUBSCRIBERS_SEGMENT_NAME = "Email subscribers"
+
+# Secrets (set with `wrangler secret put NAME`):
+# SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET, RESEND_API_KEY, UNSUB_SECRET
