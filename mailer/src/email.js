@@ -139,7 +139,7 @@ export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reas
   const bannerImg = banner
     ? `<tr><td style="padding:0;background:#1E0A57;"><img src="${env.PUBLIC_URL}/banners/${banner}" width="600" height="260" alt="${esc(bannerAlt || '')}" style="display:block;width:100%;max-width:600px;height:auto;border:0;background:#1E0A57;color:#FFFFFF;font-size:22px;font-weight:800;line-height:1.3;text-align:center;"></td></tr>`
     : '';
-  const social = (icon, href, label) => `<a href="${href}" style="display:inline-block;margin:0 5px;text-decoration:none;"><img src="${env.PUBLIC_URL}/icons/social-${icon}.png" width="36" height="36" alt="${label}" style="display:block;border:0;color:#FFFFFF;font-size:12px;"></a>`;
+  const social = (icon, href, label) => `<a href="${href}" style="display:inline-block;margin:0 5px;text-decoration:none;"><img src="${env.PUBLIC_URL}/icons/social-${icon}.png" width="36" height="36" alt="${label}" style="display:block;border:0;color:${VIOLET};font-size:12px;"></a>`;
   return `<!DOCTYPE html><html lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="x-apple-disable-message-reformatting">
 <meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light">
 <title>${esc(env.BRAND)}</title>
@@ -159,12 +159,11 @@ export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reas
 ${bannerImg}
 <tr><td class="px" style="background:#FFFFFF;padding:32px 32px 30px;">${body}</td></tr>
 ${plain ? '' : `<tr><td class="px" style="background:#F6F3FD;padding:22px 26px;">${trustRow(env)}</td></tr>`}
-<tr><td class="px" align="center" style="background:${INK};padding:28px 32px;color:#A7AFBF;font-size:13px;line-height:1.6;text-align:center;">
-<p style="margin:0 0 14px;">${social('instagram', 'https://www.instagram.com/tech.luxedealers/', 'Instagram')}${social('facebook', 'https://www.facebook.com/profile.php?id=61595062625090', 'Facebook')}${social('bag', env.STORE_URL, 'Shop')}</p>
-<p style="margin:0 0 14px;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;"><a href="${env.STORE_URL}/collections/new-arrivals" style="color:#FFFFFF;text-decoration:none;">New in</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${env.STORE_URL}/collections/best-sellers" style="color:#FFFFFF;text-decoration:none;">Best sellers</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${env.STORE_URL}/collections/all" style="color:#FFFFFF;text-decoration:none;">Shop all</a></p>
-<p style="margin:0 0 10px;">Questions? Reply to this email or write to <a href="mailto:${env.REPLY_TO}" style="color:#C9A5FF;">${env.REPLY_TO}</a>.</p>
-<p style="margin:0;font-size:11.5px;color:#7A8294;">${esc(reason || `You're receiving this because you subscribed to emails from ${env.BRAND}.`)}<br>${env.BRAND} &middot; <a href="${env.STORE_URL}" style="color:#A7AFBF;">${env.STORE_URL.replace(/^https?:\/\//, '')}</a> &middot;
-<a href="${esc(unsubUrl)}" style="color:#A7AFBF;">Unsubscribe</a></p>
+<tr><td class="px" align="center" style="background:#FFFFFF;border-top:1px solid #ECE8F7;padding:28px 32px 30px;color:${MUTED};font-size:13px;line-height:1.6;text-align:center;">
+<p style="margin:0 0 16px;">${social('instagram', 'https://www.instagram.com/tech.luxedealers/', 'Instagram')}${social('facebook', 'https://www.facebook.com/profile.php?id=61595062625090', 'Facebook')}${social('bag', env.STORE_URL, 'Shop')}</p>
+<p style="margin:0 0 14px;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;"><a href="${env.STORE_URL}/collections/new-arrivals" style="color:${INK};text-decoration:none;">New in</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${env.STORE_URL}/collections/best-sellers" style="color:${INK};text-decoration:none;">Best sellers</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${env.STORE_URL}/collections/all" style="color:${INK};text-decoration:none;">Shop all</a></p>
+<p style="margin:0 0 10px;color:${MUTED};">Questions? Just reply, or email <a href="mailto:${env.REPLY_TO}" style="color:${VIOLET};">${env.REPLY_TO}</a>.</p>
+<p style="margin:0;font-size:12px;color:#8A90A0;">${esc(reason || "You're getting this because you signed up for our emails.")} <a href="${esc(unsubUrl)}" style="color:#8A90A0;text-decoration:underline;">Unsubscribe</a></p>
 </td></tr></table></td></tr></table></body></html>`;
 }
 
