@@ -1,6 +1,8 @@
 # LuxeMail: next session handoff
 
-Status: code built and tested locally; not deployed. Environment now has CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID,
+Status: rebuilt to the "no-permission subscriber list" design (below) and tested locally (20-case harness:
+sign-up + double opt-in, rate limit, every flow, pixel, VIP/win-back from verified orders, unsubscribe, send limits).
+Not deployed yet. Environment now has CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID,
 RESEND_API_KEY, SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET, SHOPIFY_STORE_DOMAIN, and network access to
 api.cloudflare.com, api.resend.com, tech.luxedealers.com, *.workers.dev. Never print, log or commit any of them.
 
@@ -12,7 +14,13 @@ api.cloudflare.com, api.resend.com, tech.luxedealers.com, *.workers.dev. Never p
 - Protected customer data access is NOT available for this Dev Dashboard app: the Admin API returns
   "Anonymous" customers with @example.com emails, and customer/checkout webhooks will be redacted or refused.
 
-## Do first: rebuild to the "no-permission subscriber list" design
+## Done: rebuilt to the "no-permission subscriber list" design
+Implemented as specified, plus double opt-in: the sign-up beacon is unauthenticated, so anyone could submit
+someone else's address. Every new subscriber gets one confirmation email and nothing else until they click it.
+Orders from the pixel are verified with the Admin API (read_orders works; totals aren't protected data).
+All webhooks dropped (orders/create too); deploy.sh now only removes old LuxeMail webhooks.
+
+Original brief:
 LuxeMail must not depend on Shopify showing customer emails.
 1. The mailer keeps its own `subscribers` list (email, first name, consent source and time, status).
    Sources:

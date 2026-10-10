@@ -6,8 +6,9 @@
 #   SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET
 # and network access to api.cloudflare.com, api.resend.com, tech.luxedealers.com and the Shopify store.
 #
-# Steps: Resend domain check -> D1 database + schema -> secrets -> deploy -> PUBLIC_URL ->
-#        Shopify webhooks -> theme tracking URL -> health check -> test emails to ADMIN_EMAIL.
+# Steps: Resend domain check -> D1 database + schema -> deploy + PUBLIC_URL -> secrets ->
+#        remove old webhooks -> theme tracking URL + pixel.js address -> publish collections ->
+#        health check -> test emails to ADMIN_EMAIL -> commit and push.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -56,18 +57,22 @@ $WRANGLER secret bulk "$SECRETS_FILE" >/dev/null
 rm -f "$SECRETS_FILE"
 echo "   4 secrets stored in Cloudflare"
 
-echo "== 5. Shopify webhooks"
-node lib/shopify-webhooks.mjs "$WORKER_URL/webhooks"
+echo "== 5. Old Shopify webhooks (no longer used)"
+node lib/shopify-webhooks.mjs
 
-echo "== 6. Theme tracking URL"
+echo "== 6. Theme tracking URL and custom pixel address"
 node lib/theme-endpoint.mjs "$WORKER_URL/t"
+node lib/pixel-endpoint.mjs "$WORKER_URL/p"
+
+echo "== 6b. Collections used by the emails"
+node lib/publish-collections.mjs new-arrivals best-sellers || echo "   (could not publish; check them in Shopify)"
 
 echo "== 7. Health"
 curl -fsS "$WORKER_URL/health"; echo
 
 echo "== 8. Test emails"
 if [ "$DOMAIN_STATUS" = "verified" ]; then
-  for flow in welcome1 welcome2 cart1 browse wishlist vip fortnight; do
+  for flow in confirm welcome1 welcome2 checkout1 cart1 browse wishlist vip fortnight; do
     printf '   %-10s ' "$flow"
     curl -fsS "$WORKER_URL/preview?flow=$flow&send=1&key=$UNSUB_SECRET" || echo "failed"
     echo
@@ -77,8 +82,8 @@ else
 fi
 echo "== 9. Save settings to GitHub (pushing to main makes the tracking live)"
 cd ..
-if ! git diff --quiet -- config/settings_data.json mailer/wrangler.toml; then
-  git add config/settings_data.json mailer/wrangler.toml
+if ! git diff --quiet -- config/settings_data.json mailer/wrangler.toml mailer/pixel.js; then
+  git add config/settings_data.json mailer/wrangler.toml mailer/pixel.js
   git commit -q -m "LuxeMail live: database id, Worker address and theme tracking URL"
   git push -q origin HEAD:main && echo "   pushed"
 else

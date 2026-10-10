@@ -27,9 +27,9 @@ ADMIN_EMAIL = "support@luxedealers.com"
 TIMEZONE_OFFSET_HOURS = "10"
 DAILY_SEND_LIMIT = "95"
 SHOPIFY_API_VERSION = "2025-10"
-VIP_SEGMENT_NAME = "LX · VIP (spent $250+)"
-LAPSED_SEGMENT_NAME = "LX · Lapsed (no order in 60 days)"
-SUBSCRIBERS_SEGMENT_NAME = "Email subscribers"
+# VIP and win-back come from LuxeMail's own order history (verified orders from the custom pixel).
+VIP_SPEND_CENTS = "25000"
+LAPSED_DAYS = "60"
 
 # Secrets (set with `wrangler secret put NAME`):
 # SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET, RESEND_API_KEY, UNSUB_SECRET

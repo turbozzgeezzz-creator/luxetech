@@ -1,7 +1,7 @@
-// Shopify access for LuxeMail: client-credentials token, Admin GraphQL, webhook verification,
-// marketing consent, segment members, one-off discount codes, and public storefront JSON
+// Shopify access for LuxeMail: client-credentials token, Admin GraphQL, order verification,
+// best-effort unsubscribe, one-off discount codes, and public storefront JSON
 // (products, recommendations, collections, blog feed).
-import { now, randomCode, hmacBase64 } from './util.js';
+import { now, randomCode } from './util.js';
 
 export async function shopifyToken(env) {
   const cached = await env.DB.prepare('SELECT v, expires_at FROM kv WHERE k = ?').bind('shopify_token').first();
@@ -34,79 +34,35 @@ export async function gql(env, query, variables = {}) {
   return body.data;
 }
 
-/** Shopify signs app webhooks with the app's client secret (HMAC-SHA256, base64). */
-export async function verifyWebhook(env, rawBody, headerHmac) {
-  if (!headerHmac) return false;
-  const expected = await hmacBase64(env.SHOPIFY_CLIENT_SECRET, rawBody);
-  if (expected.length !== headerHmac.length) return false;
-  let diff = 0;
-  for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ headerHmac.charCodeAt(i);
-  return diff === 0;
+/**
+ * Confirms an order reported by the custom pixel really exists, and returns its total in cents.
+ * Order totals aren't protected customer data, so this works without that access.
+ */
+export async function verifyOrder(env, orderId) {
+  const id = String(orderId).startsWith('gid://') ? String(orderId) : `gid://shopify/Order/${String(orderId).replace(/\D/g, '')}`;
+  const data = await gql(env, `query($id: ID!){ order(id: $id){ id createdAt cancelledAt totalPriceSet{ shopMoney{ amount } } } }`, { id });
+  const o = data.order;
+  if (!o || o.cancelledAt) return null;
+  return { totalCents: Math.round(parseFloat(o.totalPriceSet.shopMoney.amount) * 100), createdAt: Math.floor(Date.parse(o.createdAt) / 1000) };
 }
 
-/** Marketing consent straight from Shopify, checked right before every send. */
-export async function marketingStatus(env, email) {
-  const data = await gql(env, `query($q:String!){ customers(first:1, query:$q){ nodes{
-      id firstName numberOfOrders defaultEmailAddress{ emailAddress marketingState } } } }`,
-    { q: `email:${JSON.stringify(email)}` });
-  const c = data.customers.nodes[0];
-  if (!c) return { subscribed: false };
-  return {
-    subscribed: !!(c.defaultEmailAddress && c.defaultEmailAddress.marketingState === 'SUBSCRIBED'),
-    customerId: c.id,
-    firstName: c.firstName,
-    orders: Number(c.numberOfOrders || 0),
-  };
-}
-
+/** Best effort only: without protected customer data access Shopify may not find or update the customer. */
 export async function unsubscribeInShopify(env, email) {
-  const status = await marketingStatus(env, email);
-  if (!status.customerId) return;
+  const data = await gql(env, `query($q:String!){ customers(first:1, query:$q){ nodes{ id } } }`, { q: `email:${JSON.stringify(email)}` });
+  const c = data.customers.nodes[0];
+  if (!c) return;
   await gql(env, `mutation($input: CustomerEmailMarketingConsentUpdateInput!){
       customerEmailMarketingConsentUpdate(input:$input){ userErrors{ message } } }`, {
-    input: {
-      customerId: status.customerId,
-      emailMarketingConsent: { marketingState: 'UNSUBSCRIBED', marketingOptInLevel: 'SINGLE_OPT_IN' },
-    },
+    input: { customerId: c.id, emailMarketingConsent: { marketingState: 'UNSUBSCRIBED', marketingOptInLevel: 'SINGLE_OPT_IN' } },
   });
 }
 
-/** Members of a customer segment, looked up by its name (VIP, Lapsed, Email subscribers). */
-export async function segmentMembers(env, segmentName, limit = 1000) {
-  const seg = await gql(env, `query($q:String!){ segments(first:10, query:$q){ nodes{ id name } } }`, { q: segmentName });
-  const found = seg.segments.nodes.find((s) => s.name === segmentName);
-  if (!found) throw new Error(`Segment not found: ${segmentName}`);
-  const out = [];
-  let after = null;
-  while (out.length < limit) {
-    const data = await gql(env, `query($s:ID!, $after:String){ customerSegmentMembers(first:100, segmentId:$s, after:$after){
-        pageInfo{ hasNextPage endCursor }
-        edges{ node{ id firstName defaultEmailAddress{ emailAddress marketingState } amountSpent{ amount } } } } }`,
-      { s: found.id, after });
-    const conn = data.customerSegmentMembers;
-    for (const { node } of conn.edges) {
-      const email = node.defaultEmailAddress && node.defaultEmailAddress.emailAddress;
-      // Without protected customer data access Shopify returns placeholder addresses; skip those.
-      if (!email || email.endsWith('@example.com')) continue;
-      out.push({
-        email: email.toLowerCase(),
-        firstName: node.firstName,
-        subscribed: node.defaultEmailAddress.marketingState === 'SUBSCRIBED',
-        customerId: node.id.replace('CustomerSegmentMember', 'Customer'),
-        spent: Number(node.amountSpent ? node.amountSpent.amount : 0),
-      });
-    }
-    if (!conn.pageInfo.hasNextPage) break;
-    after = conn.pageInfo.endCursor;
-  }
-  return out;
-}
-
 /**
- * Creates a real, single-use code for one customer, e.g. BACK5-7KQ2M. It expires after `days`,
- * and the email states that expiry date, so any urgency in the copy is genuine.
+ * Creates a real, single-use code, e.g. BACK5-7KQ2M, sent to one person only. Customer IDs aren't reliable
+ * without protected customer data, so the code isn't tied to a customer; the single use keeps it personal.
+ * It expires after `days`, and the email states that date, so any urgency in the copy is genuine.
  */
-export async function createPersonalCode(env, { prefix, percent, days, customerId, title }) {
+export async function createPersonalCode(env, { prefix, percent, days, title }) {
   const code = `${prefix}-${randomCode(5)}`;
   const endsAt = new Date(Date.now() + days * 86400000).toISOString();
   const data = await gql(env, `mutation($d: DiscountCodeBasicInput!){
@@ -120,7 +76,7 @@ export async function createPersonalCode(env, { prefix, percent, days, customerI
       appliesOncePerCustomer: true,
       customerGets: { value: { percentage: percent / 100 }, items: { all: true } },
       combinesWith: { orderDiscounts: false, productDiscounts: false, shippingDiscounts: true },
-      context: customerId ? { customers: { add: [customerId] } } : { all: 'ALL' },
+      context: { all: 'ALL' },
     },
   });
   const errs = data.discountCodeBasicCreate.userErrors;

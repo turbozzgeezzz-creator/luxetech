@@ -490,7 +490,8 @@
   /* ------------------------------------------------------------------ */
   /* LuxeMail tracking (only when Theme settings > Email tracking is set) */
   /* Records views, cart adds and wishlist saves so emails can recommend  */
-  /* the right products. Emails only go to people subscribed in Shopify.  */
+  /* the right products. Emails only go to people who ticked the consent  */
+  /* box (or accept marketing on their account) and confirmed by email.   */
   /* ------------------------------------------------------------------ */
   function mailClientId() {
     var id = read('luxetech:cid');
@@ -509,20 +510,24 @@
       if (!sent) fetch(mail.endpoint, { method: 'POST', body: payload, keepalive: true, mode: 'no-cors' });
     } catch (e) { /* tracking must never break the page */ }
   }
-  /* Signed-in customers: link this browser to their email once per session. */
+  /* Signed-in customers who accept marketing on their account (the theme  */
+  /* only passes their email then): once per session.                    */
   (function () {
     var mail = config.mail;
     if (!mail || !mail.email) return;
     try { if (sessionStorage.getItem('luxetech:identified')) return; sessionStorage.setItem('luxetech:identified', '1'); } catch (e) {}
-    mailTrack({ e: mail.email, fn: mail.firstName || null });
+    mailTrack({ e: mail.email, fn: mail.firstName || null, c: 1, src: 'account', pg: location.pathname });
   })();
-  /* Newsletter sign-ups identify the browser too. */
+  /* Newsletter sign-ups with the "Email me deals and new arrivals" box ticked. */
   document.addEventListener('submit', function (e) {
     var form = e.target;
     if (!form || !form.querySelector) return;
     var tags = form.querySelector('input[name="contact[tags]"]');
     var email = form.querySelector('input[name="contact[email]"]');
-    if (tags && email && /newsletter/.test(tags.value) && email.value) mailTrack({ e: email.value });
+    var consent = form.querySelector('[data-mail-consent]');
+    if (!tags || !email || !consent || !consent.checked || !/newsletter/.test(tags.value) || !email.value) return;
+    var src = (tags.value.split(',')[1] || 'newsletter').trim();
+    mailTrack({ e: email.value, c: 1, src: src, pg: location.pathname });
   }, true);
   document.addEventListener('luxe:cart-added', function (e) {
     var d = e.detail || {};

@@ -730,6 +730,8 @@ a.trust-item__title:hover { text-decoration: underline; }
 .newsletter-band .form-status { background: rgba(255, 255, 255, .1); color: #fff; }
 .newsletter-form__row { display: flex; gap: 8px; }
 .newsletter-form__row .input { flex: 1; min-width: 0; }
+.newsletter-form__consent { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; font-size: 13px; line-height: 1.4; text-align: left; cursor: pointer; }
+.newsletter-form__consent input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--c-primary); }
 
 /* ---------- Product page ---------- */
 .pdp { display: block; padding-bottom: 24px; }

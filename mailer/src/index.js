@@ -1,9 +1,9 @@
 // LuxeMail entry point: HTTP routes and the 30-minute scheduler.
 import { json, now, hmacHex, cleanEmail, esc } from './util.js';
-import { verifyWebhook, unsubscribeInShopify } from './shopify.js';
+import { unsubscribeInShopify } from './shopify.js';
 import { layout, sendViaResend, unsubscribeUrl } from './email.js';
 import {
-  recordEvent, onCustomerWebhook, onCheckoutWebhook, onOrderWebhook, scanAbandonment, scanDaily,
+  recordEvent, recordPixel, confirmSubscription, unsubscribe, scanAbandonment, scanDaily,
   scanFortnightly, drainOutbox, weeklyReport, builders,
 } from './flows.js';
 
@@ -28,33 +28,53 @@ async function validUnsub(env, email, sig) {
   return email && sig && (await hmacHex(env.UNSUB_SECRET, email)) === sig;
 }
 
+async function validConfirm(env, email, sig) {
+  return email && sig && (await hmacHex(env.UNSUB_SECRET, 'confirm:' + email)) === sig;
+}
+
+/** Beacons are small JSON bodies sent as text/plain (so browsers don't need a CORS preflight). */
+async function readBeacon(request) {
+  if (Number(request.headers.get('Content-Length') || 0) > 16000) return null;
+  const text = await request.text();
+  if (text.length > 16000) return null;
+  try { return JSON.parse(text); } catch (_) { return null; }
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (request.method === 'OPTIONS') return new Response(null, { headers: cors(env, request) });
 
-    // Theme tracking beacon.
+    // Theme beacon: browsing activity and newsletter sign-ups (with the consent box ticked).
     if (url.pathname === '/t' && request.method === 'POST') {
-      try {
-        const body = await request.json();
-        ctx.waitUntil(recordEvent(env, body));
-      } catch (_) { /* ignore malformed beacons */ }
+      const body = await readBeacon(request);
+      if (body) {
+        ctx.waitUntil(recordEvent(env, body, request.headers.get('CF-Connecting-IP'))
+          .then((jobId) => (jobId ? drainOutbox(env, { id: jobId }) : null))
+          .catch((e) => console.error('beacon', e)));
+      }
       return new Response(null, { status: 204, headers: cors(env, request) });
     }
 
-    // Shopify webhooks.
-    if (url.pathname === '/webhooks' && request.method === 'POST') {
-      const raw = await request.arrayBuffer();
-      if (!(await verifyWebhook(env, raw, request.headers.get('X-Shopify-Hmac-Sha256')))) return new Response('bad signature', { status: 401 });
-      const topic = request.headers.get('X-Shopify-Topic') || '';
-      const payload = JSON.parse(new TextDecoder().decode(raw));
-      const work = topic.startsWith('customers/') ? onCustomerWebhook(env, payload)
-        : topic.startsWith('checkouts/') ? onCheckoutWebhook(env, payload)
-        : topic === 'orders/create' ? onOrderWebhook(env, payload)
-        : Promise.resolve();
-      ctx.waitUntil(work.catch((e) => console.error('webhook', topic, e)));
-      return new Response('ok');
+    // Shopify custom pixel (mailer/pixel.js): checkouts started and completed.
+    if (url.pathname === '/p' && request.method === 'POST') {
+      const body = await readBeacon(request);
+      if (body) ctx.waitUntil(recordPixel(env, body).catch((e) => console.error('pixel', e)));
+      return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*' } });
+    }
+
+    // Confirm a subscription. GET shows a button and POST confirms, so email link scanners can't confirm for people.
+    if (url.pathname === '/c') {
+      const email = cleanEmail(url.searchParams.get('e'));
+      if (!(await validConfirm(env, email, url.searchParams.get('s')))) return page('Link expired', '<h1>Hmm.</h1><p>This confirmation link isn\'t valid. Please sign up again on the store.</p>');
+      if (request.method === 'POST') {
+        const ok = await confirmSubscription(env, email);
+        if (!ok) return page('Sign up again', `<h1>Hmm.</h1><p>We couldn't find that sign-up. Please sign up again on the store.</p><a class="b" href="${env.STORE_URL}">Back to the store</a>`);
+        ctx.waitUntil(drainOutbox(env).catch((e) => console.error('drain', e)));
+        return page('Subscribed', `<h1>You're in!</h1><p>Thanks for confirming. Your welcome email with your 10% code is on its way to ${esc(email)}.</p><a class="b" href="${env.STORE_URL}">Back to the store</a>`);
+      }
+      return page('Confirm', `<h1>Confirm your email</h1><p>Get deals and new arrivals from ${esc(env.BRAND)} at <strong>${esc(email)}</strong>. Unsubscribe any time.</p><form method="post"><button type="submit">Yes, subscribe me</button></form>`);
     }
 
     // Unsubscribe: GET shows a confirm button; POST (also used by Gmail/Apple one-click) unsubscribes.
@@ -63,8 +83,8 @@ export default {
       const sig = url.searchParams.get('s');
       if (!(await validUnsub(env, email, sig))) return page('Link expired', '<h1>Hmm.</h1><p>This unsubscribe link isn\'t valid. Email support@luxedealers.com and we\'ll remove you straight away.</p>');
       if (request.method === 'POST') {
-        await env.DB.prepare('INSERT OR REPLACE INTO suppressions (email, reason, at) VALUES (?, ?, ?)').bind(email, 'unsubscribed', now()).run();
-        await env.DB.prepare(`UPDATE sends SET status = 'skipped', error = 'unsubscribed' WHERE email = ? AND status = 'queued'`).bind(email).run();
+        await unsubscribe(env, email);
+        // Also try to unsubscribe them in Shopify; this may not work without protected customer data access.
         ctx.waitUntil(unsubscribeInShopify(env, email).catch((e) => console.error('unsub', e)));
         return page('Unsubscribed', `<h1>You're unsubscribed</h1><p>${esc(email)} won't get marketing emails from ${esc(env.BRAND)} any more. Order and shipping emails still arrive as normal.</p><a class="b" href="${env.STORE_URL}">Back to the store</a>`);
       }
@@ -74,13 +94,15 @@ export default {
     // Owner-only preview of any email with sample data: /preview?flow=welcome1&key=UNSUB_SECRET
     if (url.pathname === '/preview' && url.searchParams.get('key') === env.UNSUB_SECRET) {
       const flow = url.searchParams.get('flow') || 'welcome1';
+      const items = [{ handle: url.searchParams.get('h') || 'high-tech-supersonic-hair-dryer', qty: 1 }];
       const sample = {
+        confirm: { firstName: 'Sam' }, checkout1: { token: 'preview', items, firstName: 'Sam' },
         welcome1: { firstName: 'Sam' }, welcome2: { firstName: 'Sam' }, vip: { firstName: 'Sam' },
         browse: { handle: url.searchParams.get('h') || 'high-tech-supersonic-hair-dryer' },
         cart1: { handles: ['high-tech-supersonic-hair-dryer'] }, wishlist: { handles: ['high-tech-supersonic-hair-dryer'] },
         fortnight: { theme: url.searchParams.get('theme') || 'new', firstName: 'Sam' },
       }[flow];
-      if (!sample) return new Response('Preview supports: welcome1, welcome2, vip, browse, cart1, wishlist, fortnight', { status: 400 });
+      if (!sample) return new Response('Preview supports: confirm, welcome1, welcome2, checkout1, vip, browse, cart1, wishlist, fortnight', { status: 400 });
       const email = await builders[flow](env, 'preview@example.com', sample);
       const unsubUrl = await unsubscribeUrl(env, 'preview@example.com');
       const html = layout(env, { ...email, unsubUrl });
@@ -96,7 +118,9 @@ export default {
           (SELECT COUNT(*) FROM sends WHERE status = 'queued') AS queued,
           (SELECT COUNT(*) FROM sends WHERE status = 'sent' AND sent_at > ?) AS sent_24h,
           (SELECT COUNT(*) FROM sends WHERE status = 'error' AND sent_at > ?) AS errors_24h,
-          (SELECT COUNT(*) FROM events WHERE at > ?) AS events_24h`).bind(now() - 86400, now() - 86400, now() - 86400).first();
+          (SELECT COUNT(*) FROM events WHERE at > ?) AS events_24h,
+          (SELECT COUNT(*) FROM subscribers WHERE status = 'subscribed') AS subscribers,
+          (SELECT COUNT(*) FROM subscribers WHERE status = 'pending') AS pending`).bind(now() - 86400, now() - 86400, now() - 86400).first();
       return json({ ok: true, ...row });
     }
 

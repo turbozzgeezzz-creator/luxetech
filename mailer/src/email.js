@@ -71,8 +71,8 @@ const TRUST = `<table role="presentation" width="100%" cellpadding="0" cellspaci
 <td width="33%" valign="top" style="font-size:13px;line-height:1.45;color:${INK};"><strong style="color:${VIOLET};">&#10003;</strong> <strong>Damaged or wrong?</strong><br><span style="color:${MUTED};">Full refund</span></td>
 </tr></table>`;
 
-/** Full email: logo bar, banner image, white body, trust row, footer with unsubscribe. */
-export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reason }) {
+/** Full email: logo bar, banner image, white body, trust row (not on `plain` emails), footer with unsubscribe. */
+export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reason, plain }) {
   const bannerImg = banner
     ? `<tr><td style="padding:0;background:#1E0A57;"><img src="${env.PUBLIC_URL}/banners/${banner}" width="600" alt="${esc(bannerAlt || '')}" style="display:block;width:100%;height:auto;border:0;"></td></tr>`
     : '';
@@ -87,7 +87,7 @@ export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reas
 <tr><td class="px" style="background:${INK};border-radius:20px 20px 0 0;padding:20px 32px;"><a href="${env.STORE_URL}" style="text-decoration:none;font-size:22px;font-weight:900;font-style:italic;color:#FFFFFF;">TECH<span style="color:${VIOLET};">.</span>LUXEDEALERS</a></td></tr>
 ${bannerImg}
 <tr><td class="px" style="background:#FFFFFF;padding:30px 32px 26px;">${body}</td></tr>
-<tr><td class="px" style="background:#F4F2FB;padding:20px 32px;">${TRUST}</td></tr>
+${plain ? '' : `<tr><td class="px" style="background:#F4F2FB;padding:20px 32px;">${TRUST}</td></tr>`}
 <tr><td class="px" style="background:${INK};border-radius:0 0 20px 20px;padding:24px 32px;color:#A7AFBF;font-size:13px;line-height:1.6;">
 <p style="margin:0 0 10px;">Questions? Reply to this email or write to <a href="mailto:${env.REPLY_TO}" style="color:#C9A5FF;">${env.REPLY_TO}</a>.</p>
 <p style="margin:0 0 12px;"><a href="https://www.instagram.com/tech.luxedealers/" style="color:#fff;text-decoration:none;font-weight:700;">Instagram</a> &middot; <a href="https://www.facebook.com/profile.php?id=61595062625090" style="color:#fff;text-decoration:none;font-weight:700;">Facebook</a> &middot; <a href="${env.STORE_URL}" style="color:#fff;text-decoration:none;font-weight:700;">Shop</a></p>
@@ -117,12 +117,13 @@ export async function sendViaResend(env, { to, subject, html, unsubUrl }) {
 
 /**
  * Queue an email. `dedupe` makes each email send at most once (e.g. "welcome1:sam@x.com").
- * Lower priority numbers go first when the daily limit is tight.
+ * Lower priority numbers go first when the daily limit is tight. Returns the new job's id (null if it was a duplicate).
  */
 export async function enqueue(env, { email, flow, dedupe, priority = 5, data = {}, sendAfter = 0 }) {
-  await env.DB.prepare(`INSERT OR IGNORE INTO sends (email, flow, dedupe, status, created_at, priority, payload)
+  const res = await env.DB.prepare(`INSERT OR IGNORE INTO sends (email, flow, dedupe, status, created_at, priority, payload)
       VALUES (?, ?, ?, 'queued', ?, ?, ?)`)
     .bind(email, flow, dedupe, Math.max(now(), sendAfter), priority, JSON.stringify(data)).run();
+  return res.meta && res.meta.changes ? res.meta.last_row_id : null;
 }
 
 export async function sentTodayCount(env) {

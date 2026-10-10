@@ -1,24 +1,11 @@
-// Registers the Shopify webhooks LuxeMail listens to, pointing at the given URL. Skips ones already there.
+// LuxeMail no longer uses Shopify webhooks (customer and checkout data is redacted for this app).
+// Removes any LuxeMail webhooks an earlier deploy registered, so Shopify stops posting to a route that's gone.
 import { adminGql } from './shopify-token.mjs';
 
-const uri = process.argv[2];
-const TOPICS = ['CUSTOMERS_CREATE', 'CUSTOMERS_UPDATE', 'CHECKOUTS_CREATE', 'CHECKOUTS_UPDATE', 'ORDERS_CREATE'];
-
 const existing = (await adminGql(`{ webhookSubscriptions(first: 100) { nodes { id topic uri } } }`)).webhookSubscriptions.nodes;
-let failed = false;
-for (const topic of TOPICS) {
-  if (existing.some((w) => w.topic === topic && w.uri === uri)) { console.log(`   ${topic}: already registered`); continue; }
-  // An older LuxeMail address for the same topic gets replaced.
-  for (const old of existing.filter((w) => w.topic === topic && /luxemail/.test(w.uri))) {
-    await adminGql(`mutation($id: ID!) { webhookSubscriptionDelete(id: $id) { userErrors { message } } }`, { id: old.id });
-  }
-  const res = (await adminGql(`mutation($t: WebhookSubscriptionTopic!, $s: WebhookSubscriptionInput!) {
-      webhookSubscriptionCreate(topic: $t, webhookSubscription: $s) { webhookSubscription { id } userErrors { message } } }`,
-    { t: topic, s: { uri, format: 'JSON' } })).webhookSubscriptionCreate;
-  if (res.userErrors.length) { failed = true; console.log(`   ${topic}: FAILED - ${res.userErrors.map((e) => e.message).join('; ')}`); }
-  else console.log(`   ${topic}: registered`);
+const ours = existing.filter((w) => /luxemail/.test(w.uri || ''));
+for (const w of ours) {
+  await adminGql(`mutation($id: ID!) { webhookSubscriptionDelete(id: $id) { userErrors { message } } }`, { id: w.id });
+  console.log(`   removed old ${w.topic} webhook`);
 }
-if (failed) {
-  console.log('   Customer and checkout webhooks need "Protected customer data" (Name, Email) approved for the app.');
-  process.exitCode = 1;
-}
+if (!ours.length) console.log('   none registered');

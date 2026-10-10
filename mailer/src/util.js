@@ -14,12 +14,6 @@ async function hmacKey(secret) {
   return crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
 }
 
-export async function hmacBase64(secret, data) {
-  const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
-  const sig = await crypto.subtle.sign('HMAC', await hmacKey(secret), bytes);
-  return btoa(String.fromCharCode(...new Uint8Array(sig)));
-}
-
 export async function hmacHex(secret, data) {
   const sig = await crypto.subtle.sign('HMAC', await hmacKey(secret), new TextEncoder().encode(data));
   return Array.from(new Uint8Array(sig), (b) => b.toString(16).padStart(2, '0')).join('');
