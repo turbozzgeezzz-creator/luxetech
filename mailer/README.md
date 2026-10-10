@@ -26,20 +26,16 @@ Rules built in:
 
 ## Deploy
 
+With CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, RESEND_API_KEY, SHOPIFY_CLIENT_ID and SHOPIFY_CLIENT_SECRET in the environment:
+
 ```
-npm i -g wrangler
-wrangler login                      # or CLOUDFLARE_API_TOKEN in the environment
-wrangler d1 create luxemail         # put the id into wrangler.toml
-wrangler d1 execute luxemail --remote --file schema.sql
-wrangler secret put SHOPIFY_CLIENT_ID
-wrangler secret put SHOPIFY_CLIENT_SECRET
-wrangler secret put RESEND_API_KEY
-wrangler secret put UNSUB_SECRET    # any long random string
-wrangler deploy                     # then set PUBLIC_URL in wrangler.toml and deploy again
+./deploy.sh
 ```
 
-Register Shopify webhooks (customers/create, customers/update, checkouts/create, checkouts/update, orders/create)
-pointing to `PUBLIC_URL/webhooks`, then set Theme settings > Email tracking > Endpoint to `PUBLIC_URL/t`.
+It is safe to rerun. It checks the Resend domain (and lists any DNS records still missing), creates the D1 database and
+tables, stores the secrets, deploys, sets PUBLIC_URL, registers the Shopify webhooks, sets the theme's tracking URL,
+checks /health, emails a test of each flow to ADMIN_EMAIL, and commits and pushes the changed settings.
+UNSUB_SECRET is derived from the Shopify client secret, so it stays the same on every deploy.
 
 Preview any email: `PUBLIC_URL/preview?flow=welcome1&key=UNSUB_SECRET` (add `&send=1` to email it to ADMIN_EMAIL).
 Health: `PUBLIC_URL/health`.
