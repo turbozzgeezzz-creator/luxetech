@@ -166,7 +166,45 @@ ${plain ? '' : `<tr><td class="px" style="background:#F6F3FD;padding:22px 26px;"
 
 /* ---------- Sending ---------- */
 
-export async function sendViaResend(env, { to, subject, html, unsubUrl }) {
+function toBase64(buf) {
+  const bytes = new Uint8Array(buf);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+
+const EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp' };
+
+/**
+ * Many mail apps block remote images for new senders, so every image is embedded in the email itself
+ * (inline attachments referenced as cid:). An image that can't be fetched stays a normal link.
+ */
+export async function embedImages(env, html, maxBytes = 3_000_000) {
+  const urls = [...new Set([...html.matchAll(/<img[^>]+src="(https?:\/\/[^"]+)"/g)].map((m) => m[1]))];
+  const attachments = [];
+  let total = 0;
+  for (const [i, raw] of urls.entries()) {
+    const url = raw.replace(/&amp;/g, '&');
+    try {
+      const req = new Request(url, { headers: { Accept: 'image/png,image/jpeg,image/gif;q=0.9,*/*;q=0.5' } });
+      const res = url.startsWith(env.PUBLIC_URL + '/') && env.ASSETS ? await env.ASSETS.fetch(req) : await fetch(req);
+      const type = (res.headers.get('Content-Type') || '').split(';')[0].trim();
+      if (!res.ok || !EXT[type]) continue;
+      const buf = await res.arrayBuffer();
+      if (total + buf.byteLength > maxBytes) continue;
+      total += buf.byteLength;
+      const cid = `img${i}@luxemail`;
+      attachments.push({ filename: `image-${i}.${EXT[type]}`, content: toBase64(buf), content_id: cid, content_type: type });
+      html = html.split(`src="${raw}"`).join(`src="cid:${cid}"`);
+    } catch (e) {
+      console.error('embed image', url, e);
+    }
+  }
+  return { html, attachments };
+}
+
+export async function sendViaResend(env, { to, subject, html: rawHtml, unsubUrl }) {
+  const { html, attachments } = await embedImages(env, rawHtml);
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -176,6 +214,7 @@ export async function sendViaResend(env, { to, subject, html, unsubUrl }) {
       reply_to: env.REPLY_TO,
       subject,
       html,
+      ...(attachments.length ? { attachments } : {}),
       headers: { 'List-Unsubscribe': `<${unsubUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
     }),
   });
