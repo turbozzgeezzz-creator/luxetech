@@ -183,26 +183,30 @@ const EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'imag
  * Many mail apps block remote images for new senders, so every image is embedded in the email itself
  * (inline attachments referenced as cid:). An image that can't be fetched stays a normal link.
  */
-export async function embedImages(env, html, maxBytes = 3_000_000) {
+export async function embedImages(env, html, maxBytes = 1_500_000) {
   const urls = [...new Set([...html.matchAll(/<img[^>]+src="(https?:\/\/[^"]+)"/g)].map((m) => m[1]))];
-  const attachments = [];
-  let total = 0;
-  for (const [i, raw] of urls.entries()) {
+  // Fetch every image at once (faster sends), then attach them in page order within the size budget.
+  const fetched = await Promise.all(urls.map(async (raw) => {
     const url = raw.replace(/&amp;/g, '&');
     try {
-      const req = new Request(url, { headers: { Accept: 'image/png,image/jpeg,image/gif;q=0.9,*/*;q=0.5' } });
+      const req = new Request(url, { headers: { Accept: 'image/jpeg,image/png;q=0.9,image/gif;q=0.8' } });
       const res = url.startsWith(env.PUBLIC_URL + '/') && env.ASSETS ? await env.ASSETS.fetch(req) : await fetch(req);
       const type = (res.headers.get('Content-Type') || '').split(';')[0].trim();
-      if (!res.ok || !EXT[type]) continue;
-      const buf = await res.arrayBuffer();
-      if (total + buf.byteLength > maxBytes) continue;
-      total += buf.byteLength;
-      const cid = `img${i}@luxemail`;
-      attachments.push({ filename: `image-${i}.${EXT[type]}`, content: toBase64(buf), content_id: cid, content_type: type });
-      html = html.split(`src="${raw}"`).join(`src="cid:${cid}"`);
+      if (!res.ok || !EXT[type]) return null;
+      return { raw, type, buf: await res.arrayBuffer() };
     } catch (e) {
       console.error('embed image', url, e);
+      return null;
     }
+  }));
+  const attachments = [];
+  let total = 0;
+  for (const [i, img] of fetched.entries()) {
+    if (!img || total + img.buf.byteLength > maxBytes) continue; // anything left out stays a normal link
+    total += img.buf.byteLength;
+    const cid = `img${i}@luxemail`;
+    attachments.push({ filename: `image-${i}.${EXT[img.type]}`, content: toBase64(img.buf), content_id: cid, content_type: img.type });
+    html = html.split(`src="${img.raw}"`).join(`src="cid:${cid}"`);
   }
   return { html, attachments };
 }

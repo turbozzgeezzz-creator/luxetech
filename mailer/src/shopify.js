@@ -130,7 +130,8 @@ export function normaliseProduct(env, p) {
     handle: p.handle,
     title: p.title,
     url: `${env.STORE_URL}/products/${p.handle}`,
-    image: image ? `${image}${image.includes('?') ? '&' : '?'}width=560&height=560&crop=center` : null,
+    // Small progressive JPEGs (about 25-45 KB): sharp on phones, and emails stay light enough to open instantly.
+    image: image ? `${image}${image.includes('?') ? '&' : '?'}width=440&height=440&crop=center&format=pjpg` : null,
     price: p.priceRangeV2 ? Math.round(parseFloat(p.priceRangeV2.minVariantPrice.amount) * 100) : null,
     // On sale only if active, published to the online store, and at least one variant can be bought.
     available: p.status === 'ACTIVE' && !!p.onlineStoreUrl && (p.variants ? p.variants.nodes.some((v) => v.availableForSale) : true),
