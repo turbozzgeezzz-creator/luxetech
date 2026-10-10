@@ -1,7 +1,7 @@
 {%- comment -%}
   Shopify customer newsletter signup (adds the email to Customers with
   marketing consent). The tick box is required, and LuxeMail records it as consent and
-  emails a confirmation link (when Theme settings > Email tracking is set). Params: id (unique), button_label, tags (optional), placeholder (optional),
+  starts the welcome emails (when Theme settings > Email tracking is set). Params: id (unique), button_label, tags (optional), placeholder (optional),
   discount_code (optional; shown with an apply link after a successful signup)
 {%- endcomment -%}
 {%- assign form_id = 'Newsletter-' | append: id -%}
@@ -10,7 +10,7 @@
   {%- if form.posted_successfully? -%}
     <p class="form-status form-status--success" role="status" tabindex="-1" autofocus>
       {% render 'icon', name: 'check-circle', class: 'icon--sm' %} You're subscribed. Thanks for signing up.
-      {%- if settings.luxemail_endpoint != blank %} Check your inbox and tap the link to confirm your email.{% endif %}
+      {%- if settings.luxemail_endpoint != blank %} Your welcome email is on its way.{% endif %}
     </p>
     {%- if discount_code != blank -%}
       <div class="discount-reveal">

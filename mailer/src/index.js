@@ -3,7 +3,7 @@ import { json, now, hmacHex, cleanEmail, esc } from './util.js';
 import { unsubscribeInShopify } from './shopify.js';
 import { layout, sendViaResend, unsubscribeUrl } from './email.js';
 import {
-  recordEvent, recordPixel, confirmSubscription, unsubscribe, scanAbandonment, scanDaily,
+  recordEvent, recordPixel, unsubscribe, scanAbandonment, scanDaily,
   scanFortnightly, drainOutbox, weeklyReport, builders,
 } from './flows.js';
 
@@ -28,8 +28,11 @@ async function validUnsub(env, email, sig) {
   return email && sig && (await hmacHex(env.UNSUB_SECRET, email)) === sig;
 }
 
-async function validConfirm(env, email, sig) {
-  return email && sig && (await hmacHex(env.UNSUB_SECRET, 'confirm:' + email)) === sig;
+/** Daily counters (no personal data) so /health shows the pixel and the theme are reporting. */
+async function countHit(env, name) {
+  const key = `count:${name}:${new Date().toISOString().slice(0, 10)}`;
+  await env.DB.prepare(`INSERT INTO kv (k, v, expires_at) VALUES (?, '1', ?) ON CONFLICT(k) DO UPDATE SET v = CAST(v AS INTEGER) + 1`)
+    .bind(key, now() + 8 * 86400).run();
 }
 
 /** Beacons are small JSON bodies sent as text/plain (so browsers don't need a CORS preflight). */
@@ -50,6 +53,7 @@ export default {
     if (url.pathname === '/t' && request.method === 'POST') {
       const body = await readBeacon(request);
       if (body) {
+        ctx.waitUntil(countHit(env, 'theme_beacons').catch(() => {}));
         ctx.waitUntil(recordEvent(env, body, request.headers.get('CF-Connecting-IP'))
           .then((jobId) => (jobId ? drainOutbox(env, { id: jobId }) : null))
           .catch((e) => console.error('beacon', e)));
@@ -60,21 +64,11 @@ export default {
     // Shopify custom pixel (mailer/pixel.js): checkouts started and completed.
     if (url.pathname === '/p' && request.method === 'POST') {
       const body = await readBeacon(request);
-      if (body) ctx.waitUntil(recordPixel(env, body).catch((e) => console.error('pixel', e)));
-      return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*' } });
-    }
-
-    // Confirm a subscription. GET shows a button and POST confirms, so email link scanners can't confirm for people.
-    if (url.pathname === '/c') {
-      const email = cleanEmail(url.searchParams.get('e'));
-      if (!(await validConfirm(env, email, url.searchParams.get('s')))) return page('Link expired', '<h1>Hmm.</h1><p>This confirmation link isn\'t valid. Please sign up again on the store.</p>');
-      if (request.method === 'POST') {
-        const ok = await confirmSubscription(env, email);
-        if (!ok) return page('Sign up again', `<h1>Hmm.</h1><p>We couldn't find that sign-up. Please sign up again on the store.</p><a class="b" href="${env.STORE_URL}">Back to the store</a>`);
-        ctx.waitUntil(drainOutbox(env).catch((e) => console.error('drain', e)));
-        return page('Subscribed', `<h1>You're in!</h1><p>Thanks for confirming. Your welcome email with your 10% code is on its way to ${esc(email)}.</p><a class="b" href="${env.STORE_URL}">Back to the store</a>`);
+      if (body) {
+        ctx.waitUntil(recordPixel(env, body).catch((e) => console.error('pixel', e)));
+        ctx.waitUntil(countHit(env, `pixel_${body.t === 'order' ? 'orders' : 'checkouts'}`).catch(() => {}));
       }
-      return page('Confirm', `<h1>Confirm your email</h1><p>Get deals and new arrivals from ${esc(env.BRAND)} at <strong>${esc(email)}</strong>. Unsubscribe any time.</p><form method="post"><button type="submit">Yes, subscribe me</button></form>`);
+      return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*' } });
     }
 
     // Unsubscribe: GET shows a confirm button; POST (also used by Gmail/Apple one-click) unsubscribes.
@@ -96,14 +90,21 @@ export default {
       const flow = url.searchParams.get('flow') || 'welcome1';
       const items = [{ handle: url.searchParams.get('h') || 'high-tech-supersonic-hair-dryer', qty: 1 }];
       const sample = {
-        confirm: { firstName: 'Sam' }, checkout1: { token: 'preview', items, firstName: 'Sam' },
+        welcome3: { firstName: 'Sam' }, checkout2: { token: 'preview', items, firstName: 'Sam' }, cart2: { handles: items.map((i) => i.handle) },
+        postpurchase: { firstName: 'Sam', handles: items.map((i) => i.handle) }, winback: { firstName: 'Sam' },
+        nextreminder: { firstName: 'Sam', code: 'NEXT10-PREVIEW', endsAt: new Date(Date.now() + 7 * 86400000).toISOString(), since: 0 },
+        checkout1: { token: 'preview', items, firstName: 'Sam' },
         welcome1: { firstName: 'Sam' }, welcome2: { firstName: 'Sam' }, vip: { firstName: 'Sam' },
         browse: { handle: url.searchParams.get('h') || 'high-tech-supersonic-hair-dryer' },
         cart1: { handles: ['high-tech-supersonic-hair-dryer'] }, wishlist: { handles: ['high-tech-supersonic-hair-dryer'] },
         fortnight: { theme: url.searchParams.get('theme') || 'new', firstName: 'Sam' },
       }[flow];
-      if (!sample) return new Response('Preview supports: confirm, welcome1, welcome2, checkout1, vip, browse, cart1, wishlist, fortnight', { status: 400 });
-      const email = await builders[flow](env, 'preview@example.com', sample);
+      if (!sample) return new Response('Preview supports: welcome1, welcome2, welcome3, checkout1, checkout2, cart1, cart2, browse, wishlist, postpurchase, nextreminder, vip, winback, fortnight (theme=new|picks|best|blog)', { status: 400 });
+      if (flow === 'fortnight' && ['new', 'blog'].includes(sample.theme)) {
+        sample.offer = { code: sample.theme === 'new' ? 'NEWIN10-PREVIEW' : 'INSIDER10-PREVIEW', endsAt: new Date(Date.now() + 7 * 86400000).toISOString() };
+      }
+      // Previews use placeholder codes and never create real discounts in Shopify.
+      const email = await builders[flow]({ ...env, PREVIEW: '1' }, 'preview@example.com', sample);
       if (!email) return new Response(`Nothing to send for ${flow} with this sample (product unavailable?)`, { status: 422 });
       const unsubUrl = await unsubscribeUrl(env, 'preview@example.com');
       const html = layout(env, { ...email, unsubUrl });
@@ -120,9 +121,11 @@ export default {
           (SELECT COUNT(*) FROM sends WHERE status = 'sent' AND sent_at > ?) AS sent_24h,
           (SELECT COUNT(*) FROM sends WHERE status = 'error' AND sent_at > ?) AS errors_24h,
           (SELECT COUNT(*) FROM events WHERE at > ?) AS events_24h,
-          (SELECT COUNT(*) FROM subscribers WHERE status = 'subscribed') AS subscribers,
-          (SELECT COUNT(*) FROM subscribers WHERE status = 'pending') AS pending`).bind(now() - 86400, now() - 86400, now() - 86400).first();
-      return json({ ok: true, ...row });
+          (SELECT COUNT(*) FROM subscribers WHERE status = 'subscribed') AS subscribers`).bind(now() - 86400, now() - 86400, now() - 86400).first();
+      const today = new Date().toISOString().slice(0, 10);
+      const { results: counts } = await env.DB.prepare(`SELECT k, v FROM kv WHERE k LIKE ?`).bind(`count:%:${today}`).all();
+      const todayCounts = Object.fromEntries(counts.map((c) => [c.k.split(':')[1] + '_today_utc', Number(c.v)]));
+      return json({ ok: true, ...row, ...todayCounts });
     }
 
     return new Response('LuxeMail', { status: 404 });

@@ -39,6 +39,9 @@ const OFFER_THEMES = {
   personal: { bg: '#C2187A', grad: 'linear-gradient(135deg,#E0338F 0%,#8E0F7A 100%)', accent: '#FFFFFF', text: '#FFFFFF', soft: '#FFD6EC', icon: 'tag' },
   vip: { bg: '#0B1220', grad: 'linear-gradient(135deg,#231A05 0%,#0B1220 70%)', accent: '#F5C451', text: '#FFFFFF', soft: '#D9CFA8', icon: 'crown' },
   winback: { bg: '#1D4ED8', grad: 'linear-gradient(135deg,#3B6CF6 0%,#4A12C9 100%)', accent: '#FFFFFF', text: '#FFFFFF', soft: '#DCE6FF', icon: 'heart' },
+  lastcall: { bg: '#E0582E', grad: 'linear-gradient(135deg,#F59E0B 0%,#DB2777 100%)', accent: '#FFFFFF', text: '#FFFFFF', soft: '#FFE9D6', icon: 'sparkles' },
+  thanks: { bg: '#047857', grad: 'linear-gradient(135deg,#10B981 0%,#065F46 100%)', accent: '#FFFFFF', text: '#FFFFFF', soft: '#D1FAE5', icon: 'gift' },
+  insider: { bg: '#0E7490', grad: 'linear-gradient(135deg,#06B6D4 0%,#6D28D9 100%)', accent: '#FFFFFF', text: '#FFFFFF', soft: '#DDF6FF', icon: 'tag' },
   tiers: { bg: '#0F766E', grad: 'linear-gradient(135deg,#14A39A 0%,#0B5E73 100%)', accent: '#FFFFFF', text: '#FFFFFF', soft: '#CFF5F1', icon: 'sparkles' },
 };
 

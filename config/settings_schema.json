@@ -596,7 +596,7 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Connects the store to LuxeMail, our own email automation. Newsletter sign-ups (with the consent box ticked) join LuxeMail's list after confirming by email. For browsers that signed up, it records product views, add-to-cart and wishlist saves so emails can recommend the right products. Leave empty to turn it off."
+        "content": "Connects the store to LuxeMail, our own email automation. Newsletter sign-ups (with the consent box ticked) join LuxeMail's list. For browsers that signed up, it records product views, add-to-cart and wishlist saves so emails can recommend the right products. Leave empty to turn it off."
       },
       {
         "type": "text",

@@ -62,8 +62,9 @@ export async function unsubscribeInShopify(env, email) {
  * It expires after `days`, and the email states that date, so any urgency in the copy is genuine.
  */
 export async function createPersonalCode(env, { prefix, percent, days, title }) {
-  const code = `${prefix}-${randomCode(5)}`;
   const endsAt = new Date(Date.now() + days * 86400000).toISOString();
+  if (env.PREVIEW) return { code: `${prefix}-PREVIEW`, endsAt }; // previews never create real codes
+  const code = `${prefix}-${randomCode(5)}`;
   const data = await gql(env, `mutation($d: DiscountCodeBasicInput!){
       discountCodeBasicCreate(basicCodeDiscount:$d){ codeDiscountNode{ id } userErrors{ field message } } }`, {
     d: {
@@ -74,6 +75,35 @@ export async function createPersonalCode(env, { prefix, percent, days, title }) 
       usageLimit: 1,
       appliesOncePerCustomer: true,
       customerGets: { value: { percentage: percent / 100 }, items: { all: true } },
+      combinesWith: { orderDiscounts: false, productDiscounts: false, shippingDiscounts: true },
+      context: { all: 'ALL' },
+    },
+  });
+  const errs = data.discountCodeBasicCreate.userErrors;
+  if (errs.length) throw new Error('Discount create failed: ' + JSON.stringify(errs));
+  return { code, endsAt };
+}
+
+/**
+ * A subscriber-only code shared by everyone on the list for one fortnightly email, e.g. NEWIN10-7KQ2.
+ * Once per customer, expires after `days`, optionally limited to one collection. The email states all of that.
+ */
+export async function createSharedCode(env, { prefix, percent, days, title, collection }) {
+  const endsAt = new Date(Date.now() + days * 86400000).toISOString();
+  if (env.PREVIEW) return { code: `${prefix}-PREVIEW`, endsAt };
+  let items = { all: true };
+  if (collection) {
+    const c = await gql(env, `query($h: String!){ collectionByIdentifier(identifier: { handle: $h }){ id } }`, { h: collection });
+    if (!c.collectionByIdentifier) throw new Error(`Collection not found: ${collection}`);
+    items = { collections: { add: [c.collectionByIdentifier.id] } };
+  }
+  const code = `${prefix}-${randomCode(4)}`;
+  const data = await gql(env, `mutation($d: DiscountCodeBasicInput!){
+      discountCodeBasicCreate(basicCodeDiscount:$d){ codeDiscountNode{ id } userErrors{ field message } } }`, {
+    d: {
+      title: `${title} (${code})`, code, startsAt: new Date().toISOString(), endsAt,
+      appliesOncePerCustomer: true,
+      customerGets: { value: { percentage: percent / 100 }, items },
       combinesWith: { orderDiscounts: false, productDiscounts: false, shippingDiscounts: true },
       context: { all: 'ALL' },
     },

@@ -1,10 +1,10 @@
 // Every automated email: what triggers it (theme tracking, the Shopify custom pixel, schedule) and how it's built.
 // LuxeMail keeps its own mailing list and doesn't rely on Shopify showing customer emails. Marketing email
-// only goes to addresses that ticked the consent box (or opted in on their Shopify account) AND clicked the
-// confirmation link we emailed them, checked again right before every send.
+// only goes to addresses that ticked the consent box (or opted in on their Shopify account), checked again
+// right before every send.
 import { now, HOUR, DAY, cleanEmail, localParts, getKV, setKV, money, esc, hmacHex } from './util.js';
 import {
-  verifyOrder, createPersonalCode, productByHandle, recommendations, collectionProducts, latestArticles,
+  verifyOrder, createPersonalCode, createSharedCode, gql, productByHandle, recommendations, collectionProducts, latestArticles,
 } from './shopify.js';
 import {
   enqueue, layout, heading, para, button, offerCard, tierCard, tierNudge, productGrid, articleList, sendViaResend,
@@ -20,12 +20,7 @@ export async function subscriber(env, email) {
   return env.DB.prepare('SELECT * FROM subscribers WHERE email = ?').bind(email).first();
 }
 
-export async function confirmUrl(env, email) {
-  const sig = await hmacHex(env.UNSUB_SECRET, 'confirm:' + email);
-  return `${env.PUBLIC_URL}/c?e=${encodeURIComponent(email)}&s=${sig}`;
-}
-
-/** Simple per-IP limit so nobody can use the sign-up beacon to flood strangers with confirmation emails. */
+/** Simple per-IP limit so nobody can use the sign-up beacon to sign up lists of strangers. */
 async function rateLimited(env, ip, max) {
   if (!ip) return false;
   const key = `rl:${await hmacHex(env.UNSUB_SECRET, ip)}:${Math.floor(now() / HOUR)}`;
@@ -37,40 +32,35 @@ async function rateLimited(env, ip, max) {
 }
 
 /**
- * Someone asked to join (ticked "Email me deals and new arrivals", or is signed in with "accepts marketing"
- * on their Shopify account). They go on the list as pending and get one confirmation email; nothing else
- * is sent until they click it. Returns the queued confirmation job id, if any.
+ * Someone joined: they ticked "Email me deals and new arrivals" on a form, or are signed in with
+ * "accepts marketing" on their Shopify account. That's express consent (Spam Act), so they're subscribed
+ * straight away and the welcome series starts. Returns the welcome email's job id, to send it right away.
  */
-export async function requestSubscription(env, { email, firstName, source, page, ip }) {
+export async function subscribe(env, { email, firstName, source, page, ip }) {
   const existing = await subscriber(env, email);
   if (existing && existing.status === 'subscribed') {
     if (firstName && !existing.first_name) await env.DB.prepare('UPDATE subscribers SET first_name = ? WHERE email = ?').bind(firstName, email).run();
     return null;
   }
-  // Signed-in customers are only ever asked once: if they ignored it or unsubscribed, that stands
-  // (their Shopify account may still say "accepts marketing"). Only ticking the box on a form asks again.
+  // Signed-in customers are only added once automatically: if they unsubscribed, that stands even though
+  // their Shopify account may still say "accepts marketing". Only ticking the box on a form adds them again.
   if (existing && source === 'account') return null;
-  // At most one confirmation email per address per 7 days, however often the form is submitted.
-  if (existing && existing.status === 'pending' && existing.requested_at > now() - 7 * DAY) return null;
   if (await rateLimited(env, ip, 5)) return null;
-  await env.DB.prepare(`INSERT INTO subscribers (email, first_name, status, source, consent_text, consent_page, requested_at)
-      VALUES (?, ?, 'pending', ?, ?, ?, ?)
-      ON CONFLICT(email) DO UPDATE SET status = 'pending', first_name = COALESCE(excluded.first_name, subscribers.first_name),
-        source = excluded.source, consent_text = excluded.consent_text, consent_page = excluded.consent_page, requested_at = excluded.requested_at`)
-    .bind(email, firstName, source, source === 'account' ? 'Accepts marketing on their store account' : CONSENT_TEXT, page, now()).run();
-  return enqueue(env, { email, flow: 'confirm', dedupe: `confirm:${email}:${Math.floor(now() / (7 * DAY))}`, priority: 0, data: { firstName } });
-}
-
-/** The confirmation link was clicked: they're subscribed, and the welcome series starts. */
-export async function confirmSubscription(env, email) {
-  const s = await subscriber(env, email);
-  if (!s) return false;
-  if (s.status === 'subscribed') return true;
-  await env.DB.prepare(`UPDATE subscribers SET status = 'subscribed', confirmed_at = ?, unsubscribed_at = NULL WHERE email = ?`).bind(now(), email).run();
+  await env.DB.prepare(`INSERT INTO subscribers (email, first_name, status, source, consent_text, consent_page, requested_at, confirmed_at)
+      VALUES (?, ?, 'subscribed', ?, ?, ?, ?, ?)
+      ON CONFLICT(email) DO UPDATE SET status = 'subscribed', first_name = COALESCE(excluded.first_name, subscribers.first_name),
+        source = excluded.source, consent_text = excluded.consent_text, consent_page = excluded.consent_page,
+        requested_at = excluded.requested_at, confirmed_at = excluded.confirmed_at, unsubscribed_at = NULL`)
+    .bind(email, firstName, source, source === 'account' ? 'Accepts marketing on their store account' : CONSENT_TEXT, page, now(), now()).run();
   await env.DB.prepare('DELETE FROM suppressions WHERE email = ?').bind(email).run();
-  await enqueue(env, { email, flow: 'welcome1', dedupe: `welcome1:${email}`, priority: 1, data: { firstName: s.first_name } });
-  await enqueue(env, { email, flow: 'welcome2', dedupe: `welcome2:${email}`, priority: 4, data: { firstName: s.first_name }, sendAfter: now() + 3 * DAY });
-  return true;
+  // A returning subscriber gets a fresh welcome series (the dedupe keys include the sign-up day).
+  const day = new Date(now() * 1000).toISOString().slice(0, 10);
+  const data = { firstName };
+  const id = await enqueue(env, { email, flow: 'welcome1', dedupe: `welcome1:${email}:${day}`, priority: 1, data });
+  await enqueue(env, { email, flow: 'welcome2', dedupe: `welcome2:${email}:${day}`, priority: 4, data, sendAfter: now() + 3 * DAY });
+  // The 15% last-call code goes to an address once ever, so re-subscribing can't farm new codes.
+  await enqueue(env, { email, flow: 'welcome3', dedupe: `welcome3:${email}`, priority: 4, data, sendAfter: now() + 7 * DAY });
+  return id;
 }
 
 export async function unsubscribe(env, email, reason = 'unsubscribed') {
@@ -83,7 +73,6 @@ export async function unsubscribe(env, email, reason = 'unsubscribed') {
 export async function mayEmail(env, email, flow) {
   const suppressed = await env.DB.prepare('SELECT email FROM suppressions WHERE email = ?').bind(email).first();
   const s = await subscriber(env, email);
-  if (flow === 'confirm') return !!s && s.status === 'pending';
   return !!s && s.status === 'subscribed' && !suppressed;
 }
 
@@ -93,7 +82,7 @@ export async function mayEmail(env, email, flow) {
  * Theme beacon. Body: { cid, t?, h?, p?, ti?, e?, fn?, c?, src?, pg? }
  *  - t = view | cart | wishlist | unwishlist: browsing activity for this browser.
  *  - e with c = 1: newsletter form with the consent box ticked (src = footer/popup/...), or a signed-in
- *    customer whose Shopify account accepts marketing (src = account). Starts double opt-in.
+ *    customer whose Shopify account accepts marketing (src = account). Subscribes them.
  */
 export async function recordEvent(env, body, ip = null) {
   const cid = typeof body.cid === 'string' ? body.cid.slice(0, 64) : null;
@@ -103,7 +92,7 @@ export async function recordEvent(env, body, ip = null) {
   let job = null;
   if (email && Number(body.c) === 1) {
     const source = ['account', 'footer', 'popup', 'homepage', 'password', 'newsletter'].includes(body.src) ? body.src : 'newsletter';
-    job = await requestSubscription(env, { email, firstName, source, page: str(body.pg, 300), ip });
+    job = await subscribe(env, { email, firstName, source, page: str(body.pg, 300), ip });
     // Only browsers that gave consent are linked to an email, so their activity can personalise emails.
     await env.DB.prepare(`INSERT INTO clients (client_id, email, first_name, updated_at) VALUES (?, ?, ?, ?)
         ON CONFLICT(client_id) DO UPDATE SET email = excluded.email, first_name = COALESCE(excluded.first_name, clients.first_name), updated_at = excluded.updated_at`)
@@ -129,7 +118,7 @@ function pixelItems(items) {
 
 /**
  * Shopify custom pixel (mailer/pixel.js). Body: { t: 'checkout' | 'order', token, e, fn, total, items, order }
- * Checkouts are only stored for confirmed subscribers. A completed checkout always stops its reminders.
+ * Checkouts are only stored for subscribers. A completed checkout always stops its reminders.
  */
 export async function recordPixel(env, body) {
   const token = str(body.token, 100);
@@ -285,9 +274,19 @@ export async function scanFortnightly(env) {
   await setKV(env, 'fortnight_index', (index + 1) % THEMES.length);
   const theme = THEMES[index % THEMES.length];
   const { results } = await env.DB.prepare(`SELECT email, first_name FROM subscribers WHERE status = 'subscribed'`).all();
+  if (!results.length) return;
+  // New arrivals and blog fortnights carry a subscriber code (one shared code, 7 days, once per customer).
+  let offer = null;
+  if (theme === 'new' || theme === 'blog') {
+    try {
+      offer = await createSharedCode(env, theme === 'new'
+        ? { prefix: 'NEWIN10', percent: 10, days: 7, title: 'Subscribers 10% off New arrivals', collection: 'new-arrivals' }
+        : { prefix: 'INSIDER10', percent: 10, days: 7, title: 'Subscribers 10% off everything' });
+    } catch (e) { console.error('fortnight code', e); } // the email falls back to spend-and-save
+  }
   for (const m of results) {
     await enqueue(env, { email: m.email, flow: 'fortnight', dedupe: `fortnight:${ymd}:${m.email}`, priority: 6,
-      data: { theme, firstName: m.first_name } });
+      data: { theme, firstName: m.first_name, offer } });
   }
 }
 
@@ -301,20 +300,43 @@ async function productsForHandles(env, handles) {
   return out;
 }
 
-async function personalPicks(env, email, limit = 4) {
+/** The product a subscriber cares about most recently: last viewed, else first item of their last order. */
+async function seedProductId(env, email) {
   const lastView = await env.DB.prepare(`SELECT product_id FROM events WHERE email = ? AND product_id IS NOT NULL ORDER BY at DESC LIMIT 1`).bind(email).first();
-  let seed = lastView ? lastView.product_id : null;
-  if (!seed) {
-    const lastOrder = await env.DB.prepare('SELECT handles FROM orders WHERE email = ? ORDER BY created_at DESC LIMIT 1').bind(email).first();
-    const handle = lastOrder ? JSON.parse(lastOrder.handles || '[]')[0] : null;
-    const product = handle ? await productByHandle(env, handle) : null;
-    seed = product ? product.id : null;
-  }
+  if (lastView) return lastView.product_id;
+  const lastOrder = await env.DB.prepare('SELECT handles FROM orders WHERE email = ? ORDER BY created_at DESC LIMIT 1').bind(email).first();
+  const handle = lastOrder ? JSON.parse(lastOrder.handles || '[]')[0] : null;
+  const product = handle ? await productByHandle(env, handle) : null;
+  return product ? product.id : null;
+}
+
+async function personalPicks(env, email, limit = 4) {
+  const seed = await seedProductId(env, email);
   if (seed) {
     const recs = await recommendations(env, seed, limit);
     if (recs.length >= 2) return recs;
   }
   return collectionProducts(env, 'best-sellers', limit);
+}
+
+// Department banners for the "Picked for you" email, matched to what the subscriber has been looking at.
+const INTEREST_BANNERS = {
+  audio: ['banner-picks-audio.jpg', 'Audio picks for you'],
+  charging: ['banner-picks-charging.jpg', 'Charging picks you\'ll love'],
+  'smart-home': ['banner-picks-home.jpg', 'Kitchen picks for you'],
+  accessories: ['banner-picks-accessories.jpg', 'Accessories for you'],
+};
+
+async function interestBanner(env, email) {
+  const seed = await seedProductId(env, email);
+  if (seed) {
+    const data = await gql(env, `query($id: ID!){ product(id: $id){ collections(first: 10){ nodes{ handle } } } }`,
+      { id: `gid://shopify/Product/${String(seed).replace(/\D/g, '')}` });
+    const handles = data.product ? data.product.collections.nodes.map((c) => c.handle) : [];
+    const match = handles.find((h) => INTEREST_BANNERS[h]);
+    if (match) return INTEREST_BANNERS[match];
+  }
+  return ['banner-picks-everyone.jpg', 'Picked for you this fortnight'];
 }
 
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', timeZone: 'Australia/Sydney' });
@@ -327,17 +349,6 @@ function cartLink(env, items, code) {
 }
 
 export const builders = {
-  async confirm(env, email, d) {
-    return {
-      plain: true,
-      subject: `Please confirm your email for ${env.BRAND}`,
-      preheader: 'One tap to confirm, and your welcome email is on its way.',
-      reason: `You're receiving this because this address was entered to join the ${env.BRAND} email list. If that wasn't you, ignore this email and you won't hear from us again.`,
-      body: heading('Confirm your email') + para(`${hi(d.firstName)} thanks for signing up for deals and new arrivals from ${esc(env.BRAND)}. Tap the button to confirm it's you.`)
-        + button('Yes, subscribe me', await confirmUrl(env, email))
-        + para('<span style="font-size:14px;color:#586072;">Didn\'t sign up? Just ignore this email. We won\'t add you to our list.</span>'),
-    };
-  },
   async welcome1(env, email, d) {
     const picks = await collectionProducts(env, 'best-sellers', 4);
     return {
@@ -363,6 +374,21 @@ export const builders = {
           fine: 'First order only, one use per customer. Can\'t be combined with other discounts.' })
         + productGrid(picks, { heading: 'Just landed' })
         + button('Use my 10%', `${env.STORE_URL}/discount/WELCOME10?redirect=/collections/all`),
+    };
+  },
+  async welcome3(env, email, d) {
+    if (await orderedSince(env, email, 0)) return null;
+    const { code, endsAt } = await createPersonalCode(env, { prefix: 'WELCOME15', percent: 15, days: 3, title: 'Welcome last call 15%' });
+    const picks = await collectionProducts(env, 'best-sellers', 4);
+    return {
+      subject: 'Last call: 15% off, for 3 days',
+      preheader: `${code} takes 15% off until ${fmtDate(endsAt)}.`,
+      banner: 'banner-last-call.jpg', bannerAlt: 'Last call: 15% off, ends in 3 days',
+      body: heading('Last call: 15% off') + para(`${hi(d.firstName)} you've been with us a week, so here's our best new-member offer: 15% off your order, for the next 3 days.`)
+        + offerCard(env, { theme: 'lastcall', big: '15%', unit: '3 days only', title: 'Your new-member offer', code,
+          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
+        + button('Use my 15%', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`)
+        + productGrid(picks, { heading: 'Most loved right now' }),
     };
   },
   async checkout1(env, email, d) {
@@ -448,15 +474,39 @@ export const builders = {
   async postpurchase(env, email, d) {
     const bought = (d.handles || [])[0] ? await productByHandle(env, d.handles[0]) : null;
     const recs = bought ? (await recommendations(env, bought.id, 5)).filter((p) => !(d.handles || []).includes(p.handle)).slice(0, 4) : [];
-    if (!recs.length) return null;
+    const picks = recs.length ? recs : await collectionProducts(env, 'best-sellers', 4);
+    const { code, endsAt } = await createPersonalCode(env, { prefix: 'NEXT10', percent: 10, days: 30, title: 'Thank-you 10% next order' });
     return {
-      subject: 'Goes great with your order',
-      preheader: 'A few things that pair well with what you bought.',
-      banner: 'banner-thank-you.jpg', bannerAlt: 'Thanks for your order',
-      body: heading('Thanks for shopping with us!') + para(`${hi(d.firstName)} we hope you're enjoying your order. Here are a few things that go well with it.`)
-        + productGrid(recs) + para('Anything not right? Just reply to this email and we\'ll sort it out.'),
+      subject: 'A thank-you: 10% off your next order',
+      preheader: `${code} takes 10% off your next order, until ${fmtDate(endsAt)}.`,
+      banner: 'banner-next-order.jpg', bannerAlt: 'A thank-you gift: 10% off your next order',
+      body: heading('Thanks for shopping with us!') + para(`${hi(d.firstName)} we hope you're enjoying your order. As a thank-you, here's 10% off your next one.`)
+        + offerCard(env, { theme: 'thanks', big: '10%', unit: 'next order', title: 'A thank-you gift for your next order', code,
+          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
+        + button('Use my 10%', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`)
+        + productGrid(picks, { heading: recs.length ? 'Goes great with your order' : 'Most loved right now' })
+        + para('Anything not right with your order? Just reply to this email and we\'ll sort it out.'),
+      // A week before the code ends, remind them (skipped if they've ordered again by then).
+      afterSend: () => enqueue(env, { email, flow: 'nextreminder', dedupe: `nextreminder:${code}`, priority: 4,
+        data: { firstName: d.firstName, code, endsAt, since: now() }, sendAfter: Math.floor(Date.parse(endsAt) / 1000) - 7 * DAY }),
     };
   },
+  async nextreminder(env, email, d) {
+    if (await orderedSince(env, email, d.since)) return null;
+    if (Date.parse(d.endsAt) < Date.now() + DAY * 1000) return null;
+    const picks = await personalPicks(env, email, 4);
+    return {
+      subject: `Your 10% ends ${fmtDate(d.endsAt)}`,
+      preheader: `${d.code} still takes 10% off your next order.`,
+      banner: 'banner-next-reminder.jpg', bannerAlt: 'Your 10% is still waiting',
+      body: heading('Your 10% is still waiting') + para(`${hi(d.firstName)} a quick reminder: your thank-you code still takes 10% off your next order, until ${fmtDate(d.endsAt)}.`)
+        + offerCard(env, { theme: 'thanks', big: '10%', unit: 'next order', title: 'Your thank-you code', code: d.code,
+          fine: `Single use, valid until ${fmtDate(d.endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
+        + button('Use my 10%', `${env.STORE_URL}/discount/${d.code}?redirect=/collections/all`)
+        + productGrid(picks, { heading: 'Picked for you' }),
+    };
+  },
+
   async vip(env, email, d) {
     const picks = await collectionProducts(env, 'new-arrivals', 4);
     return {
@@ -486,35 +536,44 @@ export const builders = {
   },
   async fortnight(env, email, d) {
     const intro = `${hi(d.firstName)} here's what's worth a look this fortnight, picked by our team.`;
-    const tiers = tierCard(env);
+    // Each theme carries a different offer: a New arrivals code, spend-and-save, or a sitewide subscriber code.
+    const insider = (unit, title, where, redirect) => d.offer
+      ? offerCard(env, { theme: 'insider', big: '10%', unit, title, code: d.offer.code,
+          fine: `${where} until ${fmtDate(d.offer.endsAt)}. Once per customer. Can't be combined with other discounts.` })
+        + button('Use my 10%', `${env.STORE_URL}/discount/${d.offer.code}?redirect=${redirect}`)
+      : tierCard(env);
     if (d.theme === 'new') {
       const p = await collectionProducts(env, 'new-arrivals', 4);
-      return { subject: 'Just landed: new this fortnight', preheader: 'Fresh arrivals, picked by our team.', banner: 'banner-new-arrivals.jpg', bannerAlt: 'New arrivals this fortnight',
-        body: heading('New arrivals') + para(intro) + productGrid(p) + tiers + button('See what\'s new', `${env.STORE_URL}/collections/new-arrivals`) };
+      return { subject: d.offer ? 'Just landed, and 10% off for subscribers' : 'Just landed: new this fortnight', preheader: 'Fresh arrivals, picked by our team.', banner: 'banner-new-arrivals.jpg', bannerAlt: 'New arrivals this fortnight',
+        body: heading('New arrivals') + para(intro) + insider('new arrivals', 'Subscriber code: 10% off New arrivals', 'Valid on the New arrivals collection', '/collections/new-arrivals')
+          + productGrid(p) + (d.offer ? '' : button('See what\'s new', `${env.STORE_URL}/collections/new-arrivals`)) };
     }
     if (d.theme === 'best') {
       const p = await collectionProducts(env, 'best-sellers', 4);
       return { subject: 'What everyone\'s buying right now', preheader: 'This fortnight\'s best sellers.', banner: 'banner-best-sellers.jpg', bannerAlt: 'Best sellers this fortnight',
-        body: heading('Most loved right now') + para(intro) + productGrid(p) + tiers + button('Shop best sellers', `${env.STORE_URL}/collections/best-sellers`) };
+        body: heading('Most loved right now') + para(intro) + productGrid(p) + tierCard(env) + button('Shop best sellers', `${env.STORE_URL}/collections/best-sellers`) };
     }
     if (d.theme === 'blog') {
       const articles = await latestArticles(env, 3);
       const p = await personalPicks(env, email, 2);
-      return { subject: 'From the tech desk: new guides worth a read', preheader: 'Buying tips and how-tos from our team.', banner: 'banner-blog.jpg', bannerAlt: 'New guides worth a read',
+      return { subject: d.offer ? 'New guides, plus 10% off for subscribers' : 'From the tech desk: new guides worth a read', preheader: 'Buying tips and how-tos from our team.', banner: 'banner-blog.jpg', bannerAlt: 'New guides worth a read',
         body: heading('From the tech desk') + para(`${hi(d.firstName)} a few guides from our team, plus a couple of picks for you.`)
-          + articleList(articles) + productGrid(p, { heading: 'Picked for you' }) + button('Read all guides', `${env.STORE_URL}/blogs/news`) };
+          + articleList(articles) + insider('subscribers only', 'A subscriber code, on everything', 'Valid on everything', '/collections/all')
+          + productGrid(p, { heading: 'Picked for you' }) + (d.offer ? '' : button('Read all guides', `${env.STORE_URL}/blogs/news`)) };
     }
     const p = await personalPicks(env, email, 4);
-    return { subject: 'Picked for you this fortnight', preheader: 'Chosen from what you\'ve looked at and bought.', banner: 'banner-picks-everyone.jpg', bannerAlt: 'Picked for you this fortnight',
-      body: heading('Picked for you') + para(intro) + productGrid(p) + tiers + button('Shop your picks', `${env.STORE_URL}/collections/all`) };
+    const [banner, bannerAlt] = await interestBanner(env, email);
+    return { subject: 'Picked for you this fortnight', preheader: 'Chosen from what you\'ve looked at and bought.', banner, bannerAlt,
+      body: heading('Picked for you') + para(intro) + productGrid(p) + tierCard(env) + button('Shop your picks', `${env.STORE_URL}/collections/all`) };
   },
+
 };
 
 /* ======================= Outbox ======================= */
 
 /**
  * Sends queued emails, at most DAILY_SEND_LIMIT per 24 hours, after a fresh consent check.
- * With `id`, sends just that one job now (used for confirmation emails right after sign-up).
+ * With `id`, sends just that one job now (the welcome email, right after sign-up).
  */
 export async function drainOutbox(env, { id } = {}) {
   const budget = Number(env.DAILY_SEND_LIMIT || 95) - (await sentTodayCount(env));
@@ -529,8 +588,8 @@ export async function drainOutbox(env, { id } = {}) {
       .bind(status, error, now(), job.id).run();
     try {
       if (!(await mayEmail(env, job.email, job.flow))) { await mark('skipped', 'not subscribed'); continue; }
-      // One marketing email per person per 20 hours; anything else waits its turn. Confirmations go straight away.
-      const recent = job.flow === 'confirm' ? null : await env.DB.prepare(`SELECT id FROM sends WHERE email = ? AND status = 'sent' AND flow != 'confirm' AND sent_at > ? LIMIT 1`)
+      // One marketing email per person per 20 hours; anything else waits its turn.
+      const recent = await env.DB.prepare(`SELECT id FROM sends WHERE email = ? AND status = 'sent' AND sent_at > ? LIMIT 1`)
         .bind(job.email, now() - 20 * HOUR).first();
       if (recent) {
         await env.DB.prepare('UPDATE sends SET created_at = ? WHERE id = ?').bind(now() + 6 * HOUR, job.id).run();
@@ -544,6 +603,7 @@ export async function drainOutbox(env, { id } = {}) {
         html: layout(env, { ...email, unsubUrl }) });
       await mark('sent');
       sent++;
+      if (email.afterSend) await email.afterSend().catch((e) => console.error('afterSend', job.flow, e));
     } catch (err) {
       await mark('error', String(err && err.message || err).slice(0, 500));
     }

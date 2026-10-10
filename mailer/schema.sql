@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT, expires_at INTEGER);
 -- Our own mailing list. Nobody gets marketing email unless status = 'subscribed' here.
--- status: pending (asked, not yet confirmed) -> subscribed (clicked the confirm link) -> unsubscribed.
+-- status: subscribed (ticked the consent box, or accepts marketing on their account) -> unsubscribed.
 CREATE TABLE IF NOT EXISTS subscribers (
   email TEXT PRIMARY KEY, first_name TEXT, status TEXT NOT NULL,
   source TEXT, consent_text TEXT, consent_page TEXT, requested_at INTEGER, confirmed_at INTEGER, unsubscribed_at INTEGER);

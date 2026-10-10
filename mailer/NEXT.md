@@ -16,7 +16,7 @@ api.cloudflare.com, api.resend.com, tech.luxedealers.com, *.workers.dev. Never p
 
 ## Done: rebuilt to the "no-permission subscriber list" design
 Implemented as specified, plus double opt-in: the sign-up beacon is unauthenticated, so anyone could submit
-someone else's address. Every new subscriber gets one confirmation email and nothing else until they click it.
+someone else's address. (Later removed at the owner's request: subscribers now join straight away, with a per-IP limit.)
 Orders from the pixel are verified with the Admin API (read_orders works; totals aren't protected data).
 All webhooks dropped (orders/create too); deploy.sh now only removes old LuxeMail webhooks.
 

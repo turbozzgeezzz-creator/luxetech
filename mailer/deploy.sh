@@ -8,7 +8,7 @@
 #
 # Steps: Resend domain check -> D1 database + schema -> deploy + PUBLIC_URL -> secrets ->
 #        remove old webhooks -> theme tracking URL + pixel.js address -> publish collections ->
-#        health check -> test emails to ADMIN_EMAIL -> commit and push.
+#        health check -> build every email (SEND_TESTS=1 emails them to ADMIN_EMAIL) -> commit and push.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -70,16 +70,16 @@ node lib/publish-collections.mjs new-arrivals best-sellers || echo "   (could no
 echo "== 7. Health"
 curl -fsS "$WORKER_URL/health"; echo
 
-echo "== 8. Test emails"
-if [ "$DOMAIN_STATUS" = "verified" ]; then
-  for flow in confirm welcome1 welcome2 checkout1 cart1 browse wishlist vip fortnight; do
-    printf '   %-10s ' "$flow"
-    curl -fsS "$WORKER_URL/preview?flow=$flow&send=1&key=$UNSUB_SECRET" || echo "failed"
-    echo
-  done
-else
-  echo "   Skipped: $SEND_DOMAIN isn't verified in Resend yet (add its DNS records, then rerun this script)."
-fi
+echo "== 8. Every email builds (set SEND_TESTS=1 to also email them to ADMIN_EMAIL)"
+FAILED=0
+for flow in welcome1 welcome2 welcome3 checkout1 checkout2 cart1 cart2 browse wishlist postpurchase nextreminder vip winback \
+            "fortnight&theme=new" "fortnight&theme=picks" "fortnight&theme=best" "fortnight&theme=blog"; do
+  SEND=""; [ "${SEND_TESTS:-}" = "1" ] && [ "$DOMAIN_STATUS" = "verified" ] && SEND="&send=1"
+  CODE="$(curl -s -o /dev/null -w '%{http_code}' "$WORKER_URL/preview?flow=$flow&key=$UNSUB_SECRET$SEND")"
+  printf '   %-22s %s\n' "$flow" "$([ "$CODE" = 200 ] && echo ok${SEND:+, emailed} || echo "FAILED ($CODE)")"
+  [ "$CODE" = 200 ] || FAILED=1
+done
+[ "$FAILED" = 0 ] || echo "   Some emails failed to build; check: npx wrangler tail luxemail-tech" >&2
 echo "== 9. Save settings to GitHub (pushing to main makes the tracking live)"
 cd ..
 if ! git diff --quiet -- config/settings_data.json mailer/wrangler.toml mailer/pixel.js; then
