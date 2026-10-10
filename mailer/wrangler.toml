@@ -9,7 +9,7 @@ directory = "./public"
 [[d1_databases]]
 binding = "DB"
 database_name = "luxemail-tech"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "6acb20bf-df20-403d-991d-e7ae0512c8b0"
 
 [triggers]
 # Every 30 minutes: process reminders and drain the outbox. Daily and fortnightly jobs gate themselves on time.
@@ -19,7 +19,7 @@ crons = ["*/30 * * * *"]
 SHOP_DOMAIN = "vyc3tw-gf.myshopify.com"
 STORE_URL = "https://tech.luxedealers.com"
 # Set after the first deploy to the Worker's address, e.g. https://luxemail-tech.<account>.workers.dev
-PUBLIC_URL = "https://luxemail-tech.example.workers.dev"
+PUBLIC_URL = "https://luxemail-tech.turbozzgeezzz.workers.dev"
 BRAND = "Tech.LuxeDealers"
 FROM_EMAIL = "Tech.LuxeDealers <hello@send.tech.luxedealers.com>"
 REPLY_TO = "support@luxedealers.com"

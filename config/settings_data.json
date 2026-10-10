@@ -9,6 +9,7 @@
  */
 {
   "current": {
+    "luxemail_endpoint": "https://luxemail-tech.turbozzgeezzz.workers.dev/t",
     "color_background": "#F2F3F5",
     "color_subtle": "#E7E9ED",
     "color_surface": "#FFFFFF",

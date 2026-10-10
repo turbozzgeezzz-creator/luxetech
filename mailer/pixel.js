@@ -3,7 +3,7 @@
 // (stops reminders, sends the post-purchase email, builds the VIP and win-back history).
 // LuxeMail ignores the email of anyone who isn't a confirmed subscriber.
 // deploy.sh fills in ENDPOINT with the Worker's address.
-const ENDPOINT = 'https://luxemail-tech.example.workers.dev/p';
+const ENDPOINT = 'https://luxemail-tech.turbozzgeezzz.workers.dev/p';
 
 function handleFrom(url) {
   const m = /\/products\/([^/?#]+)/.exec(url || '');
