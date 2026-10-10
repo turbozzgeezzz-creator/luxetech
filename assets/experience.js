@@ -526,8 +526,57 @@
     var email = form.querySelector('input[name="contact[email]"]');
     if (!tags || !email || !/newsletter/.test(tags.value) || !email.value) return;
     var src = (tags.value.split(',')[1] || 'newsletter').trim();
+    try { sessionStorage.setItem('luxetech:signup-email', email.value.trim()); } catch (err) {}
     mailTrack({ e: email.value, c: 1, src: src, pg: location.pathname });
   }, true);
+  /* After the sign-up reloads the page: show the subscriber's own welcome code (from LuxeMail, the  */
+  /* same one as in their welcome email). Falls back to the shared code if anything goes wrong.      */
+  (function () {
+    var reveals = document.querySelectorAll('[data-welcome-reveal]');
+    if (!reveals.length) return;
+    var mail = config.mail;
+    var email = null;
+    try { email = sessionStorage.getItem('luxetech:signup-email'); } catch (e) {}
+    Array.prototype.forEach.call(reveals, function (el) {
+      var codeEl = el.querySelector('[data-discount-code]');
+      var copy = el.querySelector('[data-copy-code]');
+      var apply = el.querySelector('[data-apply-code]');
+      var actions = el.querySelector('.discount-reveal__actions');
+      var note = el.querySelector('[data-discount-note]');
+      var done = false;
+      function show(code, endsAt) {
+        if (done || !code) return;
+        done = true;
+        codeEl.textContent = code;
+        if (copy) copy.setAttribute('data-copy-code', code);
+        if (apply) apply.href = apply.getAttribute('data-href-base').replace('__CODE__', encodeURIComponent(code));
+        if (actions) actions.hidden = false;
+        if (endsAt && note) {
+          note.textContent = 'Your own code: single use, valid until ' + new Date(endsAt).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) + '.';
+          note.hidden = false;
+        }
+      }
+      var fallback = function () { show(el.getAttribute('data-fallback-code')); };
+      if (!mail || !mail.endpoint || !email) return fallback();
+      setTimeout(fallback, 9000);
+      var url = mail.endpoint.replace(/\/t\/?$/, '') + '/welcome-code';
+      var tries = 0;
+      (function ask() {
+        fetch(url, { method: 'POST', body: JSON.stringify({ e: email }), headers: { 'Content-Type': 'text/plain' } })
+          .then(function (res) {
+            // A brand-new sign-up can take a moment to reach the list: try again a few times.
+            if (res.status === 404 && tries++ < 3) { setTimeout(ask, 1500); return null; }
+            return res.ok ? res.json() : null;
+          })
+          .then(function (data) {
+            if (data === null && tries > 0 && tries <= 3) return;
+            if (data && data.code && Date.parse(data.endsAt) > Date.now()) show(data.code, data.endsAt);
+            else fallback();
+          })
+          .catch(fallback);
+      })();
+    });
+  })();
   document.addEventListener('luxe:cart-added', function (e) {
     var d = e.detail || {};
     if (d.handle) mailTrack({ t: 'cart', h: d.handle, p: d.product_id, ti: d.product_title || d.title });

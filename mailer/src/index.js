@@ -3,7 +3,7 @@ import { json, now, hmacHex, cleanEmail, esc } from './util.js';
 import { unsubscribeInShopify } from './shopify.js';
 import { layout, sendViaResend, unsubscribeUrl } from './email.js';
 import {
-  recordEvent, recordPixel, unsubscribe, scanAbandonment, scanDaily,
+  recordEvent, recordPixel, unsubscribe, welcomeCodeFor, subscriber, rateLimited, scanAbandonment, scanDaily,
   scanFortnightly, drainOutbox, weeklyReport, builders,
 } from './flows.js';
 
@@ -59,6 +59,25 @@ export default {
           .catch((e) => console.error('beacon', e)));
       }
       return new Response(null, { status: 204, headers: cors(env, request) });
+    }
+
+    // The subscriber's own welcome code, shown on the site right after they sign up.
+    // Only for addresses on the list; same code every time; limited per IP.
+    if (url.pathname === '/welcome-code' && request.method === 'POST') {
+      const headers = { ...cors(env, request), 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
+      const body = await readBeacon(request);
+      const email = cleanEmail(body && body.e);
+      if (!email) return new Response(JSON.stringify({ error: 'email' }), { status: 400, headers });
+      const s = await subscriber(env, email);
+      if (!s || s.status !== 'subscribed') return new Response(JSON.stringify({ error: 'not_subscribed' }), { status: 404, headers });
+      if (await rateLimited(env, 'wc:' + (request.headers.get('CF-Connecting-IP') || ''), 10)) return new Response(JSON.stringify({ error: 'busy' }), { status: 429, headers });
+      try {
+        const { code, endsAt } = await welcomeCodeFor(env, email);
+        return new Response(JSON.stringify({ code, endsAt }), { headers });
+      } catch (e) {
+        console.error('welcome-code', e);
+        return new Response(JSON.stringify({ error: 'unavailable' }), { status: 503, headers });
+      }
     }
 
     // Shopify custom pixel (mailer/pixel.js): checkouts started and completed.

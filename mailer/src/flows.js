@@ -21,7 +21,7 @@ export async function subscriber(env, email) {
 }
 
 /** Simple per-IP limit so nobody can use the sign-up beacon to sign up lists of strangers. */
-async function rateLimited(env, ip, max) {
+export async function rateLimited(env, ip, max) {
   if (!ip) return false;
   const key = `rl:${await hmacHex(env.UNSUB_SECRET, ip)}:${Math.floor(now() / HOUR)}`;
   const row = await env.DB.prepare('SELECT v FROM kv WHERE k = ?').bind(key).first();
@@ -61,6 +61,35 @@ export async function subscribe(env, { email, firstName, source, page, ip }) {
   // The 15% last-call code goes to an address once ever, so re-subscribing can't farm new codes.
   await enqueue(env, { email, flow: 'welcome3', dedupe: `welcome3:${email}`, priority: 4, data, sendAfter: now() + 7 * DAY });
   return id;
+}
+
+/**
+ * The subscriber's own welcome code (unique, 10%, single use, 30 days), created once per address ever.
+ * The site's sign-up message and the welcome emails both use it. If two requests arrive together,
+ * only the one that claims the row creates the code; the other waits for it.
+ */
+export async function welcomeCodeFor(env, email) {
+  if (env.PREVIEW) return createPersonalCode(env, { prefix: 'WELCOME10', percent: 10, days: 30, title: 'Welcome 10%' });
+  const read = () => env.DB.prepare('SELECT code, ends_at FROM welcome_codes WHERE email = ?').bind(email).first();
+  let row = await read();
+  if (row && row.code) return { code: row.code, endsAt: row.ends_at };
+  const claim = await env.DB.prepare('INSERT OR IGNORE INTO welcome_codes (email, code, ends_at, created_at) VALUES (?, NULL, NULL, ?)').bind(email, now()).run();
+  if (claim.meta && claim.meta.changes) {
+    try {
+      const { code, endsAt } = await createPersonalCode(env, { prefix: 'WELCOME10', percent: 10, days: 30, title: 'Welcome 10%' });
+      await env.DB.prepare('UPDATE welcome_codes SET code = ?, ends_at = ? WHERE email = ?').bind(code, endsAt, email).run();
+      return { code, endsAt };
+    } catch (e) {
+      await env.DB.prepare('DELETE FROM welcome_codes WHERE email = ? AND code IS NULL').bind(email).run(); // let a later try make it
+      throw e;
+    }
+  }
+  for (let i = 0; i < 12; i++) {
+    await new Promise((r) => setTimeout(r, 500));
+    row = await read();
+    if (row && row.code) return { code: row.code, endsAt: row.ends_at };
+  }
+  throw new Error('welcome code still being created');
 }
 
 export async function unsubscribe(env, email, reason = 'unsubscribed') {
@@ -350,30 +379,33 @@ function cartLink(env, items, code) {
 
 export const builders = {
   async welcome1(env, email, d) {
+    const { code, endsAt } = await welcomeCodeFor(env, email);
     const picks = await collectionProducts(env, 'best-sellers', 4);
     return {
       subject: `Welcome to ${env.BRAND}: here's 10% off`,
-      preheader: 'Your code is inside, plus a few of our most-loved picks.',
+      preheader: `Your code ${code} is inside, plus a few of our most-loved picks.`,
       banner: 'banner-welcome.jpg', bannerAlt: 'Welcome, here is 10% off your first order',
       body: heading('Welcome to the crew!') + para(`${hi(d.firstName)} thanks for joining. We hand-pick everyday tech, home and lifestyle gear, and every order is dispatched within 3-4 business days with tracking.`)
-        + offerCard(env, { theme: 'welcome', big: '10%', unit: 'off', title: 'Your welcome gift: 10% off your first order', code: 'WELCOME10',
-          fine: 'First order only, one use per customer. Can\'t be combined with other discounts. The button applies it for you.' })
-        + button('Start shopping', `${env.STORE_URL}/discount/WELCOME10?redirect=/collections/all`)
+        + offerCard(env, { theme: 'welcome', big: '10%', unit: 'off', title: 'Your welcome gift: 10% off your order', code,
+          fine: `Your own code: single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
+        + button('Start shopping', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`)
         + productGrid(picks, { heading: 'Most loved right now' }),
     };
   },
   async welcome2(env, email, d) {
     if (await orderedSince(env, email, 0)) return null;
+    const { code, endsAt } = await welcomeCodeFor(env, email);
+    if (Date.parse(endsAt) < Date.now() + DAY * 1000) return null;
     const picks = await collectionProducts(env, 'new-arrivals', 4);
     return {
       subject: 'Still deciding? Your 10% is waiting',
-      preheader: 'WELCOME10 still works on your first order.',
+      preheader: `${code} still takes 10% off, until ${fmtDate(endsAt)}.`,
       banner: 'banner-picks-everyone.jpg', bannerAlt: 'Fresh picks for you',
       body: heading('Your 10% is still here') + para(`${hi(d.firstName)} in case you missed it, your welcome code is ready whenever you are.`)
-        + offerCard(env, { theme: 'reminder', big: '10%', unit: 'still yours', title: 'Your welcome code hasn\'t been used yet', code: 'WELCOME10',
-          fine: 'First order only, one use per customer. Can\'t be combined with other discounts.' })
+        + offerCard(env, { theme: 'reminder', big: '10%', unit: 'still yours', title: 'Your welcome code hasn\'t been used yet', code,
+          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts.` })
         + productGrid(picks, { heading: 'Just landed' })
-        + button('Use my 10%', `${env.STORE_URL}/discount/WELCOME10?redirect=/collections/all`),
+        + button('Use my 10%', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`),
     };
   },
   async welcome3(env, email, d) {

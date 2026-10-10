@@ -13,12 +13,19 @@
       {%- if settings.luxemail_endpoint != blank %} Your welcome email is on its way.{% endif %}
     </p>
     {%- if discount_code != blank -%}
-      <div class="discount-reveal">
+      {%- comment -%}
+        With LuxeMail on, experience.js swaps in the subscriber's own single-use code from the mailer
+        (same code as their welcome email). If that fails it shows discount_code, the shared fallback.
+      {%- endcomment -%}
+      {%- assign personal = false -%}
+      {%- if settings.luxemail_endpoint != blank -%}{%- assign personal = true -%}{%- endif -%}
+      <div class="discount-reveal"{% if personal %} data-welcome-reveal data-fallback-code="{{ discount_code | escape }}"{% endif %}>
         <p class="discount-reveal__label">Your code</p>
-        <p class="discount-reveal__code" data-discount-code>{{ discount_code | escape }}</p>
-        <div class="discount-reveal__actions">
+        <p class="discount-reveal__code" data-discount-code aria-live="polite">{% if personal %}<span class="discount-reveal__loading">Getting your code&hellip;</span>{% else %}{{ discount_code | escape }}{% endif %}</p>
+        <p class="discount-reveal__note" data-discount-note hidden></p>
+        <div class="discount-reveal__actions"{% if personal %} hidden{% endif %}>
           <button type="button" class="btn btn--outline btn--sm" data-copy-code="{{ discount_code | escape }}">Copy code</button>
-          <a href="{{ routes.root_url }}discount/{{ discount_code | url_encode }}?redirect={{ routes.all_products_collection_url }}" class="btn btn--primary btn--sm">Apply to my cart</a>
+          <a href="{{ routes.root_url }}discount/{{ discount_code | url_encode }}?redirect={{ routes.all_products_collection_url }}" data-apply-code data-href-base="{{ routes.root_url }}discount/__CODE__?redirect={{ routes.all_products_collection_url }}" class="btn btn--primary btn--sm">Apply to my cart</a>
         </div>
       </div>
     {%- endif -%}
