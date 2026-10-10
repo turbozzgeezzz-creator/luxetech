@@ -7,7 +7,7 @@ import {
   verifyOrder, createPersonalCode, productByHandle, recommendations, collectionProducts, latestArticles,
 } from './shopify.js';
 import {
-  enqueue, layout, heading, para, button, codeBox, productGrid, articleList, sendViaResend,
+  enqueue, layout, heading, para, button, offerCard, tierCard, tierNudge, productGrid, articleList, sendViaResend,
   unsubscribeUrl, sentTodayCount,
 } from './email.js';
 
@@ -188,7 +188,7 @@ export async function scanAbandonment(env) {
     if (await orderedSince(env, ck.email, ck.started_at - HOUR)) continue;
     const items = JSON.parse(ck.items || '[]');
     if (!items.length) continue;
-    const data = { token: ck.token, items, firstName: ck.first_name };
+    const data = { token: ck.token, items, firstName: ck.first_name, subtotal: ck.total };
     if (t - ck.updated_at < 2 * DAY) {
       await enqueue(env, { email: ck.email, flow: 'checkout1', dedupe: `checkout1:${ck.token}`, priority: 1, data });
     } else {
@@ -345,7 +345,8 @@ export const builders = {
       preheader: 'Your code is inside, plus a few of our most-loved picks.',
       banner: 'banner-welcome.jpg', bannerAlt: 'Welcome, here is 10% off your first order',
       body: heading('Welcome to the crew!') + para(`${hi(d.firstName)} thanks for joining. We hand-pick everyday tech, home and lifestyle gear, and every order is dispatched within 3-4 business days with tracking.`)
-        + para('Here\'s 10% off your first order:') + codeBox('WELCOME10', 'One use per customer, on your first order')
+        + offerCard(env, { theme: 'welcome', big: '10%', unit: 'off', title: 'Your welcome gift: 10% off your first order', code: 'WELCOME10',
+          fine: 'First order only, one use per customer. Can\'t be combined with other discounts. The button applies it for you.' })
         + button('Start shopping', `${env.STORE_URL}/discount/WELCOME10?redirect=/collections/all`)
         + productGrid(picks, { heading: 'Most loved right now' }),
     };
@@ -358,7 +359,8 @@ export const builders = {
       preheader: 'WELCOME10 still works on your first order.',
       banner: 'banner-picks-everyone.jpg', bannerAlt: 'Fresh picks for you',
       body: heading('Your 10% is still here') + para(`${hi(d.firstName)} in case you missed it, your welcome code is ready whenever you are.`)
-        + codeBox('WELCOME10', '10% off your first order')
+        + offerCard(env, { theme: 'reminder', big: '10%', unit: 'still yours', title: 'Your welcome code hasn\'t been used yet', code: 'WELCOME10',
+          fine: 'First order only, one use per customer. Can\'t be combined with other discounts.' })
         + productGrid(picks, { heading: 'Just landed' })
         + button('Use my 10%', `${env.STORE_URL}/discount/WELCOME10?redirect=/collections/all`),
     };
@@ -373,7 +375,9 @@ export const builders = {
       preheader: 'Your items are still available.',
       banner: 'banner-checkout.jpg', bannerAlt: 'Your checkout is waiting',
       body: heading('Ready when you are') + para(`${hi(d.firstName)} you started a checkout but didn't quite finish. Your items are below, and the button puts them straight back in your cart.`)
-        + productGrid(products, { heading: 'Still in your checkout' }) + button('Complete my order', cartLink(env, d.items)),
+        + productGrid(products, { heading: 'Still in your checkout' })
+        + tierNudge(env, d.subtotal != null ? Math.round(parseFloat(d.subtotal) * 100) : null)
+        + button('Complete my order', cartLink(env, d.items)),
     };
   },
   async checkout2(env, email, d) {
@@ -387,7 +391,8 @@ export const builders = {
       preheader: `Your items are still available, and ${code} takes 5% off.`,
       banner: 'banner-reminder.jpg', bannerAlt: 'Here is 5% off to finish up',
       body: heading('A little nudge, with 5% off') + para(`${hi(d.firstName)} your items are still available. Here's 5% off to help you decide.`)
-        + codeBox(code, `5% off, single use, valid until ${fmtDate(endsAt)}. Already applied when you use the button.`)
+        + offerCard(env, { theme: 'personal', big: '5%', unit: 'off', title: 'A code just for you, to finish your order', code,
+          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
         + button('Complete my order', cartLink(env, d.items, code)) + productGrid(products, { heading: 'Still in your checkout' }),
     };
   },
@@ -411,7 +416,9 @@ export const builders = {
       preheader: `${code} takes 5% off your cart.`,
       banner: 'banner-reminder.jpg', bannerAlt: 'Here is 5% off to finish up',
       body: heading('Here\'s 5% off your cart') + para('Still thinking it over? Here\'s a little something to help.')
-        + codeBox(code, `5% off, single use, valid until ${fmtDate(endsAt)}`) + productGrid(products)
+        + offerCard(env, { theme: 'personal', big: '5%', unit: 'off', title: 'A code just for you, for what\'s in your cart', code,
+          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
+        + productGrid(products)
         + button('Use my 5%', `${env.STORE_URL}/discount/${code}?redirect=/cart`),
     };
   },
@@ -456,8 +463,10 @@ export const builders = {
       subject: 'You\'re a VIP. Here\'s 10% off every order',
       preheader: 'Thanks for being one of our best customers.',
       banner: 'banner-vip.jpg', bannerAlt: 'You are a VIP, 10% off every order',
-      body: heading('Welcome to VIP') + para(`${hi(d.firstName)} you've spent over $250 with us, thank you! As a VIP, this code takes 10% off every order, any time.`)
-        + codeBox('VIP10', '10% off every order for VIP customers') + productGrid(picks, { heading: 'New this fortnight' })
+      body: heading('Welcome to VIP') + para(`${hi(d.firstName)} you've spent $250 or more with us. Thank you! As a VIP, this code takes 10% off every order, any time.`)
+        + offerCard(env, { theme: 'vip', big: '10%', unit: 'every order', title: 'VIP pricing, on every order, any time', code: 'VIP10',
+          fine: 'For customers who\'ve spent $250+ with us. Use it as often as you like. Can\'t be combined with other discounts.' })
+        + productGrid(picks, { heading: 'New this fortnight' })
         + button('Shop with VIP10', `${env.STORE_URL}/discount/VIP10?redirect=/collections/all`),
     };
   },
@@ -469,13 +478,15 @@ export const builders = {
       preheader: 'See what\'s new since your last visit.',
       banner: 'banner-winback.jpg', bannerAlt: 'We miss you',
       body: heading('It\'s been a while!') + para(`${hi(d.firstName)} here's what's new since your last visit, plus 15% off your next order.`)
-        + codeBox(code, `15% off, single use, valid until ${fmtDate(endsAt)}`) + productGrid(picks, { heading: 'New since your last visit' })
+        + offerCard(env, { theme: 'winback', big: '15%', unit: 'off', title: 'Welcome back: 15% off your next order', code,
+          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
+        + productGrid(picks, { heading: 'New since your last visit' })
         + button('Use my 15%', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`),
     };
   },
   async fortnight(env, email, d) {
-    const intro = `${hi(d.firstName)} here's what's worth a look this fortnight. Every order is dispatched in 3-4 business days with tracking.`;
-    const tiers = para(`<strong>Spend ${money(10000)} and save 5%, or ${money(15000)} and save 10%.</strong> Applied at checkout, no code needed.`);
+    const intro = `${hi(d.firstName)} here's what's worth a look this fortnight, picked by our team.`;
+    const tiers = tierCard(env);
     if (d.theme === 'new') {
       const p = await collectionProducts(env, 'new-arrivals', 4);
       return { subject: 'Just landed: new this fortnight', preheader: 'Fresh arrivals, picked by our team.', banner: 'banner-new-arrivals.jpg', bannerAlt: 'New arrivals this fortnight',

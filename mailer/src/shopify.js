@@ -92,13 +92,15 @@ const PRODUCT_FIELDS = `legacyResourceId handle title status onlineStoreUrl
 
 export function normaliseProduct(env, p) {
   if (!p || !p.handle) return null;
-  const image = p.featuredMedia && p.featuredMedia.preview && p.featuredMedia.preview.image ? p.featuredMedia.preview.image.url : null;
+  let image = p.featuredMedia && p.featuredMedia.preview && p.featuredMedia.preview.image ? p.featuredMedia.preview.image.url : null;
+  // Serve product photos from the store's own domain (same Shopify CDN), cropped square for even cards.
+  if (image) image = image.replace(/^https:\/\/cdn\.shopify\.com\/s\/files\/\d+\/\d+\/\d+\/\d+\//, `${env.STORE_URL}/cdn/shop/`);
   return {
     id: p.legacyResourceId,
     handle: p.handle,
     title: p.title,
     url: `${env.STORE_URL}/products/${p.handle}`,
-    image: image ? `${image}${image.includes('?') ? '&' : '?'}width=600` : null,
+    image: image ? `${image}${image.includes('?') ? '&' : '?'}width=560&height=560&crop=center` : null,
     price: p.priceRangeV2 ? Math.round(parseFloat(p.priceRangeV2.minVariantPrice.amount) * 100) : null,
     // On sale only if active, published to the online store, and at least one variant can be bought.
     available: p.status === 'ACTIVE' && !!p.onlineStoreUrl && (p.variants ? p.variants.nodes.some((v) => v.availableForSale) : true),

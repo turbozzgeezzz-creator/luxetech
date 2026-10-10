@@ -18,7 +18,7 @@ function send(type, checkout) {
     token: checkout.token,
     e: checkout.email || null,
     fn: addr.firstName || null,
-    total: checkout.totalPrice ? String(checkout.totalPrice.amount) : null,
+    total: checkout.subtotalPrice ? String(checkout.subtotalPrice.amount) : null,
     order: checkout.order ? String(checkout.order.id) : null,
     items: (checkout.lineItems || []).map((l) => ({
       variantId: l.variant ? String(l.variant.id) : null,
