@@ -4,7 +4,7 @@ LuxeMail (marketing emails from noreply@tech.luxedealers.com, replies go to supp
 Shopify, Cloudflare and Judge.me admins, which only you can reach. About 30 minutes in total.
 
 Logo for Shopify and Judge.me (dark text, for white email headers):
-https://luxemail-tech.turbozzgeezzz.workers.dev/brand/logo-dark.png
+https://luxemail-tech.turbozzgeezzz.workers.dev/brand/logo-dark-large.png (653 px wide; Judge.me needs 512+)
 
 ## 1. Test the LuxeMail pixel (already added, 2 minutes)
 
