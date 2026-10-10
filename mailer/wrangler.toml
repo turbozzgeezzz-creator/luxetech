@@ -1,5 +1,5 @@
 # LuxeMail: Tech.LuxeDealers' own email automation (Cloudflare Worker + D1 + Resend).
-name = "luxemail"
+name = "luxemail-tech"
 main = "src/index.js"
 compatibility_date = "2025-09-01"
 
@@ -8,7 +8,7 @@ directory = "./public"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "luxemail"
+database_name = "luxemail-tech"
 database_id = "REPLACE_WITH_D1_ID"
 
 [triggers]
@@ -18,10 +18,10 @@ crons = ["*/30 * * * *"]
 [vars]
 SHOP_DOMAIN = "vyc3tw-gf.myshopify.com"
 STORE_URL = "https://tech.luxedealers.com"
-# Set after the first deploy to the Worker's address, e.g. https://luxemail.<account>.workers.dev
-PUBLIC_URL = "https://luxemail.example.workers.dev"
+# Set after the first deploy to the Worker's address, e.g. https://luxemail-tech.<account>.workers.dev
+PUBLIC_URL = "https://luxemail-tech.example.workers.dev"
 BRAND = "Tech.LuxeDealers"
-FROM_EMAIL = "Tech.LuxeDealers <hello@send.luxedealers.com>"
+FROM_EMAIL = "Tech.LuxeDealers <hello@send.tech.luxedealers.com>"
 REPLY_TO = "support@luxedealers.com"
 ADMIN_EMAIL = "support@luxedealers.com"
 TIMEZONE_OFFSET_HOURS = "10"

@@ -17,7 +17,7 @@ done
 export CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID
 
 WRANGLER="npx --yes wrangler@4.135.0"
-SEND_DOMAIN="send.luxedealers.com"
+SEND_DOMAIN="send.tech.luxedealers.com"
 
 # Unsubscribe-link secret, derived from the Shopify client secret so every deploy gets the same value
 # (changing it would break links in emails already sent).
@@ -29,19 +29,19 @@ DOMAIN_STATUS="$(node lib/resend-domain.mjs "$SEND_DOMAIN")"
 echo "   $SEND_DOMAIN: $DOMAIN_STATUS"
 
 echo "== 2. D1 database"
-DB_ID="$($WRANGLER d1 list --json 2>/dev/null | node -e 'const l=JSON.parse(require("fs").readFileSync(0));const d=l.find(x=>x.name==="luxemail");process.stdout.write(d?d.uuid:"")')"
+DB_ID="$($WRANGLER d1 list --json 2>/dev/null | node -e 'const l=JSON.parse(require("fs").readFileSync(0));const d=l.find(x=>x.name==="luxemail-tech");process.stdout.write(d?d.uuid:"")')"
 if [ -z "$DB_ID" ]; then
-  $WRANGLER d1 create luxemail >/dev/null
-  DB_ID="$($WRANGLER d1 list --json 2>/dev/null | node -e 'const l=JSON.parse(require("fs").readFileSync(0));const d=l.find(x=>x.name==="luxemail");process.stdout.write(d?d.uuid:"")')"
+  $WRANGLER d1 create luxemail-tech >/dev/null
+  DB_ID="$($WRANGLER d1 list --json 2>/dev/null | node -e 'const l=JSON.parse(require("fs").readFileSync(0));const d=l.find(x=>x.name==="luxemail-tech");process.stdout.write(d?d.uuid:"")')"
 fi
 [ -n "$DB_ID" ] || { echo "Could not create the D1 database" >&2; exit 1; }
 sed -i "s/^database_id = \".*\"/database_id = \"$DB_ID\"/" wrangler.toml
-$WRANGLER d1 execute luxemail --remote --file schema.sql --yes >/dev/null
+$WRANGLER d1 execute luxemail-tech --remote --file schema.sql --yes >/dev/null
 echo "   database ready"
 
 echo "== 3. Deploy"
 DEPLOY_OUT="$($WRANGLER deploy 2>&1)" || { echo "$DEPLOY_OUT" >&2; exit 1; }
-WORKER_URL="$(printf '%s' "$DEPLOY_OUT" | grep -oE 'https://luxemail\.[a-z0-9-]+\.workers\.dev' | head -1)"
+WORKER_URL="$(printf '%s' "$DEPLOY_OUT" | grep -oE 'https://luxemail-tech\.[a-z0-9-]+\.workers\.dev' | head -1)"
 [ -n "$WORKER_URL" ] || { echo "$DEPLOY_OUT" >&2; echo "No workers.dev address found. Open Workers & Pages in Cloudflare once to choose a subdomain, then rerun." >&2; exit 1; }
 if ! grep -q "PUBLIC_URL = \"$WORKER_URL\"" wrangler.toml; then
   sed -i "s#^PUBLIC_URL = \".*\"#PUBLIC_URL = \"$WORKER_URL\"#" wrangler.toml

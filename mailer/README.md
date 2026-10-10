@@ -1,4 +1,4 @@
-# LuxeMail
+# LuxeMail (tech store): Tech.LuxeDealers' own email automation (Cloudflare Worker + D1 + Resend).
 
 Tech.LuxeDealers' own email automation: a Cloudflare Worker (free tier) with a D1 database, sending through Resend.
 Shopify ignores this folder; it isn't part of the theme.

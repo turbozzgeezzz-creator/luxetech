@@ -602,7 +602,7 @@
         "type": "text",
         "id": "luxemail_endpoint",
         "label": "LuxeMail tracking URL",
-        "info": "For example https://luxemail.your-account.workers.dev/t"
+        "info": "For example https://luxemail-tech.your-account.workers.dev/t"
       }
     ]
   }
