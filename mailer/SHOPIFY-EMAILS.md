@@ -1,4 +1,17 @@
-# Shopify and Judge.me emails: setup steps
+# Your setup checklist (Shopify, Judge.me, LuxeMail)
+
+LuxeMail itself is live and tested. These are the steps only you can do in the Shopify, Cloudflare and Judge.me admins.
+
+## 0. LuxeMail custom pixel (5 minutes, do this first)
+
+1. Shopify admin → **Settings → Customer events → Add custom pixel**. Name: `LuxeMail` → **Add pixel**.
+2. **Customer privacy**: Permission **Not required**; Data sale **Data collected does not qualify as data sale**.
+3. Delete the sample code and paste the whole of `mailer/pixel.js` from GitHub main.
+4. **Save**, then **Connect**.
+
+Then switch off the old automations so nobody gets two of the same email:
+- **Apps → Shopify Flow**: turn off "Recover abandoned checkout".
+- **Marketing → Automations**: turn off welcome, abandoned checkout, abandoned cart and browse automations.
 
 LuxeMail (this folder) sends the marketing emails from **hello@send.tech.luxedealers.com**.
 Shopify sends the order, shipping and delivery emails, and Judge.me sends review requests. Their settings
