@@ -100,10 +100,12 @@ ${p.image ? `<img src="${esc(p.image)}" width="254" alt="${esc(shortTitle(p.titl
 ${p.price != null ? `<span style="display:block;margin-top:6px;font-size:18px;font-weight:900;font-style:italic;color:${INK};">${money(p.price)}</span>` : ''}
 <a href="${esc(p.url)}" style="display:inline-block;margin-top:10px;padding:9px 16px;border-radius:999px;background:${VIOLET};color:#FFFFFF;font-size:13px;font-weight:800;text-decoration:none;">Shop now</a>
 </td></tr></table></td>` : '<td class="pcell" width="50%"></td>';
-    rows += `<tr>${cell(items[i])}${cell(items[i + 1])}</tr>`;
+    rows += items.length === 1 ? `<tr>${cell(items[0])}</tr>` : `<tr>${cell(items[i])}${cell(items[i + 1])}</tr>`;
   }
   return `${title ? `<p style="margin:26px 0 6px;font-size:19px;font-weight:900;font-style:italic;color:${INK};">${esc(title)}</p>` : ''}
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="grid">${rows}</table>`;
+${items.length === 1
+    ? `<table role="presentation" align="center" width="300" cellpadding="0" cellspacing="0" class="grid" style="width:300px;max-width:100%;margin:0 auto;">${rows}</table>`
+    : `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="grid">${rows}</table>`}`;
 }
 
 export function articleList(articles) {
@@ -132,7 +134,7 @@ function trustRow(env) {
 /** Full email: header, banner, body, store promises, footer with social icons and unsubscribe. */
 export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reason, plain }) {
   const bannerImg = banner
-    ? `<tr><td style="padding:0;background:${VIOLET};"><img src="${env.PUBLIC_URL}/banners/${banner}" width="600" height="300" alt="${esc(bannerAlt || '')}" style="display:block;width:100%;max-width:600px;height:auto;border:0;background:${VIOLET};color:#FFFFFF;font-size:22px;font-weight:800;line-height:1.3;text-align:center;"></td></tr>`
+    ? `<tr><td style="padding:0;background:#1E0A57;"><img src="${env.PUBLIC_URL}/banners/${banner}" width="600" height="190" alt="${esc(bannerAlt || '')}" style="display:block;width:100%;max-width:600px;height:auto;border:0;background:#1E0A57;color:#FFFFFF;font-size:22px;font-weight:800;line-height:1.3;text-align:center;"></td></tr>`
     : '';
   const social = (icon, href, label) => `<a href="${href}" style="display:inline-block;margin:0 5px;text-decoration:none;"><img src="${env.PUBLIC_URL}/icons/social-${icon}.png" width="36" height="36" alt="${label}" style="display:block;border:0;color:#FFFFFF;font-size:12px;"></a>`;
   return `<!DOCTYPE html><html lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="x-apple-disable-message-reformatting">
@@ -144,15 +146,16 @@ export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reas
 .px{padding-left:20px!important;padding-right:20px!important}.h1{font-size:28px!important}
 .stack{display:block!important;width:100%!important;box-sizing:border-box}
 .offer-big{padding:24px 20px 4px!important}.offer-copy{padding:8px 22px 24px!important;text-align:center!important}.offer-copy table{margin-left:auto!important;margin-right:auto!important}
-.pcell{padding:5px!important}.pbody{padding:12px 10px 14px!important}.ptitle{font-size:13px!important}
+.nav{letter-spacing:1px!important;font-size:11px!important}.pcell{padding:5px!important}.pbody{padding:12px 10px 14px!important}.ptitle{font-size:13px!important}
 }</style></head>
 <body style="margin:0;padding:0;background:#ECEEF3;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:${INK};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${esc(preheader || '')}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ECEEF3;"><tr><td class="outer" align="center" style="padding:24px 12px;">
 <table role="presentation" class="wrap card" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;border-radius:22px;overflow:hidden;background:#FFFFFF;">
-<tr><td class="px" style="background:${INK};padding:20px 32px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-<td valign="middle"><a href="${env.STORE_URL}" style="text-decoration:none;font-size:22px;font-weight:900;font-style:italic;letter-spacing:-0.3px;color:#FFFFFF;">TECH<span style="color:#9B4DFF;">.</span>LUXEDEALERS</a></td>
-<td align="right" valign="middle"><a href="${env.STORE_URL}/collections/all" style="font-size:13px;font-weight:800;color:#C9A5FF;text-decoration:none;">Shop &rarr;</a></td></tr></table></td></tr>
+<tr><td class="px" align="center" style="background:${INK};padding:26px 32px 18px;text-align:center;">
+<a href="${env.STORE_URL}" style="text-decoration:none;"><img src="${env.PUBLIC_URL}/brand/logo-light.png" width="176" height="48" alt="${esc(env.BRAND)}" style="display:block;margin:0 auto;border:0;color:#FFFFFF;font-size:22px;font-weight:900;font-style:italic;"></a>
+<p class="nav" style="margin:16px 0 0;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">
+<a href="${env.STORE_URL}/collections/new-arrivals" style="color:#C9C3E6;text-decoration:none;">New in</a><span style="color:#4B4566;">&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span><a href="${env.STORE_URL}/collections/best-sellers" style="color:#C9C3E6;text-decoration:none;">Best sellers</a><span style="color:#4B4566;">&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span><a href="${env.STORE_URL}/collections/all" style="color:#C9C3E6;text-decoration:none;">Shop all</a></p></td></tr>
 ${bannerImg}
 <tr><td class="px" style="background:#FFFFFF;padding:32px 32px 30px;">${body}</td></tr>
 ${plain ? '' : `<tr><td class="px" style="background:#F6F3FD;padding:22px 26px;">${trustRow(env)}</td></tr>`}
