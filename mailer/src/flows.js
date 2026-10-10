@@ -11,7 +11,7 @@ import {
   unsubscribeUrl, sentTodayCount,
 } from './email.js';
 
-export const CONSENT_TEXT = 'Email me deals and new arrivals';
+export const CONSENT_TEXT = 'Signed up to the email list (form says: By signing up you agree to get our emails)';
 const str = (v, n) => (v == null || v === '' ? null : String(v).slice(0, n));
 
 /* ======================= Mailing list ======================= */

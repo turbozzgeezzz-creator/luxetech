@@ -490,8 +490,8 @@
   /* ------------------------------------------------------------------ */
   /* LuxeMail tracking (only when Theme settings > Email tracking is set) */
   /* Records views, cart adds and wishlist saves so emails can recommend  */
-  /* the right products. Emails only go to people who ticked the consent  */
-  /* box (or accept marketing on their account) and confirmed by email.   */
+  /* the right products. Emails only go to people who signed up to the    */
+  /* email list (or accept marketing on their account).                   */
   /* ------------------------------------------------------------------ */
   function mailClientId() {
     var id = read('luxetech:cid');
@@ -518,14 +518,13 @@
     try { if (sessionStorage.getItem('luxetech:identified')) return; sessionStorage.setItem('luxetech:identified', '1'); } catch (e) {}
     mailTrack({ e: mail.email, fn: mail.firstName || null, c: 1, src: 'account', pg: location.pathname });
   })();
-  /* Newsletter sign-ups with the "Email me deals and new arrivals" box ticked. */
+  /* Newsletter sign-ups: submitting the form joins the email list. */
   document.addEventListener('submit', function (e) {
     var form = e.target;
     if (!form || !form.querySelector) return;
     var tags = form.querySelector('input[name="contact[tags]"]');
     var email = form.querySelector('input[name="contact[email]"]');
-    var consent = form.querySelector('[data-mail-consent]');
-    if (!tags || !email || !consent || !consent.checked || !/newsletter/.test(tags.value) || !email.value) return;
+    if (!tags || !email || !/newsletter/.test(tags.value) || !email.value) return;
     var src = (tags.value.split(',')[1] || 'newsletter').trim();
     mailTrack({ e: email.value, c: 1, src: src, pg: location.pathname });
   }, true);
