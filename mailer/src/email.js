@@ -139,6 +139,11 @@ export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reas
   const bannerImg = banner
     ? `<tr><td style="padding:0;background:#1E0A57;"><img src="${env.PUBLIC_URL}/banners/${banner}" width="600" height="260" alt="${esc(bannerAlt || '')}" style="display:block;width:100%;max-width:600px;height:auto;border:0;background:#1E0A57;color:#FFFFFF;font-size:22px;font-weight:800;line-height:1.3;text-align:center;"></td></tr>`
     : '';
+  // Footer text is drawn as images (tools/footer.mjs): dark-mode recolouring can't touch them. Alt text is the same words.
+  const part = (name, w, h, alt, href) => {
+    const img = `<img src="${env.PUBLIC_URL}/footer/${name}.png" width="${w}" height="${h}" alt="${esc(alt)}" style="display:inline-block;vertical-align:middle;border:0;max-width:100%;height:auto;color:#C3C8D4;font-size:12px;line-height:18px;font-family:Arial,sans-serif;">`;
+    return href ? `<a href="${esc(href)}" style="display:inline-block;text-decoration:none;color:#C3C8D4;">${img}</a>` : img;
+  };
   const social = (icon, href, label) => `<a href="${href}" style="display:inline-block;margin:0 5px;text-decoration:none;"><img src="${env.PUBLIC_URL}/icons/social-${icon}.png" width="36" height="36" alt="${label}" style="display:block;border:0;color:${VIOLET};font-size:12px;"></a>`;
   return `<!DOCTYPE html><html lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="x-apple-disable-message-reformatting">
 <meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light">
@@ -159,11 +164,12 @@ export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reas
 ${bannerImg}
 <tr><td class="px" style="background:#FFFFFF;padding:32px 32px 30px;">${body}</td></tr>
 ${plain ? '' : `<tr><td class="px" style="background:#F6F3FD;padding:22px 26px;">${trustRow(env)}</td></tr>`}
-<tr><td class="px" align="center" style="background:#FFFFFF;border-top:1px solid #ECE8F7;padding:28px 32px 30px;color:${MUTED};font-size:13px;line-height:1.6;text-align:center;">
-<p style="margin:0 0 16px;">${social('instagram', 'https://www.instagram.com/tech.luxedealers/', 'Instagram')}${social('facebook', 'https://www.facebook.com/profile.php?id=61595062625090', 'Facebook')}${social('bag', env.STORE_URL, 'Shop')}</p>
-<p style="margin:0 0 14px;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;"><a href="${env.STORE_URL}/collections/new-arrivals" style="color:${INK};text-decoration:none;">New in</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${env.STORE_URL}/collections/best-sellers" style="color:${INK};text-decoration:none;">Best sellers</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${env.STORE_URL}/collections/all" style="color:${INK};text-decoration:none;">Shop all</a></p>
-<p style="margin:0 0 10px;color:${MUTED};">Questions? Just reply, or email <a href="mailto:${env.REPLY_TO}" style="color:${VIOLET};">${env.REPLY_TO}</a>.</p>
-<p style="margin:0;font-size:12px;color:#8A90A0;">${esc(reason || "You're getting this because you signed up for our emails.")} <a href="${esc(unsubUrl)}" style="color:#8A90A0;text-decoration:underline;">Unsubscribe</a></p>
+<tr><td class="px" align="center" bgcolor="${INK}" style="background-color:${INK};background-image:linear-gradient(${INK},${INK});padding:30px 24px 32px;text-align:center;font-size:0;line-height:0;">
+<p style="margin:0 0 18px;">${social('instagram', 'https://www.instagram.com/tech.luxedealers/', 'Instagram')}${social('facebook', 'https://www.facebook.com/profile.php?id=61595062625090', 'Facebook')}${social('bag', env.STORE_URL, 'Shop')}</p>
+<p style="margin:0 0 14px;">${part('nav-new', 67, 22, 'New in', `${env.STORE_URL}/collections/new-arrivals`)}${part('nav-dot', 16, 22, '·')}${part('nav-best', 124, 22, 'Best sellers', `${env.STORE_URL}/collections/best-sellers`)}${part('nav-dot', 16, 22, '·')}${part('nav-all', 86, 22, 'Shop all', `${env.STORE_URL}/collections/all`)}</p>
+<p style="margin:0 0 12px;">${part('contact', 202, 50, `Questions? Just reply, or email ${env.REPLY_TO}`, `mailto:${env.REPLY_TO}`)}</p>
+<p style="margin:0;">${reason ? `<span style="display:block;margin:0 0 6px;font-size:12px;line-height:18px;color:#8A90A0;">${esc(reason)}</span>` : part('reason', 177, 44, "You're getting this because you signed up for our emails.")}</p>
+<p style="margin:2px 0 0;">${part('unsubscribe', 80, 26, 'Unsubscribe', unsubUrl)}</p>
 </td></tr></table></td></tr></table></body></html>`;
 }
 
