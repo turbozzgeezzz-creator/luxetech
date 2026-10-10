@@ -18,7 +18,7 @@ done
 export CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID
 
 WRANGLER="npx --yes wrangler@4.135.0"
-SEND_DOMAIN="send.tech.luxedealers.com"
+SEND_DOMAIN="tech.luxedealers.com"
 
 # Unsubscribe-link secret, derived from the Shopify client secret so every deploy gets the same value
 # (changing it would break links in emails already sent).

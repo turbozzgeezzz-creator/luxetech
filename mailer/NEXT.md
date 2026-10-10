@@ -8,7 +8,7 @@ api.cloudflare.com, api.resend.com, tech.luxedealers.com, *.workers.dev. Never p
 
 ## Facts
 - Cloudflare workers.dev subdomain: turbozzgeezzz (Worker will be luxemail-tech.turbozzgeezzz.workers.dev).
-- Resend: separate free account; sending domain send.tech.luxedealers.com (DNS in the tech.luxedealers.com
+- Resend: separate free account; sending domain tech.luxedealers.com (from noreply@tech.luxedealers.com; DNS in the tech.luxedealers.com
   Cloudflare zone). May still be verifying; deploy.sh skips test sends until verified.
 - Store is on Shopify Basic. Shopify Flow "Send HTTP request" is NOT available (Grow+ only).
 - Protected customer data access is NOT available for this Dev Dashboard app: the Admin API returns

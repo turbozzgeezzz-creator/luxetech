@@ -1,6 +1,6 @@
 # Your setup checklist
 
-LuxeMail (marketing emails from hello@send.tech.luxedealers.com) is live and tested. These steps are in the
+LuxeMail (marketing emails from noreply@tech.luxedealers.com, replies go to support@luxedealers.com) is live and tested. These steps are in the
 Shopify, Cloudflare and Judge.me admins, which only you can reach. About 30 minutes in total.
 
 Logo for Shopify and Judge.me (dark text, for white email headers):
