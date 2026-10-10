@@ -134,7 +134,7 @@ function trustRow(env) {
 /** Full email: header, banner, body, store promises, footer with social icons and unsubscribe. */
 export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reason, plain }) {
   const bannerImg = banner
-    ? `<tr><td style="padding:0;background:#1E0A57;"><img src="${env.PUBLIC_URL}/banners/${banner}" width="600" height="190" alt="${esc(bannerAlt || '')}" style="display:block;width:100%;max-width:600px;height:auto;border:0;background:#1E0A57;color:#FFFFFF;font-size:22px;font-weight:800;line-height:1.3;text-align:center;"></td></tr>`
+    ? `<tr><td style="padding:0;background:#1E0A57;"><img src="${env.PUBLIC_URL}/banners/${banner}" width="600" height="260" alt="${esc(bannerAlt || '')}" style="display:block;width:100%;max-width:600px;height:auto;border:0;background:#1E0A57;color:#FFFFFF;font-size:22px;font-weight:800;line-height:1.3;text-align:center;"></td></tr>`
     : '';
   const social = (icon, href, label) => `<a href="${href}" style="display:inline-block;margin:0 5px;text-decoration:none;"><img src="${env.PUBLIC_URL}/icons/social-${icon}.png" width="36" height="36" alt="${label}" style="display:block;border:0;color:#FFFFFF;font-size:12px;"></a>`;
   return `<!DOCTYPE html><html lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="x-apple-disable-message-reformatting">
