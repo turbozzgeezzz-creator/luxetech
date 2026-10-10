@@ -81,31 +81,31 @@
         "c3": {
           "type": "carrier",
           "settings": {
-            "name": "Aramex",
-            "url": "https://www.aramex.com.au/tools/track?l={number}"
+            "name": "FedEx",
+            "url": "https://www.fedex.com/fedextrack/?trknbr={number}"
           }
         },
         "c4": {
           "type": "carrier",
           "settings": {
-            "name": "CouriersPlease",
-            "url": "https://www.couriersplease.com.au/tools-track/no/{number}"
+            "name": "UPS",
+            "url": "https://www.ups.com/track?tracknum={number}"
           }
         },
         "c5": {
           "type": "carrier",
           "settings": {
             "name": "DHL",
-            "url": "https://www.dhl.com/au-en/home/tracking/tracking-express.html?submit=1&tracking-id={number}"
+            "url": "https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id={number}"
           }
         }
       },
       "block_order": [
         "c1",
-        "c2",
+        "c5",
         "c3",
         "c4",
-        "c5"
+        "c2"
       ]
     }
   },

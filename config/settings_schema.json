@@ -541,7 +541,7 @@
         "type": "text",
         "id": "seo_home_title",
         "label": "Homepage title",
-        "default": "Tech.LuxeDealers | Everyday Tech, Home & Lifestyle Gear in Australia"
+        "default": "Tech.LuxeDealers | Everyday Tech, Home & Lifestyle Gear"
       },
       {
         "type": "textarea",
