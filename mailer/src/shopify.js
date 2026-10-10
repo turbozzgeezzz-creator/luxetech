@@ -1,6 +1,5 @@
 // Shopify access for LuxeMail: client-credentials token, Admin GraphQL, order verification,
-// best-effort unsubscribe, one-off discount codes, and public storefront JSON
-// (products, recommendations, collections, blog feed).
+// best-effort unsubscribe, one-off discount codes, and product, collection and blog data.
 import { now, randomCode } from './util.js';
 
 export async function shopifyToken(env) {
@@ -84,57 +83,67 @@ export async function createPersonalCode(env, { prefix, percent, days, title }) 
   return { code, endsAt };
 }
 
-/* ---------- Public storefront data (no token needed) ---------- */
+/* ---------- Products, collections and blog posts (Admin API) ---------- */
+// The storefront's public JSON (/products/x.js etc.) refuses requests from Cloudflare Workers,
+// so product data comes from the Admin API, which this app can read (read_products, read_content).
 
-async function storefrontJson(env, path) {
-  const res = await fetch(env.STORE_URL + path, { headers: { Accept: 'application/json' }, cf: { cacheTtl: 900 } });
-  if (!res.ok) return null;
-  return res.json();
-}
+const PRODUCT_FIELDS = `legacyResourceId handle title status onlineStoreUrl
+  featuredMedia{ preview{ image{ url } } } priceRangeV2{ minVariantPrice{ amount } } variants(first: 20){ nodes{ availableForSale } }`;
 
 export function normaliseProduct(env, p) {
   if (!p || !p.handle) return null;
-  let image = p.featured_image || (p.images && p.images[0] && (p.images[0].src || p.images[0])) || null;
-  if (image && image.startsWith('//')) image = 'https:' + image;
-  const cents = typeof p.price === 'number' ? p.price
-    : p.variants && p.variants[0] ? Math.round(parseFloat(p.variants[0].price) * 100) : null;
+  const image = p.featuredMedia && p.featuredMedia.preview && p.featuredMedia.preview.image ? p.featuredMedia.preview.image.url : null;
   return {
-    id: p.id,
+    id: p.legacyResourceId,
     handle: p.handle,
     title: p.title,
     url: `${env.STORE_URL}/products/${p.handle}`,
-    image,
-    price: cents,
-    available: p.available !== false,
+    image: image ? `${image}${image.includes('?') ? '&' : '?'}width=600` : null,
+    price: p.priceRangeV2 ? Math.round(parseFloat(p.priceRangeV2.minVariantPrice.amount) * 100) : null,
+    // On sale only if active, published to the online store, and at least one variant can be bought.
+    available: p.status === 'ACTIVE' && !!p.onlineStoreUrl && (p.variants ? p.variants.nodes.some((v) => v.availableForSale) : true),
   };
 }
 
 export async function productByHandle(env, handle) {
-  return normaliseProduct(env, await storefrontJson(env, `/products/${encodeURIComponent(handle)}.js`));
+  const data = await gql(env, `query($h: String!){ productByIdentifier(identifier: { handle: $h }){ ${PRODUCT_FIELDS} } }`, { h: handle });
+  return normaliseProduct(env, data.productByIdentifier);
 }
 
+/** "You might also like": other products from the same collections (skipping the catch-all ones). */
 export async function recommendations(env, productId, limit = 4) {
-  const body = await storefrontJson(env, `/recommendations/products.json?product_id=${productId}&limit=${limit}`);
-  return body && body.products ? body.products.map((p) => normaliseProduct(env, p)).filter((p) => p && p.available) : [];
+  const data = await gql(env, `query($id: ID!, $n: Int!){ product(id: $id){ handle collections(first: 5){ nodes{ handle
+      products(first: $n, sortKey: COLLECTION_DEFAULT){ nodes{ ${PRODUCT_FIELDS} } } } } } }`,
+    { id: `gid://shopify/Product/${String(productId).replace(/\D/g, '')}`, n: limit + 4 });
+  if (!data.product) return [];
+  const generic = ['all', 'frontpage', 'best-sellers', 'new-arrivals'];
+  const cols = [...data.product.collections.nodes].sort((a, b) => generic.includes(a.handle) - generic.includes(b.handle));
+  const seen = new Set([data.product.handle]);
+  const out = [];
+  for (const c of cols) {
+    for (const node of c.products.nodes) {
+      const p = normaliseProduct(env, node);
+      if (p && p.available && !seen.has(p.handle)) { seen.add(p.handle); out.push(p); }
+    }
+  }
+  return out.slice(0, limit);
 }
 
 export async function collectionProducts(env, handle, limit = 6) {
-  const body = await storefrontJson(env, `/collections/${handle}/products.json?limit=${limit}`);
-  return body && body.products ? body.products.map((p) => normaliseProduct(env, p)).filter(Boolean) : [];
+  const data = await gql(env, `query($h: String!, $n: Int!){ collectionByIdentifier(identifier: { handle: $h }){
+      products(first: $n, sortKey: COLLECTION_DEFAULT){ nodes{ ${PRODUCT_FIELDS} } } } }`, { h: handle, n: limit + 4 });
+  if (!data.collectionByIdentifier) return [];
+  return data.collectionByIdentifier.products.nodes.map((n) => normaliseProduct(env, n)).filter((p) => p && p.available).slice(0, limit);
 }
 
 export async function latestArticles(env, limit = 3) {
-  const res = await fetch(`${env.STORE_URL}/blogs/news.atom`, { cf: { cacheTtl: 900 } });
-  if (!res.ok) return [];
-  const xml = await res.text();
-  const strip = (s) => s.replace(/<!\[CDATA\[|\]\]>/g, '').replace(/&lt;.*?&gt;/g, ' ').replace(/<[^>]+>/g, ' ')
-    .replace(/&amp;/g, '&').replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
-  return xml.split('<entry>').slice(1, limit + 1).map((entry) => {
-    const pick = (re) => { const m = entry.match(re); return m ? m[1] : ''; };
-    return {
-      title: strip(pick(/<title[^>]*>([\s\S]*?)<\/title>/)),
-      url: pick(/<link[^>]*href="([^"]+)"/),
-      summary: strip(pick(/<summary[^>]*>([\s\S]*?)<\/summary>/)).slice(0, 160),
-    };
-  }).filter((a) => a.title && a.url);
+  const data = await gql(env, `query($n: Int!){ articles(first: $n, sortKey: PUBLISHED_AT, reverse: true, query: "published_status:published"){
+      nodes{ title handle summary blog{ handle } } } }`, { n: limit });
+  const strip = (h) => String(h || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
+    .replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+  return data.articles.nodes.map((a) => ({
+    title: a.title,
+    url: `${env.STORE_URL}/blogs/${a.blog.handle}/${a.handle}`,
+    summary: strip(a.summary).slice(0, 160),
+  }));
 }

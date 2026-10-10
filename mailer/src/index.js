@@ -104,6 +104,7 @@ export default {
       }[flow];
       if (!sample) return new Response('Preview supports: confirm, welcome1, welcome2, checkout1, vip, browse, cart1, wishlist, fortnight', { status: 400 });
       const email = await builders[flow](env, 'preview@example.com', sample);
+      if (!email) return new Response(`Nothing to send for ${flow} with this sample (product unavailable?)`, { status: 422 });
       const unsubUrl = await unsubscribeUrl(env, 'preview@example.com');
       const html = layout(env, { ...email, unsubUrl });
       if (url.searchParams.get('send') === '1') {
