@@ -88,27 +88,27 @@ export function tierNudge(env, subtotalCents) {
 <td valign="middle" style="font-size:14px;line-height:1.5;color:#0B3B36;">${msg}</td></tr></table></td></tr></table>`;
 }
 
-/** Product cards, two per row. */
+/**
+ * Product cards, two per row. Each table cell is the card itself (border-spacing makes the gaps), so both
+ * cards in a row are always the same height, and titles get a fixed two-line box so prices line up.
+ */
 export function productGrid(products, { heading: title } = {}) {
   const items = products.filter(Boolean).slice(0, 6);
   if (!items.length) return '';
-  let rows = '';
-  for (let i = 0; i < items.length; i += 2) {
-    const cell = (p) => p ? `<td class="pcell" width="50%" valign="top" style="padding:7px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #E7E9ED;border-radius:18px;background:#FFFFFF;"><tr><td style="padding:0;">
+  const cell = (p) => p ? `<td class="pcard" width="50%" valign="top" style="width:50%;padding:0;border:1px solid #E7E9ED;border-radius:18px;background:#FFFFFF;overflow:hidden;">
 <a href="${esc(p.url)}" style="text-decoration:none;color:${INK};display:block;">
-${p.image ? `<img src="${esc(p.image)}" width="254" alt="${esc(shortTitle(p.title))}" style="display:block;width:100%;height:auto;border:0;border-radius:17px 17px 0 0;background:#F2F3F5;">` : ''}</a></td></tr>
-<tr><td class="pbody" style="padding:14px 14px 16px;">
-<a href="${esc(p.url)}" style="text-decoration:none;color:${INK};"><span class="ptitle" style="display:block;min-height:38px;font-size:14px;font-weight:700;line-height:1.35;">${esc(shortTitle(p.title))}</span></a>
-${p.price != null ? `<span style="display:block;margin-top:6px;font-size:18px;font-weight:900;font-style:italic;color:${INK};">${money(p.price)}</span>` : ''}
+${p.image ? `<img src="${esc(p.image)}" width="254" alt="${esc(shortTitle(p.title))}" style="display:block;width:100%;height:auto;border:0;border-radius:17px 17px 0 0;background:#F2F3F5;">` : ''}</a>
+<div class="pbody" style="padding:14px 14px 16px;">
+<a href="${esc(p.url)}" style="text-decoration:none;color:${INK};"><span class="ptitle" style="display:block;height:38px;overflow:hidden;font-size:14px;font-weight:700;line-height:19px;">${esc(shortTitle(p.title))}</span></a>
+<span style="display:block;margin-top:8px;font-size:18px;line-height:22px;font-weight:900;font-style:italic;color:${INK};">${p.price != null ? money(p.price) : '&nbsp;'}</span>
 <a href="${esc(p.url)}" style="display:inline-block;margin-top:10px;padding:9px 16px;border-radius:999px;background:${VIOLET};color:#FFFFFF;font-size:13px;font-weight:800;text-decoration:none;">Shop now</a>
-</td></tr></table></td>` : '<td class="pcell" width="50%"></td>';
-    rows += items.length === 1 ? `<tr>${cell(items[0])}</tr>` : `<tr>${cell(items[i])}${cell(items[i + 1])}</tr>`;
-  }
-  return `${title ? `<p style="margin:26px 0 6px;font-size:19px;font-weight:900;font-style:italic;color:${INK};">${esc(title)}</p>` : ''}
-${items.length === 1
-    ? `<table role="presentation" align="center" width="300" cellpadding="0" cellspacing="0" class="grid" style="width:300px;max-width:100%;margin:0 auto;">${rows}</table>`
-    : `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="grid">${rows}</table>`}`;
+</div></td>` : '<td class="pcard pcard--empty" width="50%" style="width:50%;padding:0;"></td>';
+  let rows = '';
+  if (items.length === 1) rows = `<tr>${cell(items[0])}</tr>`;
+  else for (let i = 0; i < items.length; i += 2) rows += `<tr>${cell(items[i])}${cell(items[i + 1])}</tr>`;
+  const one = items.length === 1;
+  return `${title ? `<p style="margin:26px 0 2px;font-size:19px;font-weight:900;font-style:italic;color:${INK};">${esc(title)}</p>` : ''}
+<table role="presentation" ${one ? 'align="center" width="300"' : 'width="100%"'} cellpadding="0" cellspacing="0" class="grid" style="${one ? 'width:300px;max-width:100%;margin:0 auto;' : 'width:100%;'}border-collapse:separate;border-spacing:0 12px;table-layout:fixed;">${rows.replace(/<\/td><td class="pcard/g, '</td><td class="gap" width="12" style="width:12px;padding:0;font-size:0;line-height:0;">&nbsp;</td><td class="pcard')}</table>`;
 }
 
 export function articleList(articles) {
@@ -121,7 +121,7 @@ ${a.summary ? `<span style="display:block;margin-top:6px;font-size:14px;line-hei
 
 function shortTitle(t) {
   const s = String(t || '').split(/[,|(]| – | - /)[0].trim();
-  return s.length > 52 ? s.slice(0, 49) + '…' : s;
+  return s.length > 46 ? s.slice(0, 43).trim() + '…' : s;
 }
 
 /** Store promises (no discounts here: each email has its own offer). Wraps to 2x2 on phones without media queries. */
@@ -149,23 +149,21 @@ export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reas
 .px{padding-left:20px!important;padding-right:20px!important}.h1{font-size:28px!important}
 .stack{display:block!important;width:100%!important;box-sizing:border-box}
 .offer-big{padding:24px 20px 4px!important}.offer-copy{padding:8px 22px 24px!important;text-align:center!important}.offer-copy table{margin-left:auto!important;margin-right:auto!important}
-.nav{letter-spacing:1px!important;font-size:11px!important}.pcell{padding:5px!important}.pbody{padding:12px 10px 14px!important}.ptitle{font-size:13px!important}
+.gap{width:8px!important}.pbody{padding:12px 10px 14px!important}.ptitle{font-size:13px!important;line-height:17px!important;height:34px!important}
 }</style></head>
 <body style="margin:0;padding:0;background:#ECEEF3;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:${INK};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${esc(preheader || '')}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ECEEF3;"><tr><td class="outer" align="center" style="padding:24px 12px;">
 <table role="presentation" class="wrap card" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;border-radius:22px;overflow:hidden;background:#FFFFFF;">
-<tr><td class="px" align="center" style="background:${INK};padding:26px 32px 18px;text-align:center;">
-<a href="${env.STORE_URL}" style="text-decoration:none;"><img src="${env.PUBLIC_URL}/brand/logo-light.png" width="176" height="48" alt="${esc(env.BRAND)}" style="display:block;margin:0 auto;border:0;color:#FFFFFF;font-size:22px;font-weight:900;font-style:italic;"></a>
-<p class="nav" style="margin:16px 0 0;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">
-<a href="${env.STORE_URL}/collections/new-arrivals" style="color:#C9C3E6;text-decoration:none;">New in</a><span style="color:#4B4566;">&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span><a href="${env.STORE_URL}/collections/best-sellers" style="color:#C9C3E6;text-decoration:none;">Best sellers</a><span style="color:#4B4566;">&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span><a href="${env.STORE_URL}/collections/all" style="color:#C9C3E6;text-decoration:none;">Shop all</a></p></td></tr>
+<tr><td style="padding:0;background:${INK};"><a href="${env.STORE_URL}" style="display:block;text-decoration:none;"><img src="${env.PUBLIC_URL}/brand/header.png" width="600" height="100" alt="${esc(env.BRAND)}" style="display:block;width:100%;max-width:600px;height:auto;border:0;background:${INK};color:#FFFFFF;font-size:22px;font-weight:900;font-style:italic;text-align:center;"></a></td></tr>
 ${bannerImg}
 <tr><td class="px" style="background:#FFFFFF;padding:32px 32px 30px;">${body}</td></tr>
 ${plain ? '' : `<tr><td class="px" style="background:#F6F3FD;padding:22px 26px;">${trustRow(env)}</td></tr>`}
 <tr><td class="px" align="center" style="background:${INK};padding:28px 32px;color:#A7AFBF;font-size:13px;line-height:1.6;text-align:center;">
 <p style="margin:0 0 14px;">${social('instagram', 'https://www.instagram.com/tech.luxedealers/', 'Instagram')}${social('facebook', 'https://www.facebook.com/profile.php?id=61595062625090', 'Facebook')}${social('bag', env.STORE_URL, 'Shop')}</p>
+<p style="margin:0 0 14px;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;"><a href="${env.STORE_URL}/collections/new-arrivals" style="color:#FFFFFF;text-decoration:none;">New in</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${env.STORE_URL}/collections/best-sellers" style="color:#FFFFFF;text-decoration:none;">Best sellers</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${env.STORE_URL}/collections/all" style="color:#FFFFFF;text-decoration:none;">Shop all</a></p>
 <p style="margin:0 0 10px;">Questions? Reply to this email or write to <a href="mailto:${env.REPLY_TO}" style="color:#C9A5FF;">${env.REPLY_TO}</a>.</p>
-<p style="margin:0;font-size:11.5px;color:#7A8294;">${esc(reason || `You're receiving this because you subscribed to emails from ${env.BRAND}.`)}<br>${env.BRAND}, Australia &middot;
+<p style="margin:0;font-size:11.5px;color:#7A8294;">${esc(reason || `You're receiving this because you subscribed to emails from ${env.BRAND}.`)}<br>${env.BRAND} &middot; <a href="${env.STORE_URL}" style="color:#A7AFBF;">${env.STORE_URL.replace(/^https?:\/\//, '')}</a> &middot;
 <a href="${esc(unsubUrl)}" style="color:#A7AFBF;">Unsubscribe</a></p>
 </td></tr></table></td></tr></table></body></html>`;
 }
