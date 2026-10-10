@@ -1,93 +1,78 @@
-# Your setup checklist (Shopify, Judge.me, LuxeMail)
+# Your setup checklist
 
-LuxeMail itself is live and tested. These are the steps only you can do in the Shopify, Cloudflare and Judge.me admins.
+LuxeMail (marketing emails from hello@send.tech.luxedealers.com) is live and tested. These steps are in the
+Shopify, Cloudflare and Judge.me admins, which only you can reach. About 30 minutes in total.
 
-## 0. LuxeMail custom pixel (5 minutes, do this first)
+Logo for Shopify and Judge.me (dark text, for white email headers):
+https://luxemail-tech.turbozzgeezzz.workers.dev/brand/logo-dark.png
 
-1. Shopify admin → **Settings → Customer events → Add custom pixel**. Name: `LuxeMail` → **Add pixel**.
-2. **Customer privacy**: Permission **Not required**; Data sale **Data collected does not qualify as data sale**.
-3. Delete the sample code and paste the whole of `mailer/pixel.js` from GitHub main.
-4. **Save**, then **Connect**.
+## 1. Test the LuxeMail pixel (already added, 2 minutes)
 
-Then switch off the old automations so nobody gets two of the same email:
+1. On your phone or computer, open tech.luxedealers.com, add any product to the cart and go to checkout.
+2. Enter an email address and continue to shipping. Don't pay.
+3. Tell Claude. The pixel's count shows at https://luxemail-tech.turbozzgeezzz.workers.dev/health
+   as `pixel_checkouts_today_utc`.
+
+Check the pasted pixel code contains `subtotalPrice`. If it says `totalPrice`, paste `mailer/pixel.js` again
+(Settings → Customer events → LuxeMail → replace the code → Save).
+
+## 2. Switch off the old marketing automations (LuxeMail sends these now)
+
 - **Apps → Shopify Flow**: turn off "Recover abandoned checkout".
-- **Marketing → Automations**: turn off welcome, abandoned checkout, abandoned cart and browse automations.
+- **Marketing → Automations**: turn off the welcome, abandoned checkout, abandoned cart and browse automations.
 
-LuxeMail (this folder) sends the marketing emails from **hello@send.tech.luxedealers.com**.
-Shopify sends the order, shipping and delivery emails, and Judge.me sends review requests. Their settings
-aren't reachable through any API this app has, so these steps are done in the admin. About 20 minutes in total.
+Leave every email under **Settings → Notifications** on (order confirmation, shipping, out for delivery,
+delivered, refunds). LuxeMail doesn't send those.
 
-## 1. Shopify sender address: noreply@tech.luxedealers.com
+## 3. Shopify sender address: noreply@tech.luxedealers.com
 
-1. Shopify admin → **Settings → Notifications → Sender email**.
-2. Enter `noreply@tech.luxedealers.com` and click **Save**.
-3. Shopify says the domain needs authenticating and lists several **CNAME** DNS records. Leave that page open.
-4. In another tab: Cloudflare dashboard → **luxedealers.com** → **DNS → Records**. For each record Shopify lists,
-   click **Add record**, choose **CNAME**, and copy the **Name** and **Target** exactly.
-   Set **Proxy status to "DNS only"** (grey cloud). Save.
-5. Back in Shopify, click **Verify**. It can take up to 48 hours, but usually takes minutes.
-6. In **Settings → General → Store contact email**, make sure it's `support@luxedealers.com`. Shopify's emails
-   point customers there, because replies to a noreply address aren't read.
+1. **Settings → Notifications → Sender email** → enter `noreply@tech.luxedealers.com` → **Save**.
+2. Shopify lists some **CNAME** records. In another tab: Cloudflare → **luxedealers.com → DNS → Records →
+   Add record**, type **CNAME**, copy each **Name** and **Target** exactly, **Proxy status: DNS only** (grey
+   cloud) → **Save**.
+3. Back in Shopify click **Verify** (usually minutes, up to 48 hours).
+4. **Settings → General → Store contact email**: `support@luxedealers.com` (where customers' replies go).
 
-## 2. Make every Shopify email on-brand (one setting covers them all)
+## 4. Brand Shopify's order and delivery emails (one setting styles them all)
 
-1. **Settings → Notifications → Customer notifications → Customize email templates** (the brand settings
-   button at the top).
-2. **Logo**: upload `assets/logo-tech-luxedealers.png` (dark text, for Shopify's white header).
-   **Logo width**: 180 px.
-3. **Colour**: `#7D03FC` (the store violet).
-4. **Save**. This applies to order confirmation, shipping, delivery, refund and account emails.
+1. **Settings → Notifications → Customer notifications → Customize email templates**.
+2. **Logo**: upload the logo above. **Logo width**: `180`. **Colour**: `#7D03FC`. **Save**.
+3. Under **Shipping**, open **Shipping confirmation**, **Out for delivery** and **Delivered** and click
+   **Send test email** on each to check them.
+4. When you fulfil an order, always add the tracking number: it's what triggers "Out for delivery" and
+   "Delivered".
 
-## 3. Delivery emails
-
-In **Settings → Notifications → Customer notifications**, under **Shipping**:
-
-- **Shipping confirmation**: sent when you fulfil an order with tracking. Always add the tracking number when
-  fulfilling, because it powers the next two emails.
-- **Shipping update**: sent when you change tracking on a fulfilment.
-- **Out for delivery** and **Delivered**: sent automatically when the carrier reports those events
-  (Australia Post, Aramex, StarTrack and most big carriers do). Open each one: if it has an on/off toggle,
-  turn it on.
-
-Click **Send test email** on each one to see it with your logo and colour.
-
-Keep these Shopify emails on. Turn off only the Shopify Email *marketing automations* (welcome, abandoned
-cart, abandoned checkout, browse) and the Flow "Recover abandoned checkout", because LuxeMail now sends those.
-
-## 4. Judge.me review requests
+## 5. Judge.me review requests
 
 In Shopify admin → **Apps → Judge.me**:
 
-1. **Review requests** (or **Settings → Emails**): turn on **Review request emails**.
-2. **When to send**: 14 days after fulfilment (orders are dispatched in 3-4 business days, then delivery
-   takes a few more). If Judge.me offers "after delivery", choose that with a 3 day wait instead.
-3. **Reminder**: one reminder, 7 days later.
+1. Open **Review requests** (or **Settings → Emails**) and turn on **review request emails**.
+2. **When to send**: 14 days after fulfilment. If "after delivery" is offered, choose that with a 3 day wait.
+3. **Reminder**: one, 7 days later.
 4. **Sender name**: `Tech.LuxeDealers`. **Reply-to**: `support@luxedealers.com`.
-5. **Branding / design**: upload the same logo, button colour `#7D03FC`.
-6. **Email copy**: paste in the text below.
+5. **Design**: upload the same logo; button colour `#7D03FC`.
+6. **Email text** (use the placeholder names Judge.me's editor shows if they differ):
 
-**Subject:** How's your {{product_name}}?
+   **Subject:** How's your {{product_name}}?
 
-**Body:**
-> Hi {{customer_name}},
->
-> Your {{product_name}} should have arrived by now. We hope you love it!
->
-> Could you take a minute to tell other shoppers what you think? Every honest review helps, good or bad.
->
-> [Write a review]
->
-> Something not right with your order? Just reply to this email and our team will sort it out.
->
-> Thanks,
-> The Tech.LuxeDealers team
+   > Hi {{customer_name}},
+   >
+   > Your {{product_name}} should have arrived by now. We hope you love it!
+   >
+   > Could you take a minute to tell other shoppers what you think? Every honest review helps, good or bad.
+   >
+   > [Write a review]
+   >
+   > Something not right with your order? Just reply to this email and our team will sort it out.
+   >
+   > Thanks,
+   > The Tech.LuxeDealers team
 
-Judge.me's placeholder names can differ from `{{product_name}}` and `{{customer_name}}`; use the ones its
-editor lists.
+7. Click **Send test** to see it, then **Save**.
 
-**Australian Consumer Law:** don't offer a discount or gift only for *positive* reviews, and don't hide
-negative ones. Offering a small thank-you for *any* honest review is allowed if the email says so plainly.
-The copy above offers nothing, which is the simplest option.
+Australian Consumer Law: don't offer a reward only for positive reviews and don't hide negative ones.
+The text above offers nothing, which is the simplest option.
 
-Optional: Judge.me can send from your own domain (e.g. `reviews@tech.luxedealers.com`) on its paid plan.
-It gives you DNS records to add in Cloudflare, the same way as step 1.
+## 6. Optional
+
+- Cloudflare → **Workers & Pages** → `holy-shape-4b85` → **Settings → Delete** (an unused test worker).
