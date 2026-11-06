@@ -2419,3 +2419,14 @@ html.atc-on shopify-chat, html.atc-on #shopify-chat { transform: translateY(-96p
 .plug-note { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0 0; padding: 10px 14px; border-radius: 12px; background: #F2F7FF; border: 1px solid #D7E6FA; font-size: 13.5px; line-height: 1.45; color: var(--c-ink); }
 .plug-note .icon { flex: none; margin-top: 2px; color: #0066FF; }
 html[data-theme="dark"] .plug-note { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
+
+/* Free shipping progress bar: bold and easy to see (truck icon, thicker blue bar) */
+.ship-bar { position: relative; padding: 12px 14px 14px 46px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D7E6FA; box-shadow: 0 6px 18px -14px rgba(0, 82, 214, .6); }
+.ship-bar::before { content: ''; position: absolute; left: 14px; top: 12px; width: 22px; height: 22px; background: #0066FF;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h11v10H3zM14 9h4l3 3v4h-7'/%3E%3Ccircle cx='7' cy='17.5' r='1.8'/%3E%3Ccircle cx='17' cy='17.5' r='1.8'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h11v10H3zM14 9h4l3 3v4h-7'/%3E%3Ccircle cx='7' cy='17.5' r='1.8'/%3E%3Ccircle cx='17' cy='17.5' r='1.8'/%3E%3C/svg%3E") center / contain no-repeat; }
+.ship-bar > span { display: block; font-size: 14.5px; font-weight: 600; color: #0B1F4D; }
+.ship-bar__track { height: 8px !important; margin-top: 8px; border-radius: 999px; background: #E3ECFA !important; overflow: hidden; }
+.ship-bar__fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #3D8BFF, #0066FF) !important; width: var(--pct, 0%); transition: width .5s ease; }
+html[data-theme="dark"] .ship-bar { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
+html[data-theme="dark"] .ship-bar > span { color: #F2F7FF; }
