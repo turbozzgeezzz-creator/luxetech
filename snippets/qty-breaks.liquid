@@ -1,47 +1,33 @@
 {%- comment -%}
-  Buy more, save more cards on the product page. Shown when Theme settings >
-  Volume and bundle deals is turned on (and as a preview in the theme editor).
-  The matching automatic discount must exist in Shopify for the saving to apply.
-  Params: variant
+  Buy more, save more (Theme settings > Cart). Only shown when offers are set, which must match
+  real automatic discounts in Shopify. Selecting an option sets the quantity added to the bag.
+  Params: product, form_id
 {%- endcomment -%}
-{%- if settings.qty_breaks_enabled or request.design_mode -%}
-  {%- liquid
-    assign unit = variant.price
-    assign t1q = settings.tier1_qty
-    assign t1p = settings.tier1_pct
-    assign t2q = settings.tier2_qty
-    assign t2p = settings.tier2_pct
-  -%}
-  <fieldset class="qty-breaks{% unless settings.qty_breaks_enabled %} qty-breaks--preview{% endunless %}">
-    <legend class="qty-breaks__legend">Buy more, save more</legend>
-    {%- unless settings.qty_breaks_enabled -%}<p class="qty-breaks__note">Preview: turn on in Theme settings &gt; Volume and bundle deals after creating the discount.</p>{%- endunless -%}
-    <div class="qty-breaks__options">
-      <label class="qty-break">
-        <input type="radio" name="qty-break" value="1" data-qty-break checked>
-        <span class="qty-break__qty">1 item</span>
-        <span class="qty-break__price">{{ unit | money_with_currency | replace: '.00 ', ' ' }}</span>
-        <span class="qty-break__save">Standard price</span>
+{%- liquid
+  assign c1 = settings.qty_1_count | default: 0
+  assign c2 = settings.qty_2_count | default: 0
+  assign v = product.selected_or_first_available_variant
+-%}
+{%- if c1 > 1 and v.available -%}
+  <fieldset class="qtyb" data-qty-breaks data-form="{{ form_id }}">
+    <legend class="qtyb__title">{% render 'icon', name: 'sparkle', class: 'icon--sm' %} {{ 'products.qty_title' | t }}</legend>
+    {%- capture rows -%}1:0{% if c1 > 1 %},{{ c1 }}:{{ settings.qty_1_percent }}{% endif %}{% if c2 > c1 %},{{ c2 }}:{{ settings.qty_2_percent }}{% endif %}{%- endcapture -%}
+    {%- assign rows = rows | split: ',' -%}
+    {%- for r in rows -%}
+      {%- assign parts = r | split: ':' -%}
+      {%- assign n = parts[0] | plus: 0 -%}{%- assign pc = parts[1] | plus: 0 -%}
+      {%- assign each = 100 | minus: pc | times: v.price | divided_by: 100 -%}
+      {%- assign tot = each | times: n -%}
+      <label class="qtyb__opt">
+        <input type="radio" name="{{ form_id }}-qtyb" value="{{ n }}"{% if forloop.first %} checked{% endif %} data-price="{{ v.price }}" data-pct="{{ pc }}">
+        <span class="qtyb__radio" aria-hidden="true"></span>
+        <span class="qtyb__main"><strong>Buy {{ n }}</strong>
+          {%- if pc > 0 -%}<span class="qtyb__save">{{ 'products.qty_save' | t: percent: pc }}</span>{%- else -%}<span class="qtyb__save qtyb__save--none">{{ 'products.qty_standard' | t }}</span>{%- endif -%}
+          {%- if n > 1 -%}{%- assign em = each | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' -%}<small>{{ 'products.qty_each' | t: price: em }}</small>{%- endif -%}
+        </span>
+        <span class="qtyb__price"><strong data-qtyb-total>{{ tot | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</strong>{%- if pc > 0 -%}<s data-qtyb-was>{{ v.price | times: n | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</s>{%- endif -%}</span>
       </label>
-      {%- assign full1 = unit | times: t1q -%}
-      {%- assign off1 = full1 | times: t1p | divided_by: 100 -%}
-      <label class="qty-break">
-        <input type="radio" name="qty-break" value="{{ t1q }}" data-qty-break>
-        <span class="qty-break__qty">Buy {{ t1q }}</span>
-        <span class="qty-break__price">{{ full1 | minus: off1 | money_with_currency | replace: '.00 ', ' ' }} <s>{{ full1 | money_with_currency | replace: '.00 ', ' ' }}</s></span>
-        <span class="qty-break__save">Save {{ t1p }}%</span>
-      </label>
-      {%- if t2p > 0 and t2q > t1q -%}
-        {%- assign full2 = unit | times: t2q -%}
-        {%- assign off2 = full2 | times: t2p | divided_by: 100 -%}
-        <label class="qty-break qty-break--best">
-          <input type="radio" name="qty-break" value="{{ t2q }}" data-qty-break>
-          <span class="qty-break__badge">Best value</span>
-          <span class="qty-break__qty">Buy {{ t2q }}+</span>
-          <span class="qty-break__price">{{ full2 | minus: off2 | money_with_currency | replace: '.00 ', ' ' }} <s>{{ full2 | money_with_currency | replace: '.00 ', ' ' }}</s></span>
-          <span class="qty-break__save">Save {{ t2p }}%</span>
-        </label>
-      {%- endif -%}
-    </div>
-    <p class="qty-breaks__fine">Saving applied at checkout on quantities of the same item.</p>
+    {%- endfor -%}
+    <p class="qtyb__note">Mix and match any items. The discount is applied automatically at checkout.</p>
   </fieldset>
 {%- endif -%}

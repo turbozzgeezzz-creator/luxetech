@@ -1,0 +1,26 @@
+{%- comment -%} Picks an illustration for a collection handle (Tech.LuxeDealers departments). Param: handle {%- endcomment -%}
+{%- liquid
+  assign h = handle | downcase
+  assign art = 'ill-col-all'
+  if h contains 'audio' or h contains 'ear' or h contains 'speaker' or h contains 'headphone'
+    assign art = 'ill-col-audio'
+  elsif h contains 'charg' or h contains 'power'
+    assign art = 'ill-col-charging'
+  elsif h contains 'home' or h contains 'kitchen'
+    assign art = 'ill-col-home'
+  elsif h contains 'watch' or h contains 'wear'
+    assign art = 'ill-watch'
+  elsif h contains 'hair' or h contains 'beauty'
+    assign art = 'ill-haircare'
+  elsif h contains 'car'
+    assign art = 'ill-track'
+  elsif h contains 'entertain' or h contains 'projector'
+    assign art = 'ill-devices'
+  elsif h contains 'phone' or h contains 'computer' or h contains 'access'
+    assign art = 'ill-col-accessories'
+  elsif h contains 'new'
+    assign art = 'ill-offer'
+  elsif h contains 'deal' or h contains 'sale'
+    assign art = 'ill-coupon'
+  endif
+-%}{{ art }}

@@ -1,0 +1,100 @@
+{%- comment -%}
+  Help centre: live search, topic tabs with counts, questions grouped by topic, and a help panel.
+  Each question block picks its topic.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign topics = 'shipping,orders,products,refunds' | split: ','
+-%}
+<section class="section section--tight faqc" data-faqc>
+  <div class="container faqc__grid">
+    <aside class="faqc__side">
+      <div class="faqc__search">
+        {% render 'icon', name: 'search', class: 'icon--sm' %}
+        <label class="visually-hidden" for="FaqSearch">{{ 'faq.search' | t }}</label>
+        <input id="FaqSearch" type="search" placeholder="{{ 'faq.search' | t }}" autocomplete="off" data-faqc-search>
+      </div>
+      <nav class="faqc__tabs" aria-label="{{ 'faq.topics' | t }}">
+        <button type="button" class="faqc__tab is-active" data-faqc-topic="all">{% render 'icon', name: 'sparkle', class: 'icon--sm' %}<span>{{ 'faq.all' | t }}</span><small>{{ section.blocks.size }}</small></button>
+        {%- for tp in topics -%}
+          {%- assign n = 0 -%}{%- for b in section.blocks -%}{%- if b.settings.topic == tp -%}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}
+          {%- if n > 0 -%}
+            {%- liquid
+              assign ic = 'truck'
+              case tp
+                when 'orders'
+                  assign ic = 'lock'
+                when 'products'
+                  assign ic = 'ruler'
+                when 'refunds'
+                  assign ic = 'return'
+              endcase
+            -%}
+            <button type="button" class="faqc__tab" data-faqc-topic="{{ tp }}">{% render 'icon', name: ic, class: 'icon--sm' %}<span>{{ 'faq.topic_' | append: tp | t }}</span><small>{{ n }}</small></button>
+          {%- endif -%}
+        {%- endfor -%}
+      </nav>
+      <div class="faqc__help">
+        <strong>{{ s.help_title }}</strong>
+        <p>{{ s.help_text }}</p>
+        <a class="btn btn--gold btn--sm" href="{{ s.help_link }}">{% render 'icon', name: 'mail', class: 'icon--sm' %} {{ s.help_button }}</a>
+        <a class="faqc__help-link" href="/pages/track-order">{% render 'icon', name: 'truck', class: 'icon--sm' %} {{ 'contact.track_title' | t }}</a>
+      </div>
+    </aside>
+    <div class="faqc__main">
+      {%- for tp in topics -%}
+        {%- assign qn = 0 -%}{%- for b in section.blocks -%}{%- if b.settings.topic == tp -%}{%- assign qn = qn | plus: 1 -%}{%- endif -%}{%- endfor -%}
+        {%- if qn > 0 -%}
+          <div class="faqc__group" data-faqc-group="{{ tp }}">
+            <h2 class="faqc__h">{{ 'faq.topic_' | append: tp | t }}</h2>
+            <div class="faqc__list">
+              {%- for block in section.blocks -%}
+                {%- if block.settings.topic != tp -%}{%- continue -%}{%- endif -%}
+                <details class="faqc__q" data-faqc-q {{ block.shopify_attributes }}>
+                  <summary><span>{{ block.settings.question }}</span><span class="faqc__plus" aria-hidden="true"></span></summary>
+                  <div class="faqc__a rte">{{ block.settings.answer }}</div>
+                </details>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+      <p class="faqc__empty" data-faqc-empty hidden>{{ 'faq.no_results' | t }} <a href="{{ s.help_link }}">{{ s.help_button }}</a></p>
+    </div>
+  </div>
+</section>
+{%- if section.blocks.size > 0 -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {%- for block in section.blocks -%}
+          { "@type": "Question", "name": {{ block.settings.question | json }}, "acceptedAnswer": { "@type": "Answer", "text": {{ block.settings.answer | strip_html | json }} } }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ]
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Help centre",
+  "class": "section-faqc",
+  "settings": [
+    { "type": "text", "id": "help_title", "label": "Help title", "default": "Still need help?" },
+    { "type": "text", "id": "help_text", "label": "Help text", "default": "Real people answer every message." },
+    { "type": "text", "id": "help_button", "label": "Help button", "default": "Contact us" },
+    { "type": "url", "id": "help_link", "label": "Help link" }
+  ],
+  "blocks": [
+    { "type": "question", "name": "Question", "settings": [
+      { "type": "select", "id": "topic", "label": "Topic", "default": "shipping", "options": [
+        { "value": "shipping", "label": "Shipping and delivery" }, { "value": "orders", "label": "Orders and payment" },
+        { "value": "products", "label": "Products and compatibility" }, { "value": "refunds", "label": "Refunds and faulty items" } ] },
+      { "type": "text", "id": "question", "label": "Question", "default": "Question" },
+      { "type": "richtext", "id": "answer", "label": "Answer" } ] }
+  ],
+  "presets": [{ "name": "Help centre" }]
+}
+{% endschema %}

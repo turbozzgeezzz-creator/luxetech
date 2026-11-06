@@ -1,32 +1,13 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "hero": {
-      "type": "page-hero",
-      "settings": {
-        "tone": "ink",
-        "art": "ill-privacy",
-        "kicker": "Your information",
-        "text": "<p>What we collect, why we collect it, and how you stay in control. Written in plain English.</p>"
-      }
-    },
     "main": {
       "type": "main-page",
       "settings": {
-        "show_title": false
+        "show_title": true
       }
     }
   },
   "order": [
-    "hero",
     "main"
   ]
 }

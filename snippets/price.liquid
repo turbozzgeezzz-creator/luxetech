@@ -1,47 +1,35 @@
 {%- comment -%}
-  Price block. Handles regular, sale (struck-through original + Save X%),
-  varying prices (From ...) and unit prices.
-
-  Params:
-  - product: product object (required)
-  - variant: optional variant; when given, its price is shown exactly (product page)
-  - size: optional 'lg' for the product page buy box
-  - id_prefix: optional; when set, elements get ids so JS can update them
+  Params: product (or variant via `variant`), show_from (bool), class
 {%- endcomment -%}
 {%- liquid
-  assign show_from = false
-  if variant != blank
-    assign target = variant
-  elsif product.price_varies
-    assign target = product.variants | sort: 'price' | first
-    assign show_from = true
+  if variant
+    assign price = variant.price
+    assign compare = variant.compare_at_price
   else
     assign target = product.selected_or_first_available_variant
+    assign price = target.price
+    assign compare = target.compare_at_price
   endif
-
-  assign price = target.price
-  assign compare = target.compare_at_price | default: 0
   assign on_sale = false
   if compare > price
     assign on_sale = true
-    assign save_pct = compare | minus: price | times: 100.0 | divided_by: compare | round
+  endif
+  assign varies = false
+  if show_from and product.price_varies and variant == blank
+    assign varies = true
+    assign price = product.price_min
   endif
 -%}
-<div class="price{% if on_sale %} price--sale{% endif %}{% if size == 'lg' %} price--lg{% endif %}"{% if id_prefix %} id="{{ id_prefix }}-price"{% endif %}>
-  <span class="price__current">
-    <span class="visually-hidden">{% if on_sale %}Sale price{% else %}Price{% endif %}</span>
-    {%- if show_from -%}<span class="price__from">From </span>{%- endif -%}
-    {{- price | money_with_currency | replace: '.00 ', ' ' -}}
-  </span>
+<div class="price{% if on_sale %} price--sale{% endif %}{% if class %} {{ class }}{% endif %}" data-price>
+  {%- if varies -%}<span class="price__from">{{ 'products.from' | t }}</span>{%- endif -%}
+  <span class="price__current">{{ price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</span>
   {%- if on_sale -%}
-    <s class="price__compare"><span class="visually-hidden">Regular price</span>{{ compare | money_with_currency | replace: '.00 ', ' ' }}</s>
-    <span class="price__save">Save {{ save_pct }}%</span>
-  {%- endif -%}
-  {%- if target.unit_price_measurement -%}
-    <span class="price__unit">
-      {{- target.unit_price | money_with_currency | replace: '.00 ', ' ' }}/
-      {%- if target.unit_price_measurement.reference_value != 1 -%}{{ target.unit_price_measurement.reference_value }}{%- endif -%}
-      {{- target.unit_price_measurement.reference_unit -}}
-    </span>
+    <s class="price__compare"><span class="visually-hidden">{{ 'products.regular_price' | t }}</span>{{ compare | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</s>
+    {%- assign pct = compare | minus: price | times: 100 | divided_by: compare -%}
+    {%- assign saved = compare | minus: price -%}{%- assign saved_m = saved | money_without_trailing_zeros -%}
+    <span class="price__save">{%- if class contains 'product__price' and saved >= 2000 -%}{{ 'products.save_amount' | t: amount: saved_m }} ({{ pct }}%){%- else -%}{{ 'products.save_percent' | t: percent: pct }}{%- endif -%}</span>
   {%- endif -%}
 </div>
+{%- if variant.unit_price_measurement -%}
+  <div class="unit-price">{{ variant.unit_price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}/{% if variant.unit_price_measurement.reference_value != 1 %}{{ variant.unit_price_measurement.reference_value }}{% endif %}{{ variant.unit_price_measurement.reference_unit }}</div>
+{%- endif -%}

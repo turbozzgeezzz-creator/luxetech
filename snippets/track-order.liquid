@@ -1,0 +1,113 @@
+{%- comment -%} Order tracking help, shown on /pages/track-order (and the track-order page template). {%- endcomment -%}
+{%- assign tt = 'Track your order' -%}{%- assign te = 'Help' -%}{%- assign tx = 'Every order ships free with tracking. Enter your order number below to see exactly where it is.' -%}
+{% render 'page-banner', title: tt, eyebrow: te, text: tx, art: 'ill-track' %}
+<section class="section section--flush-top">
+  <div class="container track">
+    {%- assign trk_endpoint = settings.luxemail_endpoint | replace: '/t', '/track' -%}
+    <div class="trk-lookup">
+      <h2 class="trk-lookup__title">Find your order</h2>
+      <p class="trk-lookup__text">Enter the order number from your confirmation email. Add your email to see your items and tracking number too.</p>
+      <form class="trk-lookup__form" data-track-lookup data-endpoint="{{ trk_endpoint }}" novalidate>
+        <label class="trk-lookup__label" for="TrackOrder">Order number</label>
+        <input class="field__input" id="TrackOrder" name="o" placeholder="Order number" required autocomplete="off" autocapitalize="characters" spellcheck="false">
+        <label class="trk-lookup__label" for="TrackEmail">Email <span>(optional)</span></label>
+        <input class="field__input" id="TrackEmail" name="e" type="email" placeholder="Email used at checkout" autocomplete="email" inputmode="email">
+        <button type="submit" class="btn btn--gold btn--block">Track my order</button>
+      </form>
+      <p class="track__msg" data-track-msg role="status" aria-live="polite"></p>
+    </div>
+    <div class="trk" data-track-result hidden></div>
+
+    <ol class="track__steps track__steps--compact" role="list">
+      <li><span class="track__icon">{% render 'icon', name: 'check' %}</span><strong>{{ 'track.s1' | t }}</strong><span>{{ 'track.s1_text' | t }}</span></li>
+      <li><span class="track__icon">{% render 'icon', name: 'box' %}</span><strong>{{ 'track.s2' | t }}</strong><span>{{ 'track.s2_text' | t }}</span></li>
+      <li><span class="track__icon">{% render 'icon', name: 'truck' %}</span><strong>{{ 'track.s3' | t }}</strong><span>{{ 'track.s3_text' | t }}</span></li>
+      <li><span class="track__icon">{% render 'icon', name: 'home' %}</span><strong>{{ 'track.s4' | t }}</strong><span>{{ 'track.s4_text' | t }}</span></li>
+    </ol>
+    <div class="track__cards track__cards--two">
+      <div class="track__card">
+        <h2>{{ 'track.account' | t }}</h2>
+        <p>{{ 'track.account_text' | t }}</p>
+        <a class="btn btn--sm" href="{{ routes.account_url }}">{{ 'track.sign_in' | t }}</a>
+      </div>
+      <div class="track__card track__card--dark">
+        <h2>{{ 'track.help' | t }}</h2>
+        <p>{{ 'track.help_text' | t }}</p>
+        <a class="btn btn--sm btn--gold" href="mailto:{{ settings.support_email }}">{{ settings.support_email }}</a>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+(function () {
+  var form = document.querySelector('[data-track-lookup]');
+  if (!form) return;
+  var msg = document.querySelector('[data-track-msg]'), out = document.querySelector('[data-track-result]');
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var day = function (d) { return d ? new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : ''; };
+  var addDays = function (d, n) { return new Date(new Date(d).getTime() + n * 86400000); };
+  var LABEL = { CONFIRMED: 'Parcel handed to our shipping partner', LABEL_PRINTED: 'Shipping label created', LABEL_PURCHASED: 'Shipping label created', READY_FOR_PICKUP: 'Ready for pickup', IN_TRANSIT: 'In transit', OUT_FOR_DELIVERY: 'Out for delivery', ATTEMPTED_DELIVERY: 'Delivery attempted', DELIVERED: 'Delivered', FAILURE: 'Delivery problem, please contact us', PICKED_UP: 'Picked up', CARRIER_PICKED_UP: 'Picked up for delivery' };
+  function render(d) {
+    var sh = d.shipments || [], ev = [], tracks = [];
+    sh.forEach(function (s) { (s.events || []).forEach(function (e) { ev.push(e); }); (s.tracking || []).forEach(function (t) { if (tracks.indexOf(t.number) < 0) tracks.push(t.number); }); });
+    ev.sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
+    var scans = []; sh.forEach(function (s) { (s.scans || []).forEach(function (x) { scans.push(x); }); });
+    scans.sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
+    var parcel = (sh.filter(function (s) { return s.parcel; })[0] || {}).parcel;
+    var when = function (d) { return d ? new Date(d).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : ''; };
+    var has = function (st) { return ev.some(function (e) { return e.status === st; }); };
+    var deliveredAt = (sh.filter(function (s) { return s.deliveredAt; })[0] || {}).deliveredAt;
+    var delivered = !!deliveredAt || has('DELIVERED') || parcel === 'Delivered';
+    var shipped = sh.length > 0, shippedAt = shipped ? sh[0].shippedAt : null;
+    var moving = delivered || has('IN_TRANSIT') || has('OUT_FOR_DELIVERY') || /InTransit|OutForDelivery|AvailableForPickup/.test(parcel || '') || (shipped && (Date.now() - new Date(shippedAt)) > 2 * 86400000);
+    var stage = d.cancelled ? 0 : delivered ? 4 : moving ? 3 : shipped ? 2 : 1;
+    var title = d.cancelled ? 'Order cancelled' : delivered ? 'Delivered' : has('OUT_FOR_DELIVERY') ? 'Out for delivery today' : moving ? 'On its way to you' : shipped ? 'Shipped' : 'Being prepared';
+    var est = sh.map(function (s) { return s.estimate; }).filter(Boolean)[0];
+    var line;
+    if (d.cancelled) line = 'Placed ' + day(d.placedAt) + '. Contact us if you have any questions.';
+    else if (delivered) line = 'Delivered' + (deliveredAt ? ' on ' + day(deliveredAt) : '') + '. We hope you love it.';
+    else if (est) line = 'Estimated delivery ' + day(est);
+    else if (shipped) line = 'Shipped ' + day(shippedAt) + ' · Expected ' + day(addDays(shippedAt, 7)) + ' to ' + day(addDays(shippedAt, 14));
+    else line = 'Placed ' + day(d.placedAt) + ' · Most orders ship within 3 to 7 business days';
+    var steps = [['Ordered', d.placedAt], ['Shipped', shippedAt], ['In transit', (sh[0] && sh[0].inTransitAt) || null], ['Delivered', deliveredAt]];
+    var html = '<div class="trk__head"><span class="trk__eyebrow">Order ' + esc(d.name) + '</span><h2 class="trk__title">' + esc(title) + '</h2><p class="trk__line">' + esc(line) + '</p></div>';
+    if (!d.cancelled) html += '<div class="trk__bar" role="img" aria-label="' + esc(title) + '"><div class="trk__fill" style="width:' + [0, 8, 38, 70, 100][stage] + '%"></div></div><ol class="trk__stages">' +
+      steps.map(function (s, i) { return '<li class="' + (stage >= i + 1 ? 'is-done' : '') + (stage === i + 1 && !delivered ? ' is-now' : '') + '"><strong>' + s[0] + '</strong><span>' + (stage >= i + 1 && s[1] ? day(s[1]) : '') + '</span></li>'; }).join('') + '</ol>';
+    if (scans.length) {
+      html += '<div class="trk__latest"><span class="trk__eyebrow">Latest update</span><strong>' + esc(scans[0].text) + '</strong><span>' + when(scans[0].at) + (scans[0].place ? ' · ' + esc(scans[0].place) : '') + '</span></div>';
+    } else if (ev.length && !d.limited) html += '<div class="trk__latest"><span class="trk__eyebrow">Latest update</span><strong>' + esc(LABEL[ev[0].status] || ev[0].status.replace(/_/g, ' ').toLowerCase()) + '</strong><span>' + day(ev[0].at) + (ev[0].place ? ' · ' + esc(ev[0].place) : '') + '</span></div>';
+    if (tracks.length) html += tracks.map(function (n) { return '<div class="trk__num"><span class="trk__eyebrow">Tracking number</span><div class="trk__numrow"><strong>' + esc(n) + '</strong><button type="button" class="btn btn--sm" data-copy="' + esc(n) + '">Copy</button></div></div>'; }).join('');
+    if (shipped && !delivered && !d.cancelled) html += '<p class="trk__note">International parcels can go a few days without a new update while they move between countries. That\u2019s normal. If yours hasn\u2019t moved for 10 days, email us and we\u2019ll chase it.</p>';
+    if (d.limited) html += '<p class="trk__note trk__note--hint">Add the email you used at checkout to see your items, tracking number and full history.</p>';
+    if (scans.length > 1) html += '<details class="trk__history" open><summary>Full tracking history</summary><ul>' + scans.map(function (e) { return '<li><strong>' + esc(e.text) + '</strong><span>' + when(e.at) + (e.place ? ' · ' + esc(e.place) : '') + '</span></li>'; }).join('') + '</ul></details>';
+    else if (ev.length > 1 && !d.limited) html += '<details class="trk__history"><summary>Full shipping history</summary><ul>' + ev.map(function (e) { return '<li><strong>' + esc(LABEL[e.status] || e.status.replace(/_/g, ' ').toLowerCase()) + '</strong><span>' + day(e.at) + (e.place ? ' · ' + esc(e.place) : '') + '</span>' + (e.message ? '<em>' + esc(e.message) + '</em>' : '') + '</li>'; }).join('') + '</ul></details>';
+    if ((d.items || []).length) html += '<div class="trk__items">' + d.items.map(function (i) { return '<div class="trk__item">' + (i.image ? '<img src="' + esc(i.image) + '" alt="" width="56" height="56" loading="lazy">' : '') + '<span>' + esc(i.title) + (i.variant ? ' <em>' + esc(i.variant) + '</em>' : '') + ' × ' + i.qty + '</span></div>'; }).join('') + '</div>';
+    if (d.statusPage) html += '<p><a class="link" href="' + esc(d.statusPage) + '" target="_blank" rel="noopener">View full order details</a></p>';
+    out.innerHTML = html; out.hidden = false; out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  out.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy]'); if (!b) return;
+    var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1800); };
+    if (navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy).then(done, function () {}); else done();
+  });
+  function lookup() {
+    var o = form.o.value.trim(), em = form.e.value.trim();
+    if (!o) { msg.textContent = 'Enter your order number.'; return; }
+    var btn = form.querySelector('button'); btn.disabled = true; msg.textContent = 'Looking up your order…';
+    fetch(form.dataset.endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ o: o, e: em }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, j: j }; }); })
+      .then(function (r) {
+        if (r.ok) { msg.textContent = ''; render(r.j); }
+        else if (r.status === 404) msg.textContent = em ? 'We couldn\u2019t find that order number with that email. Check both match your order confirmation email.' : 'We couldn\u2019t find that order number. Check it matches your order confirmation email.';
+        else if (r.status === 429) msg.textContent = 'Too many lookups. Please try again in an hour, or email us.';
+        else msg.textContent = 'Tracking is busy right now. Please try again in a minute.';
+      })
+      .catch(function () { msg.textContent = 'Tracking is busy right now. Please try again in a minute.'; })
+      .finally(function () { btn.disabled = false; });
+  }
+  form.addEventListener('submit', function (e) { e.preventDefault(); lookup(); });
+  // Links from shipping emails: /pages/track-order?order=1234
+  var pre = new URLSearchParams(location.search).get('order');
+  if (pre) { form.o.value = pre.replace(/^#/, ''); lookup(); }
+})();
+</script>

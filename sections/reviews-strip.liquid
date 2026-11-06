@@ -1,0 +1,146 @@
+{%- comment -%}
+  Store-wide rating and a row of real reviews, gathered from Judge.me data on
+  the products in the chosen collection. Hidden when there are none.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign c = s.collection | default: collections.all
+  assign avg = shop.metafields.judgeme.all_reviews_rating.value | default: shop.metafields.judgeme.all_reviews_rating
+  assign total = shop.metafields.judgeme.all_reviews_count.value | default: shop.metafields.judgeme.all_reviews_count
+  assign shown = 0
+-%}
+{%- comment -%}
+  Store reviews and product reviews together. Order: photo reviews from verified buyers, other photo reviews,
+  verified written reviews, then the rest. Store reviews come first within each group. One review per product.
+{%- endcomment -%}
+{%- liquid
+  assign wd = shop.metafields.judgeme.all_reviews_widget_v2025_data.value
+  assign store_revs = wd.shop_reviews
+  assign used = ','
+  assign store_label = 'reviews.store_review' | t
+-%}
+{%- capture cards -%}
+  {%- for pass in (1..4) -%}
+    {%- for src in (1..2) -%}
+      {%- if src == 1 -%}
+        {%- for review in store_revs -%}
+          {%- if shown >= s.limit -%}{%- break -%}{%- endif -%}
+          {%- assign key = ',s' | append: review.uuid | append: ',' -%}
+          {%- if used contains key -%}{%- continue -%}{%- endif -%}
+          {%- liquid
+            assign pic = false
+            if review.pictures_urls.size > 0
+              assign pic = true
+            endif
+            assign ok = false
+            if review.rating >= s.min_rating
+              case pass
+                when 1
+                  if pic and review.verified_buyer
+                    assign ok = true
+                  endif
+                when 2
+                  if pic
+                    assign ok = true
+                  endif
+                when 3
+                  if pic == false and review.body != blank and review.verified_buyer
+                    assign ok = true
+                  endif
+                else
+                  if pic == false and review.body != blank
+                    assign ok = true
+                  endif
+              endcase
+            endif
+          -%}
+          {%- if ok -%}
+            {% render 'review-card', review: review, product_title: store_label, product_url: s.link, hero: true %}
+            {%- assign shown = shown | plus: 1 -%}
+            {%- assign used = used | append: 's' | append: review.uuid | append: ',' -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for p in c.products limit: 40 -%}
+          {%- if shown >= s.limit -%}{%- break -%}{%- endif -%}
+          {%- assign key = ',' | append: p.id | append: ',' -%}
+          {%- if used contains key -%}{%- continue -%}{%- endif -%}
+          {%- assign jd = p.metafields.judgeme.review_widget_data.value -%}
+          {%- if jd.number_of_reviews > 0 -%}
+            {%- for review in jd.reviews limit: 1 -%}
+              {%- liquid
+                assign pic = false
+                if review.pictures_urls.size > 0
+                  assign pic = true
+                endif
+                assign ok = false
+                if review.rating >= s.min_rating
+                  case pass
+                    when 1
+                      if pic and review.verified_buyer
+                        assign ok = true
+                      endif
+                    when 2
+                      if pic
+                        assign ok = true
+                      endif
+                    when 3
+                      if pic == false and review.body != blank and review.verified_buyer
+                        assign ok = true
+                      endif
+                    else
+                      if pic == false and review.body != blank
+                        assign ok = true
+                      endif
+                  endcase
+                endif
+              -%}
+              {%- if ok -%}
+                {% render 'review-card', review: review, product_title: p.title, product_url: p.url, hero: true %}
+                {%- assign shown = shown | plus: 1 -%}
+                {%- assign used = used | append: p.id | append: ',' -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- if shown > 0 -%}
+<section class="section reviews-strip">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow">{{ s.eyebrow }}</span>{%- endif -%}
+        <h2 class="h2">{{ s.heading }}</h2>
+        {%- if avg != blank and total != blank -%}
+          <p class="reviews-strip__score"><span class="rating__stars rating__stars--gold" aria-hidden="true"><span style="--pct: {{ avg | times: 20 }}%"></span></span><strong>{{ avg | times: 1 | round: 2 }} / 5</strong> {{ 'reviews.from_count' | t: count: total }}</p>
+        {%- endif -%}
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center">
+        {%- if s.link != blank -%}<a class="pill-link" href="{{ s.link }}">{{ s.link_label }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
+        <div class="rail__controls"><button type="button" class="rail__btn" data-rail-prev aria-label="{{ 'general.previous' | t }}">{% render 'icon', name: 'arrow-left', class: 'icon--sm' %}</button><button type="button" class="rail__btn" data-rail-next aria-label="{{ 'general.next' | t }}">{% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</button></div>
+      </div>
+    </div>
+    <div class="rail" data-rail><div class="rail__track reviews-strip__track">{{ cards }}</div></div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Reviews strip",
+  "class": "section-reviews-strip",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Reviews" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Loved by our customers" },
+    { "type": "collection", "id": "collection", "label": "Take reviews from" },
+    { "type": "range", "id": "limit", "label": "Reviews to show", "min": 3, "max": 12, "step": 1, "default": 8 },
+    { "type": "range", "id": "min_rating", "label": "Lowest star rating to show", "min": 1, "max": 5, "step": 1, "default": 1, "info": "1 shows every review, good or bad." },
+    { "type": "text", "id": "link_label", "label": "Link text", "default": "All reviews" },
+    { "type": "url", "id": "link", "label": "Link" }
+  ],
+  "presets": [{ "name": "Reviews strip" }]
+}
+{% endschema %}

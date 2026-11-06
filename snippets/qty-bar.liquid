@@ -1,0 +1,32 @@
+{%- comment -%} Buy more, save more progress in the bag (Theme settings > Cart). Counts pieces in the bag. {%- endcomment -%}
+{%- liquid
+  assign c1 = settings.qty_1_count | default: 0
+  assign c2 = settings.qty_2_count | default: 0
+  assign n = cart.item_count
+-%}
+{%- if c1 > 1 and n > 0 -%}
+  {%- liquid
+    assign top = c1
+    if c2 > c1
+      assign top = c2
+    endif
+    assign pct = n | times: 100 | divided_by: top
+    if pct > 100
+      assign pct = 100
+    endif
+    assign m1 = c1 | times: 100 | divided_by: top
+  -%}
+  <div class="tier-bar tier-bar--qty">
+    <p class="tier-bar__msg">
+      {%- if n < c1 -%}{%- assign more = c1 | minus: n -%}{{ 'cart.qty_need' | t: count: more, percent: settings.qty_1_percent }}
+      {%- elsif c2 > c1 and n < c2 -%}{%- assign more = c2 | minus: n -%}{{ 'cart.qty_next' | t: current: settings.qty_1_percent, count: more, percent: settings.qty_2_percent }}
+      {%- elsif c2 > c1 -%}{{ 'cart.qty_done' | t: percent: settings.qty_2_percent }}
+      {%- else -%}{{ 'cart.qty_done' | t: percent: settings.qty_1_percent }}{%- endif -%}
+    </p>
+    <div class="tier-bar__track" aria-hidden="true">
+      <div class="tier-bar__fill" style="width: {{ pct }}%"></div>
+      <span class="tier-bar__mark{% if n >= c1 %} is-hit{% endif %}" style="left: {{ m1 }}%">{{ settings.qty_1_percent }}%</span>
+      {%- if c2 > c1 -%}<span class="tier-bar__mark{% if n >= c2 %} is-hit{% endif %}" style="left: 100%">{{ settings.qty_2_percent }}%</span>{%- endif -%}
+    </div>
+  </div>
+{%- endif -%}

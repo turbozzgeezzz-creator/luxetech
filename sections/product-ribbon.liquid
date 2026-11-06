@@ -1,0 +1,55 @@
+{%- comment -%}
+  A slow-moving ribbon of real products (photo, name, price), with the buy-more price for 3 or more pieces.
+  Pauses on hover; shows as a normal swipeable row for visitors who prefer less motion.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign c2 = settings.qty_2_count | default: 0
+  assign p2 = settings.qty_2_percent | default: 0
+  assign coll = s.collection | default: collections['new-arrivals']
+-%}
+{%- if coll and coll.products_count > 0 -%}
+<section class="ribbon" aria-label="{{ s.heading | escape }}">
+  <div class="container ribbon__head">
+    <div>
+      {%- if s.eyebrow != blank -%}<span class="ribbon__eyebrow">{{ s.eyebrow }}</span>{%- endif -%}
+      <h2 class="ribbon__title">{{ s.heading }}</h2>
+    </div>
+    {%- if c2 > 1 -%}<p class="ribbon__deal">{{ 'sections.ribbon_deal' | t: q1: settings.qty_1_count, p1: settings.qty_1_percent, q2: c2, p2: p2 }}</p>{%- endif -%}
+    <a class="ribbon__all" href="{{ coll.url }}">{{ 'sections.ribbon_all' | t }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>
+  </div>
+  <div class="ribbon__viewport">
+    <ul class="ribbon__track" role="list" style="--ribbon-speed: {{ s.speed }}s">
+      {%- capture items -%}
+        {%- for p in coll.products limit: s.limit -%}
+          {%- if p.available == false -%}{%- continue -%}{%- endif -%}
+          <li class="ribbon__item">
+            <a href="{{ p.url }}" class="ribbon__link">
+              <span class="ribbon__img">{%- if p.featured_media -%}{{ p.featured_media | image_url: width: 360 | image_tag: width: 180, height: 180, loading: 'lazy', alt: p.title, sizes: '180px' }}{%- endif -%}</span>
+              <span class="ribbon__name">{{ p.title }}</span>
+              <span class="ribbon__price">{{ p.price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</span>
+              {%- if c2 > 1 and p2 > 0 -%}{%- assign each = 100 | minus: p2 | times: p.price | divided_by: 100 | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' -%}<span class="ribbon__each">{{ 'sections.ribbon_each' | t: price: each, count: c2 }}</span>{%- endif -%}
+            </a>
+          </li>
+        {%- endfor -%}
+      {%- endcapture -%}
+      {{ items }}
+      <span class="ribbon__dupe" aria-hidden="true" style="display: contents">{{ items | replace: '<a ', '<a tabindex="-1" ' }}</span>
+    </ul>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product ribbon",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The edit" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Build your look" },
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "Defaults to New arrivals." },
+    { "type": "range", "id": "limit", "label": "Products", "min": 6, "max": 20, "step": 1, "default": 14 },
+    { "type": "range", "id": "speed", "label": "Seconds per loop", "min": 30, "max": 120, "step": 5, "default": 60 }
+  ],
+  "presets": [{ "name": "Product ribbon" }]
+}
+{% endschema %}

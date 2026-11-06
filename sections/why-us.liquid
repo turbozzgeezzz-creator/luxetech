@@ -1,0 +1,35 @@
+{%- assign s = section.settings -%}
+<section class="section why">
+  <div class="container why__grid">
+    <div class="why__intro">
+      {%- if s.eyebrow != blank -%}<span class="eyebrow">{{ s.eyebrow }}</span>{%- endif -%}
+      <h2 class="why__title">{{ s.heading | newline_to_br }}</h2>
+      {%- if s.text != blank -%}<div class="rte why__text">{{ s.text }}</div>{%- endif -%}
+      {%- if s.button != blank -%}<a class="pill-link" href="{{ s.link }}">{{ s.button }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
+    </div>
+    <ol class="why__list" role="list">
+      {%- for block in section.blocks -%}
+        <li {{ block.shopify_attributes }}><span class="why__num">{{ forloop.index | prepend: '0' }}</span><div><h3>{{ block.settings.title }}</h3><p>{{ block.settings.text }}</p></div></li>
+      {%- endfor -%}
+    </ol>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Why shop with us",
+  "class": "section-why",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Why Tech.LuxeDealers" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Luxury looks,\nhonest prices" },
+    { "type": "richtext", "id": "text", "label": "Text" },
+    { "type": "text", "id": "button", "label": "Button" },
+    { "type": "url", "id": "link", "label": "Button link" }
+  ],
+  "blocks": [
+    { "type": "point", "name": "Point", "settings": [ { "type": "text", "id": "title", "label": "Title", "default": "Point" }, { "type": "textarea", "id": "text", "label": "Text" } ] }
+  ],
+  "max_blocks": 4,
+  "presets": [{ "name": "Why shop with us", "blocks": [{ "type": "point" }, { "type": "point" }, { "type": "point" }] }]
+}
+{% endschema %}

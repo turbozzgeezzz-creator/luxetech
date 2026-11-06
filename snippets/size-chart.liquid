@@ -1,0 +1,53 @@
+{%- comment -%} Size guide (from the store's Size Charts page). Param: show (all, shoes, apparel) {%- endcomment -%}
+<div class="size-chart">
+  <div class="size-chart__notes">
+    <div><strong>{{ 'size.asian' | t }}</strong><span>{{ 'size.size_up' | t }}</span></div>
+    <div><strong>{{ 'size.intl' | t }}</strong><span>{{ 'size.standard' | t }}</span></div>
+  </div>
+  {%- unless show == 'apparel' -%}
+  <h3 class="size-chart__title"><span>01</span> {{ 'size.footwear' | t }}</h3>
+  <div class="size-chart__scroll"><table class="size-table">
+    <thead><tr><th>EU</th><th>US Men</th><th>US Women</th><th>{{ 'size.length' | t }}</th></tr></thead>
+    <tbody>
+      <tr><td>36</td><td>4</td><td>5.5</td><td>23.0 cm</td></tr>
+      <tr><td>37</td><td>5</td><td>6.5</td><td>23.5 cm</td></tr>
+      <tr><td>38</td><td>6</td><td>7.5</td><td>24.0 cm</td></tr>
+      <tr><td>39</td><td>7</td><td>8.5</td><td>25.0 cm</td></tr>
+      <tr><td>40</td><td>7.5–8</td><td>9.5</td><td>25.5–26 cm</td></tr>
+      <tr><td>41</td><td>8–8.5</td><td>10</td><td>26–26.5 cm</td></tr>
+      <tr><td>42</td><td>9–9.5</td><td>11</td><td>27–27.5 cm</td></tr>
+      <tr><td>43</td><td>10–10.5</td><td>12</td><td>28–28.5 cm</td></tr>
+      <tr><td>44</td><td>11–12</td><td>13</td><td>29–29.5 cm</td></tr>
+      <tr><td>45</td><td>12–13</td><td>14</td><td>30.0 cm</td></tr>
+      <tr><td>46</td><td>13–14</td><td>15</td><td>30.5 cm</td></tr>
+      <tr><td>47</td><td>14+</td><td>16</td><td>31.0 cm</td></tr>
+      <tr><td>48</td><td>15+</td><td>17</td><td>31.5 cm</td></tr>
+    </tbody>
+  </table></div>
+  {%- endunless -%}
+  {%- unless show == 'shoes' -%}
+  <h3 class="size-chart__title"><span>02</span> {{ 'size.men' | t }}</h3>
+  <div class="size-chart__scroll"><table class="size-table">
+    <thead><tr><th>{{ 'size.tag' | t }}</th><th>{{ 'size.fits_like' | t }}</th><th>{{ 'size.recommended' | t }}</th></tr></thead>
+    <tbody>
+      <tr><td>S</td><td>XS – Small</td><td>Size up for regular fit</td></tr>
+      <tr><td>M</td><td>Small – Medium</td><td>Size up for relaxed fit</td></tr>
+      <tr><td>L</td><td>Medium – Large</td><td>Most common size</td></tr>
+      <tr><td>XL</td><td>Large – XL</td><td>Size up for oversized</td></tr>
+      <tr><td>XXL</td><td>XL – XXL</td><td>For loose fit</td></tr>
+    </tbody>
+  </table></div>
+  <h3 class="size-chart__title"><span>03</span> {{ 'size.women' | t }}</h3>
+  <div class="size-chart__scroll"><table class="size-table">
+    <thead><tr><th>{{ 'size.tag' | t }}</th><th>{{ 'size.fits_like' | t }}</th><th>{{ 'size.recommended' | t }}</th></tr></thead>
+    <tbody>
+      <tr><td>XS</td><td>XXS – XS</td><td>Size up for comfort</td></tr>
+      <tr><td>S</td><td>XS – Small</td><td>Standard fit</td></tr>
+      <tr><td>M</td><td>Small – Medium</td><td>Most common</td></tr>
+      <tr><td>L</td><td>Medium – Large</td><td>Relaxed fit</td></tr>
+      <tr><td>XL</td><td>Large – XL</td><td>Loose fit</td></tr>
+    </tbody>
+  </table></div>
+  {%- endunless -%}
+  <p class="size-chart__tip"><strong>{{ 'size.unsure' | t }}</strong> {{ 'size.unsure_text' | t }}</p>
+</div>

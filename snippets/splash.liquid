@@ -1,0 +1,9 @@
+{%- comment -%} Logo intro, first page of each visit only. theme.js fades it out on load. {%- endcomment -%}
+{%- if settings.intro_splash and settings.motion != 'off' -%}
+  <div class="splash" id="Splash" aria-hidden="true">
+    <div class="splash__inner">
+      <img class="splash__mark" src="{{ 'logo-tech-luxedealers-purple.png' | asset_url }}" alt="" width="440" height="120">
+      <span class="splash__line"><i></i></span>
+    </div>
+  </div>
+{%- endif -%}

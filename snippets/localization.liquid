@@ -1,0 +1,45 @@
+{%- comment -%}
+  Country / currency and language pickers, from Settings > Markets and
+  Languages. Params: id (unique), direction ('down' opens below), show_language (bool), compact (bool: currency only)
+{%- endcomment -%}
+{%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
+  {%- form 'localization', id: id, class: 'localization-form' -%}
+    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+      {%- if localization.available_countries.size > 1 -%}
+        <div class="localization{% if direction == 'down' %} localization--down{% endif %}" data-localization>
+          <button type="button" class="localization__btn" aria-expanded="false" aria-controls="{{ id }}-countries">
+            {% render 'icon', name: 'globe', class: 'icon--sm' %}
+            <span class="visually-hidden">{{ 'localization.country' | t }}</span>
+            {%- if compact -%}{{ localization.country.currency.iso_code }} {{ localization.country.currency.symbol }}{%- else -%}{{ localization.country.name }} · {{ localization.country.currency.iso_code }} {{ localization.country.currency.symbol }}{%- endif -%}
+            {% render 'icon', name: 'chevron-down' %}
+          </button>
+          <div class="localization__list" id="{{ id }}-countries" hidden>
+            {%- for c in localization.available_countries -%}
+              <button type="button" data-value="{{ c.iso_code }}"{% if c.iso_code == localization.country.iso_code %} aria-current="true"{% endif %}>
+                <span>{{ c.name }}</span><small>{{ c.currency.iso_code }} {{ c.currency.symbol }}</small>
+              </button>
+            {%- endfor -%}
+          </div>
+          <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}" data-loc-input>
+        </div>
+      {%- endif -%}
+      {%- if show_language != false and localization.available_languages.size > 1 -%}
+        <div class="localization{% if direction == 'down' %} localization--down{% endif %}" data-localization>
+          <button type="button" class="localization__btn" aria-expanded="false" aria-controls="{{ id }}-languages">
+            <span class="visually-hidden">{{ 'localization.language' | t }}</span>
+            {{ localization.language.endonym_name | capitalize }}
+            {% render 'icon', name: 'chevron-down' %}
+          </button>
+          <div class="localization__list" id="{{ id }}-languages" hidden>
+            {%- for l in localization.available_languages -%}
+              <button type="button" data-value="{{ l.iso_code }}" lang="{{ l.iso_code }}"{% if l.iso_code == localization.language.iso_code %} aria-current="true"{% endif %}>
+                <span>{{ l.endonym_name | capitalize }}</span>
+              </button>
+            {%- endfor -%}
+          </div>
+          <input type="hidden" name="locale_code" value="{{ localization.language.iso_code }}" data-loc-input>
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endform -%}
+{%- endif -%}

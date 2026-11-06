@@ -1,67 +1,92 @@
-<div class="utility-bar">
-  <div class="utility-bar__inner container">
-    {%- liquid
-      assign show_free_ship = false
-      if section.settings.show_free_shipping and settings.free_shipping_threshold > 0
-        assign show_free_ship = true
-      endif
-    -%}
-    {%- if section.blocks.size > 0 or show_free_ship -%}
-      <ul class="utility-bar__messages" role="list">
-        {%- if show_free_ship -%}
-          <li class="utility-bar__message">
-            {% render 'icon', name: 'truck', class: 'icon--sm' %}
-            <span>Free shipping on orders over {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}</span>
-          </li>
-        {%- endif -%}
-        {%- for block in section.blocks -%}
-          <li class="utility-bar__message" {{ block.shopify_attributes }}>
-            {% render 'icon', name: block.settings.icon, class: 'icon--sm' %}
-            {%- if block.settings.link != blank -%}
-              <a href="{{ block.settings.link }}">{{ block.settings.text | escape }}</a>
-            {%- else -%}
-              <span>{{ block.settings.text | escape }}</span>
-            {%- endif -%}
-          </li>
-        {%- endfor -%}
-      </ul>
+{%- comment -%}
+  Top bar: short selling points with icons. All of them show in a row on
+  wide screens; phones rotate through them. The country selector sits on
+  the right. Messages marked "Needs welcome code" only appear once a code is
+  set in Theme settings > Welcome offer, so no offer is shown that can't be
+  redeemed.
+{%- endcomment -%}
+{%- liquid
+  assign shown = 0
+  for block in section.blocks
+    if block.settings.needs_code and settings.welcome_code == blank and settings.welcome_personal != true
+      continue
+    endif
+    if block.settings.needs_tiers and settings.tier_1_spend == 0
+      continue
+    endif
+    if block.settings.needs_qty and settings.qty_1_count < 2
+      continue
+    endif
+    assign shown = shown | plus: 1
+  endfor
+-%}
+{%- if shown > 0 -%}
+<div class="announcement announcement--usp" role="region" aria-label="{{ 'header.announcements' | t }}">
+  <div class="container announcement__inner">
+    <ul class="usp-list" role="list" data-rotator="{{ section.settings.speed }}">
+      {%- for block in section.blocks -%}
+        {%- if block.settings.needs_code and settings.welcome_code == blank and settings.welcome_personal != true -%}{%- continue -%}{%- endif -%}
+        {%- if block.settings.needs_tiers and settings.tier_1_spend == 0 -%}{%- continue -%}{%- endif -%}
+        {%- if block.settings.needs_qty and settings.qty_1_count < 2 -%}{%- continue -%}{%- endif -%}
+        <li class="usp announcement__msg{% if forloop.first %} is-active{% endif %}" {{ block.shopify_attributes }}>
+          {%- capture inner -%}{% render 'icon', name: block.settings.icon, class: 'icon--sm' %}<span>{{ block.settings.text }}</span>{%- endcapture -%}
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}"{% if block.settings.opens_popup %} data-open-popup{% endif %}>{{ inner }}</a>
+          {%- elsif block.settings.opens_popup -%}
+            <button type="button" data-open-popup>{{ inner }}</button>
+          {%- else -%}
+            {{ inner }}
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+    {%- if section.settings.show_localization -%}
+      <div class="announcement__loc">{% render 'localization', id: 'TopLocalization', direction: 'down', show_language: false, compact: true %}</div>
     {%- endif -%}
-    <div class="utility-bar__end">
-    {% render 'currency-selector', id: 'bar', variant: 'bar' %}
-    {%- if section.settings.menu != blank and section.settings.menu.links.size > 0 -%}
-      <ul class="utility-bar__links" role="list">
-        {%- for link in section.settings.menu.links -%}
-          <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
-        {%- endfor -%}
-      </ul>
-    {%- elsif settings.support_phone != blank -%}
-      <p class="utility-bar__links">
-        <a href="tel:{{ settings.support_phone | remove: ' ' }}">Support: {{ settings.support_phone }}</a>
-      </p>
-    {%- endif -%}
-    </div>
   </div>
 </div>
+{%- endif -%}
 
 {% schema %}
 {
-  "name": "Utility bar",
-  "class": "section-utility",
-  "max_blocks": 4,
+  "name": "Announcement bar",
+  "class": "section-announcement",
   "settings": [
-    { "type": "checkbox", "id": "show_free_shipping", "label": "Show free shipping message", "default": true, "info": "Uses the threshold in Theme settings > Cart. Hidden while the threshold is 0. Only turn the threshold on once a matching free shipping rate exists in Settings > Shipping and delivery." },
-    { "type": "link_list", "id": "menu", "label": "Right-side links", "info": "Optional small links, e.g. Help center, Track order, Contact. If empty, the support phone from Theme settings is shown." }
+    { "type": "range", "id": "speed", "label": "Seconds per message on phones", "min": 3, "max": 12, "step": 1, "default": 4 },
+    { "type": "checkbox", "id": "show_localization", "label": "Show country selector", "default": true }
   ],
   "blocks": [
     {
       "type": "message",
       "name": "Message",
       "settings": [
-        { "type": "text", "id": "text", "label": "Text", "default": "Tracked shipping on every order" },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "percent", "label": "Percent" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "return", "label": "Returns" },
+            { "value": "lock", "label": "Secure" },
+            { "value": "diamond", "label": "Diamond" },
+            { "value": "sparkle", "label": "Sparkle" },
+            { "value": "chat", "label": "Chat" },
+            { "value": "check", "label": "Check" },
+            { "value": "tag", "label": "Tag" }
+          ],
+          "default": "truck"
+        },
+        { "type": "text", "id": "text", "label": "Text", "default": "Free shipping on every order" },
         { "type": "url", "id": "link", "label": "Link" },
-        { "type": "select", "id": "icon", "label": "Icon", "options": [{"value": "truck", "label": "Truck"}, {"value": "shield", "label": "Shield"}, {"value": "repeat", "label": "Repeat"}, {"value": "chat", "label": "Chat"}, {"value": "headset", "label": "Headset"}, {"value": "lock", "label": "Lock"}, {"value": "box", "label": "Box"}, {"value": "gift", "label": "Gift"}, {"value": "clock", "label": "Clock"}, {"value": "percent", "label": "Percent"}, {"value": "bolt", "label": "Bolt"}, {"value": "check-circle", "label": "Check circle"}], "default": "truck" }
+        { "type": "checkbox", "id": "opens_popup", "label": "Opens the email popup", "default": false },
+        { "type": "checkbox", "id": "needs_code", "label": "Needs welcome code", "default": false, "info": "Hide this message until a code is set in Theme settings > Welcome offer." },
+        { "type": "checkbox", "id": "needs_qty", "label": "Needs buy-more-save-more", "default": false, "info": "Hide this message unless Theme settings > Cart > Buy more, save more is set." },
+        { "type": "checkbox", "id": "needs_tiers", "label": "Needs spend and save", "default": false, "info": "Hide this message until tiers are set in Theme settings > Cart." }
       ]
     }
-  ]
+  ],
+  "max_blocks": 6
 }
 {% endschema %}

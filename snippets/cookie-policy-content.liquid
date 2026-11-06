@@ -1,0 +1,28 @@
+{%- comment -%} The store's cookie policy text. Used by the Cookie policy page template and /pages/cookie-policy. {%- endcomment -%}
+<p><strong>Last updated: {{ 'now' | date: '%B %Y' }}</strong></p>
+<p>This policy explains how {{ shop.name }} ("we", "us") uses cookies and similar technologies on {{ shop.domain }}. It should be read with our <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">privacy policy</a>.</p>
+
+<h2>What cookies are</h2>
+<p>Cookies are small text files a website stores on your device. Similar technologies, such as your browser's local storage and pixels, work in a similar way. We call them all "cookies" here.</p>
+
+<h2>Your choices</h2>
+<p>Where the law requires it, we ask before setting any cookie that isn't essential. You can change your choice at any time with the <button type="button" class="link" data-cookie-prefs>Cookie preferences</button> link in the footer of every page. You can also block or delete cookies in your browser settings, but parts of the store, such as your bag and checkout, may then stop working.</p>
+
+<h2>The cookies we use</h2>
+<h3>Essential</h3>
+<p>Needed for the store to work, so they can't be switched off. They keep items in your bag, remember your country and currency, keep checkout secure and help prevent fraud. They're set by Shopify, which runs our store and checkout.</p>
+<h3>Preferences</h3>
+<p>Remember choices you make, such as your wishlist, recently viewed items and light or dark mode. Most of these are kept only in your browser and aren't shared.</p>
+<h3>Analytics</h3>
+<p>Help us understand how the store is used, such as which pages are visited and how people find us, so we can improve it. These come from Shopify's analytics.</p>
+<h3>Marketing</h3>
+<p>Used to show you relevant offers and to measure our advertising, including by advertising partners such as social media platforms. These are only set if you allow marketing cookies.</p>
+
+<h2>Third parties</h2>
+<p>Some features are provided by other companies that may set their own cookies when you use them: Shopify (store, checkout and Shop Pay), payment providers such as PayPal, our reviews provider (Judge.me), our live chat (Shopify Inbox) and our email sign-up. Their use is covered by their own privacy and cookie policies.</p>
+
+<h2>How long cookies last</h2>
+<p>Some cookies are deleted when you close your browser. Others last for a set time, from a few minutes up to about two years, or until you delete them.</p>
+
+<h2>Changes and contact</h2>
+<p>We may update this policy when our store or the law changes. The date at the top shows the latest version. Questions? Email <a href="mailto:{{ settings.support_email | default: 'support@luxedealers.com' }}">{{ settings.support_email | default: 'support@luxedealers.com' }}</a>.</p>

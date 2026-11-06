@@ -1,30 +1,28 @@
 <!doctype html>
-<html class="no-js" lang="{{ request.locale.iso_code }}">
+<html class="no-js" lang="{{ request.locale.iso_code }}" data-motion="{{ settings.motion }}"{% if settings.gold_shimmer %} data-shimmer{% endif %}{% if settings.page_transitions %} data-transitions{% endif %}>
   <head>
     <meta charset="utf-8">
     {%- comment -%}
-      Security: browsers only run scripts from the sources below, so injected code can't load a script from anywhere
-      else (LuxeDealers had this happen through a compromised app). Off in the theme editor.
+      Security: browsers only run scripts from the sources below. Injected code that tries to load a script from
+      anywhere else (like the cartassure.top attack via a compromised app) is blocked. Off in the theme editor.
       If a new app stops working, add its script domain here.
     {%- endcomment -%}
     {%- unless request.design_mode -%}
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.shopify.com https://*.shopify.com https://*.shopifycloud.com https://*.shopifycdn.com https://shop.app https://*.shop.app https://connect.facebook.net https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://*.hcaptcha.com https://hcaptcha.com https://*.judge.me https://luxemail-tech.turbozzgeezzz.workers.dev; object-src 'none'; base-uri 'self'">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.shopify.com https://*.shopify.com https://*.shopifycloud.com https://shop.app https://*.shop.app https://connect.facebook.net https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://*.judge.me https://*.swym.it https://*.swymrelay.com https://*.shopifycdn.com https://*.hcaptcha.com https://hcaptcha.com https://luxemail-tech.turbozzgeezzz.workers.dev; object-src 'none'; base-uri 'self'">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     {%- endunless -%}
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="#8048F5">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="{{ settings.color_background }}">
+    <script>try{var m=localStorage.getItem('luxe:theme');if(m==='"dark"'||m==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name=theme-color]').setAttribute('content','#1A0A3A');}}catch(e){}</script>
     <link rel="canonical" href="{{ canonical_url }}">
-    {%- if settings.favicon != blank -%}
-      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
-    {%- else -%}
-      <link rel="icon" type="image/svg+xml" href="{{ 'favicon.svg' | asset_url }}">
-      <link rel="icon" type="image/png" sizes="32x32" href="{{ 'favicon-32.png' | asset_url }}">
-    {%- endif -%}
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    {%- comment -%} The gold LD monogram is the site icon (browser tab, bookmarks, phone home screen). {%- endcomment -%}
+    <link rel="icon" type="image/svg+xml" href="{{ 'favicon.svg' | asset_url }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ 'favicon-32.png' | asset_url }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ 'apple-touch-icon.png' | asset_url }}">
 
     {%- liquid
-      assign seo_brand = settings.seo_brand | default: shop.name
       assign seo_title = page_title
       if request.page_type == 'index' and settings.seo_home_title != blank
         assign seo_title = settings.seo_home_title
@@ -33,38 +31,41 @@
       if request.page_type == 'index' and settings.seo_home_description != blank
         assign seo_desc = settings.seo_home_description
       endif
-      if seo_desc == blank
+      # Pages without their own description get one built from their own content, never the homepage text
+      # (identical descriptions across pages are flagged by Google and Bing).
+      if seo_desc == blank or seo_desc == settings.seo_home_description and request.page_type != 'index'
         case request.page_type
+          when 'collection'
+            assign seo_desc = 'Shop ' | append: collection.title | append: ' at Tech.LuxeDealers: ' | append: collection.products_count | append: ' products, each picked by our team, with tracked shipping and a refund or replacement guarantee.'
           when 'product'
             assign seo_desc = product.description | strip_html | strip_newlines | truncate: 155
-          when 'collection'
-            assign seo_desc = collection.description | strip_html | strip_newlines | truncate: 155
             if seo_desc == blank
-              assign seo_desc = 'Shop ' | append: collection.title | append: ' at ' | append: seo_brand | append: '. Hand-picked, dispatched in 3-4 business days with tracking.'
+              assign seo_desc = 'Shop ' | append: product.title | append: ' at Tech.LuxeDealers from ' | append: product.price_min | money_without_trailing_zeros | append: '. Tracked shipping, refund or replacement guarantee.'
             endif
-          when 'article'
-            assign seo_desc = article.excerpt_or_content | strip_html | strip_newlines | truncate: 155
-          when 'blog'
-            assign seo_desc = 'Buying guides, care tips and news from the ' | append: seo_brand | append: ' team.'
           when 'page'
             assign seo_desc = page.content | strip_html | strip_newlines | truncate: 155
+          when 'blog'
+            assign seo_desc = 'Buying guides, how-tos and tech tips from the Tech.LuxeDealers team: ' | append: blog.title | append: '.'
+          when 'article'
+            assign seo_desc = article.excerpt_or_content | strip_html | strip_newlines | truncate: 155
+          else
+            assign seo_desc = settings.seo_home_description
         endcase
-      endif
-      if seo_desc == blank
-        assign seo_desc = settings.seo_home_description
+        if seo_desc == blank
+          assign seo_desc = settings.seo_home_description
+        endif
       endif
     -%}
     <title>
       {{ seo_title }}
-      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_tags %} &ndash; {{ current_tags | join: ', ' }}{% endif -%}
       {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-      {%- comment -%} Brand suffix only when the title still fits in search results (about 60 characters). {%- endcomment -%}
-      {%- unless seo_title contains seo_brand or seo_title contains shop.name or seo_title.size > 42 %} &ndash; {{ seo_brand }}{% endunless -%}
+      {%- comment -%} Brand suffix only when the title still fits in search results (about 60 characters). {%- endcomment -%}{%- unless seo_title contains shop.name or seo_title.size > 44 %} &ndash; {{ shop.name }}{% endunless -%}
     </title>
     <meta name="description" content="{{ seo_desc | escape }}">
     {%- liquid
       assign noindex = false
-      if template.suffix == 'wishlist' or request.page_type == 'search' or request.page_type == 'cart' or request.page_type == 'customers/account' or request.page_type == 'customers/order'
+      if request.page_type == 'search' or request.page_type == 'cart' or template.suffix == 'wishlist' or request.page_type == 'customers/account' or request.page_type == 'customers/order'
         assign noindex = true
       endif
       # Filtered or re-sorted collection pages are near-duplicates of the main page: keep them out of Google.
@@ -81,29 +82,20 @@
     -%}
     {%- if noindex -%}<meta name="robots" content="noindex, follow">{%- endif -%}
 
-    {% render 'meta-tags', seo_title: seo_title, seo_desc: seo_desc, seo_brand: seo_brand %}
-    {% render 'structured-data' %}
-    {% render 'fonts' %}
-
-    <script>
-      /* Apply the saved or device colour mode before first paint (no flash). */
-      (function () {
-        var mode = {{ settings.dark_mode | default: 'device' | json }};
-        if (mode === 'off') return;
-        var saved = null;
-        try { saved = localStorage.getItem('luxetech:theme'); } catch (e) {}
-        var dark = saved ? saved === 'dark' : (mode === 'device' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        if (dark) document.documentElement.setAttribute('data-theme', 'dark');
-      })();
-    </script>
+    {% render 'meta-tags', seo_title: seo_title, seo_desc: seo_desc, product: product %}
+    {% render 'seo-schema', product: product, collection: collection %}
     {% render 'css-variables' %}
-
     {{ 'theme.css' | asset_url | stylesheet_tag }}
-    {{ 'lilac.css' | asset_url | stylesheet_tag }}
+    {{ 'atelier.css' | asset_url | stylesheet_tag }}
+    {{ 'dark.css' | asset_url | stylesheet_tag }}
+    {%- if settings.page_transitions and settings.motion != 'off' -%}
+      <style>@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .45s; }</style>
+    {%- endif -%}
 
     <script>
       document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
-      window.LuxeTech = {
+      try { if (sessionStorage.getItem('luxe:splash')) document.documentElement.classList.add('splash-seen'); } catch (e) {}
+      window.Luxe = {
         routes: {
           root: {{ routes.root_url | json }},
           cart: {{ routes.cart_url | json }},
@@ -114,25 +106,44 @@
           recommendations: {{ routes.product_recommendations_url | json }}
         },
         cartType: {{ settings.cart_type | json }},
-        mail: {{ settings.luxemail_endpoint | json }} ? { endpoint: {{ settings.luxemail_endpoint | json }}{% if customer and customer.accepts_marketing %}, email: {{ customer.email | json }}, firstName: {{ customer.first_name | json }}{% endif %} } : null,
         moneyFormat: {{ shop.money_format | json }},
-        currency: {{ cart.currency.iso_code | json }}
+        currency: {{ cart.currency.iso_code | json }},
+        welcome: {{ settings.welcome_code | json }},
+        mail: {% if settings.luxemail_endpoint != blank %}{ endpoint: {{ settings.luxemail_endpoint | json }}{% if customer and customer.accepts_marketing %}, email: {{ customer.email | json }}, firstName: {{ customer.first_name | json }}{% endif %} }{% else %}null{% endif %},
+        searchStrings: {
+          products: {{ 'search.products' | t | json }},
+          collections: {{ 'search.collections' | t | json }},
+          suggestions: {{ 'search.suggestions' | t | json }},
+          all: {{ 'search.view_all' | t: terms: '%TERMS%' | json }},
+          none: {{ 'search.no_results' | t: terms: '%TERMS%' | json }}
+        },
+        strings: {
+          added: {{ 'cart.added' | t | json }},
+          soldOut: {{ 'products.sold_out' | t | json }},
+          unavailable: {{ 'products.unavailable' | t | json }},
+          addToBag: {{ 'products.add_to_bag' | t | json }},
+          copied: {{ 'general.copied' | t | json }},
+          codeNote: {{ 'newsletter.code_note' | t: date: '[date]' | json }},
+          welcomeBack: {{ 'newsletter.welcome_back' | t | json }},
+          welcomeBackNote: {{ 'newsletter.welcome_back_note' | t | json }},
+          view: {{ 'wishlist.view' | t | json }},
+          remove: {{ 'wishlist.remove' | t | json }}
+        }
       };
     </script>
     <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'experience.js' | asset_url }}" defer="defer"></script>
 
     {{ content_for_header }}
   </head>
 
-  <body class="template-{{ template.name | handle }}">
-    <a class="skip-link" href="#MainContent">Skip to content</a>
+  <body class="template-{{ template.name | handle }}{% if template.suffix %} template-{{ template.suffix | handle }}{% endif %}">
+    <a class="skip-link" href="#MainContent">{{ 'general.skip' | t }}</a>
+    {% render 'splash' %}
 
     {% sections 'header-group' %}
 
     <main id="MainContent" class="main-content" role="main" tabindex="-1">
-      {%- if request.page_type == 'index' -%}<h1 class="visually-hidden">{{ shop.name | escape }}: tech, home and lifestyle gear</h1>{%- endif -%}
-      {%- if request.page_type == 'policy' -%}{% render 'policy-hero' %}{%- endif -%}
+      {%- if request.page_type == 'index' -%}<h1 class="visually-hidden">{{ settings.seo_home_title | default: shop.name }}</h1>{%- endif -%}
       {{ content_for_layout }}
     </main>
 
@@ -140,9 +151,16 @@
 
     {% section 'cart-drawer' %}
     {% section 'newsletter-popup' %}
+    {% render 'search-overlay' %}
+    {% render 'quick-view' %}
     {% render 'welcome-back' %}
-    {% render 'quick-add-modal' %}
+    {% render 'wishlist-drawer' %}
+    {%- if settings.advisor_float and settings.advisor_whatsapp != blank -%}
+      <a class="advisor-float" href="https://wa.me/{{ settings.advisor_whatsapp }}" target="_blank" rel="noopener"><span class="advisor__dot" aria-hidden="true"></span>{{ settings.advisor_label }}</a>
+    {%- endif -%}
+    {%- if settings.view_cursor and settings.motion != 'off' -%}<div class="view-cursor" aria-hidden="true">{{ 'products.view' | t }}</div>{%- endif -%}
 
     <div class="visually-hidden" aria-live="polite" role="status" id="A11yStatus"></div>
+    {% render 'cookie-banner' %}
   </body>
 </html>

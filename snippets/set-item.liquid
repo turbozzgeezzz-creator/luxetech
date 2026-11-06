@@ -1,0 +1,26 @@
+{%- assign v = p.selected_or_first_available_variant -%}
+<div class="bset__item" data-set-item>
+  <label class="bset__toggle">
+    <input type="checkbox" class="visually-hidden" data-set-variant="{{ v.id }}" data-price="{{ v.price }}">
+    <span class="bset__check" aria-hidden="true">{% render 'icon', name: 'plus', class: 'icon--sm' %}{% render 'icon', name: 'check', class: 'icon--sm' %}</span>
+    <span class="visually-hidden">{{ 'bundle.add_item' | t: title: p.title }}</span>
+  </label>
+  <a class="bset__img" href="{{ p.url }}">{{ p.featured_media.preview_image | image_url: width: 400 | image_tag: width: 200, height: 200, loading: 'lazy', alt: p.title }}</a>
+  <a class="bset__name" href="{{ p.url }}">{{ p.title }}</a>
+  <strong class="bset__price" data-set-price>{{ v.price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</strong>
+  {%- assign avail = p.variants | where: 'available' -%}
+  {%- if avail.size > 1 -%}
+    <select class="bset__select" data-set-select aria-label="{{ 'bundle.choose' | t: title: p.title | escape }}">
+      {%- for x in avail -%}
+        {%- capture label -%}
+          {%- for val in x.options -%}
+            {%- assign digits = val | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9' | strip -%}
+            {%- unless forloop.first %} / {% endunless -%}
+            {%- if digits == blank -%}{{ p.options[forloop.index0] | replace: 'Collection', 'Style' }} {% endif -%}{{ val }}
+          {%- endfor -%}
+        {%- endcapture -%}
+        <option value="{{ x.id }}" data-price="{{ x.price }}" data-money="{{ x.price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' | escape }}"{% if x.featured_media %} data-img="{{ x.featured_media.preview_image | image_url: width: 400 }}"{% endif %}{% if x.id == v.id %} selected{% endif %}>{{ label | strip }}</option>
+      {%- endfor -%}
+    </select>
+  {%- endif -%}
+</div>

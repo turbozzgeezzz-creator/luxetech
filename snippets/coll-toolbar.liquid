@@ -1,0 +1,32 @@
+{%- comment -%} Params: results (collection or search), count_text, sort_options, sort_by {%- endcomment -%}
+<div class="toolbar">
+  <div class="toolbar__left">
+    {%- if results.filters.size > 0 -%}
+      <button type="button" class="toolbar__btn coll__filter-btn" data-drawer-open="FacetDrawer" aria-controls="FacetDrawer" aria-expanded="false">{% render 'icon', name: 'filter', class: 'icon--sm' %} {{ 'collections.filter' | t }}</button>
+    {%- endif -%}
+    <span class="toolbar__count" data-product-count>{{ count_text }}</span>
+  </div>
+  <div class="toolbar__right">
+    <label class="toolbar__sort"><span>{{ 'collections.sort' | t }}</span>
+      <select class="select" data-sort>
+        {%- for option in sort_options -%}<option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>{%- endfor -%}
+      </select>
+    </label>
+  </div>
+</div>
+<div class="active-filters" data-active-filters>
+  {%- assign any_active = false -%}
+  {%- for filter in results.filters -%}
+    {%- for value in filter.active_values -%}
+      {%- assign any_active = true -%}
+      <a href="{{ value.url_to_remove }}" data-facet-link>{{ value.label }} {% render 'icon', name: 'close', class: 'icon--sm' %}</a>
+    {%- endfor -%}
+    {%- if filter.type == 'price_range' -%}
+      {%- if filter.min_value.value or filter.max_value.value -%}
+        {%- assign any_active = true -%}
+        <a href="{{ filter.url_to_remove }}" data-facet-link>{{ filter.min_value.value | default: 0 | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }} – {{ filter.max_value.value | default: filter.range_max | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }} {% render 'icon', name: 'close', class: 'icon--sm' %}</a>
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if any_active -%}<a class="active-filters__clear" href="{{ clear_url }}" data-facet-link>{{ 'collections.clear' | t }}</a>{%- endif -%}
+</div>

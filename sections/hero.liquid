@@ -1,0 +1,166 @@
+{%- liquid
+  assign slide_count = section.blocks.size
+-%}
+<section class="hero hero--h-{{ section.settings.height }}" data-slideshow data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.speed }}" aria-roledescription="carousel" aria-label="{{ section.settings.label | escape }}">
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign b = block.settings
+      assign eager = false
+      if forloop.first
+        assign eager = true
+      endif
+      assign load = 'lazy'
+      if eager
+        assign load = 'eager'
+      endif
+    -%}
+    {%- liquid
+      assign has_media = false
+      if b.image != blank or b.video != blank or b.video_url != blank
+        assign has_media = true
+      endif
+    -%}
+    <div class="hero__slide{% if forloop.first %} is-active{% endif %}{% unless has_media %} hero__slide--noimg{% endunless %}" style="--shade: {{ b.shade | divided_by: 100.0 }}" role="group" aria-roledescription="slide" aria-label="{{ forloop.index }} / {{ slide_count }}" {{ block.shopify_attributes }}>
+      {%- if b.mobile_image != blank -%}
+        <div class="hero__media hero__media--mobile">{% render 'image', image: b.mobile_image, loading: load, sizes: '100vw' %}</div>
+      {%- endif -%}
+      <div class="hero__media hero__media--desktop">
+        {%- if block.type == 'video' and b.video != blank -%}
+          {{ b.video | video_tag: autoplay: false, loop: true, muted: true, playsinline: true, preload: 'metadata', image_size: '1920x' }}
+        {%- elsif block.type == 'video' and b.video_url != blank -%}
+          <video src="{{ b.video_url }}" muted loop playsinline preload="metadata"{% if b.image != blank %} poster="{{ b.image | image_url: width: 1920 }}"{% endif %}></video>
+        {%- else -%}
+          {% render 'image', image: b.image, loading: load, sizes: '100vw', label: 'Hero photo' %}
+        {%- endif -%}
+      </div>
+      <div class="hero__overlay" aria-hidden="true"></div>
+      <div class="container hero__content hero__content--{{ b.align }}{% if b.dark_text %} hero__content--dark{% endif %}">
+        {%- if b.eyebrow != blank -%}<span class="eyebrow hero__eyebrow">{{ b.eyebrow }}</span>{%- endif -%}
+        {%- if b.heading != blank -%}
+          <h2 class="hero__title" data-split>{{ b.heading | newline_to_br }}</h2>
+        {%- endif -%}
+        {%- if b.text != blank -%}<div class="hero__text">{{ b.text }}</div>{%- endif -%}
+        {%- if b.button_1 != blank or b.button_2 != blank -%}
+          <div class="hero__actions">
+            {%- if b.button_1 != blank -%}<a href="{{ b.link_1 | default: routes.all_products_collection_url }}" class="btn {% if b.dark_text %}{% else %}btn--light{% endif %}">{{ b.button_1 }}</a>{%- endif -%}
+            {%- if b.button_2 != blank -%}<a href="{{ b.link_2 | default: routes.collections_url }}" class="btn {% if b.dark_text %}btn--outline{% else %}btn--ghost-light{% endif %}">{{ b.button_2 }}</a>{%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endfor -%}
+
+  {%- if slide_count > 1 or section.settings.show_scroll -%}
+    <div class="hero__nav">
+      <div class="container hero__nav-inner">
+        {%- if slide_count > 1 -%}
+          <div class="hero__dots" role="group" aria-label="{{ 'hero.choose_slide' | t }}">
+            {%- for block in section.blocks -%}
+              <button type="button" class="hero__dot{% if forloop.first %} is-active{% endif %}" aria-label="{{ 'hero.go_to' | t: n: forloop.index }}"{% if forloop.first %} aria-current="true"{% endif %}>
+                <span></span>{% if block.settings.dot_label != blank %}{{ block.settings.dot_label }}{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}
+              </button>
+            {%- endfor -%}
+          </div>
+          {%- if section.settings.autoplay -%}
+            <button type="button" class="icon-btn hero__pause" data-slideshow-pause aria-label="{{ 'hero.pause' | t }}" data-pause-label="{{ 'hero.pause' | t }}" data-play-label="{{ 'hero.play' | t }}">
+              <span data-icon-pause>{% render 'icon', name: 'pause', class: 'icon--sm' %}</span><span data-icon-play hidden>{% render 'icon', name: 'play', class: 'icon--sm' %}</span>
+            </button>
+          {%- endif -%}
+        {%- endif -%}
+        {%- if section.settings.show_scroll -%}<span class="hero__scroll" aria-hidden="true"><i></i>{{ 'hero.scroll' | t }}</span>{%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Hero slideshow",
+  "tag": "div",
+  "class": "section-hero",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Name for screen readers", "default": "Featured" },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height",
+      "options": [
+        { "value": "large", "label": "Full screen" },
+        { "value": "medium", "label": "Large" },
+        { "value": "small", "label": "Medium" }
+      ],
+      "default": "large"
+    },
+    { "type": "checkbox", "id": "autoplay", "label": "Change slides automatically", "default": true },
+    { "type": "range", "id": "speed", "label": "Seconds per slide", "min": 4, "max": 12, "step": 1, "default": 7 },
+    { "type": "checkbox", "id": "show_scroll", "label": "Show scroll cue", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "2400 x 1400 px or larger." },
+        { "type": "image_picker", "id": "mobile_image", "label": "Phone image (optional)", "info": "Portrait, 1200 x 1800 px." },
+        { "type": "range", "id": "shade", "label": "Image darkening", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 40 },
+        { "type": "text", "id": "dot_label", "label": "Slide label", "info": "Short name under the progress line, e.g. Watches." },
+        { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The new season" },
+        { "type": "textarea", "id": "heading", "label": "Heading", "default": "The art of\n<em>the detail</em>" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Clothing, shoes, bags and accessories, priced in your currency and sent with tracking.</p>" },
+        { "type": "text", "id": "button_1", "label": "Button 1", "default": "Shop new arrivals" },
+        { "type": "url", "id": "link_1", "label": "Button 1 link" },
+        { "type": "text", "id": "button_2", "label": "Button 2", "default": "Explore watches" },
+        { "type": "url", "id": "link_2", "label": "Button 2 link" },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Text position",
+          "options": [
+            { "value": "left", "label": "Bottom left" },
+            { "value": "center", "label": "Centre" }
+          ],
+          "default": "left"
+        },
+        { "type": "checkbox", "id": "dark_text", "label": "Dark text (for light photos)", "default": false }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video slide",
+      "settings": [
+        { "type": "video", "id": "video", "label": "Video", "info": "Upload in Content > Files. Plays muted on a loop." },
+        { "type": "url", "id": "video_url", "label": "Or video file URL (.mp4)" },
+        { "type": "image_picker", "id": "image", "label": "Cover image" },
+        { "type": "image_picker", "id": "mobile_image", "label": "Phone image (optional)" },
+        { "type": "range", "id": "shade", "label": "Darkening", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 35 },
+        { "type": "text", "id": "dot_label", "label": "Slide label" },
+        { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "In motion" },
+        { "type": "textarea", "id": "heading", "label": "Heading", "default": "Made to be\nworn every day" },
+        { "type": "richtext", "id": "text", "label": "Text" },
+        { "type": "text", "id": "button_1", "label": "Button 1", "default": "Shop now" },
+        { "type": "url", "id": "link_1", "label": "Button 1 link" },
+        { "type": "text", "id": "button_2", "label": "Button 2" },
+        { "type": "url", "id": "link_2", "label": "Button 2 link" },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Text position",
+          "options": [
+            { "value": "left", "label": "Bottom left" },
+            { "value": "center", "label": "Centre" }
+          ],
+          "default": "center"
+        },
+        { "type": "checkbox", "id": "dark_text", "label": "Dark text", "default": false }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Hero slideshow",
+      "blocks": [{ "type": "image" }, { "type": "image" }]
+    }
+  ]
+}
+{% endschema %}

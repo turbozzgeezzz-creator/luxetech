@@ -1,55 +1,85 @@
 {%- comment -%}
-  Design tokens. Every color in theme.css reads from these variables so the
-  merchant's Colors settings flow through the whole theme.
+  Design tokens and fonts. Every colour in theme.css reads from these
+  variables, so Theme settings > Colors and Typography apply everywhere.
 {%- endcomment -%}
+{%- liquid
+  assign fh = settings.font_heading
+  assign fb = settings.font_body
+  assign fh_italic = fh | font_modify: 'style', 'italic'
+  assign fb_medium = fb | font_modify: 'weight', '500'
+  assign fb_semi = fb | font_modify: 'weight', '600'
+  assign fb_bold = fb | font_modify: 'weight', 'bold'
+  assign fb_italic = fb | font_modify: 'style', 'italic'
+  assign scale = settings.heading_scale | divided_by: 100.0
+-%}
+{%- if settings.typeface == 'custom' -%}
+{{ fh | font_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{{ fb | font_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{%- elsif settings.typeface == 'atelier' -%}
+{{ 'poppins-400.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{{ 'poppins-600.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{%- else -%}
+{{ 'jost-var.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{%- endif -%}
+
 <style>
+  {%- if settings.typeface == 'atelier' %}
+  @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 400; font-display: swap; src: url({{ 'poppins-400.woff2' | asset_url }}) format('woff2'); }
+  @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 500; font-display: swap; src: url({{ 'poppins-500.woff2' | asset_url }}) format('woff2'); }
+  @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 600; font-display: swap; src: url({{ 'poppins-600.woff2' | asset_url }}) format('woff2'); }
+  @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 700; font-display: swap; src: url({{ 'poppins-700.woff2' | asset_url }}) format('woff2'); }
+  {%- endif %}
+  @font-face { font-family: 'Jost'; font-style: normal; font-weight: 100 900; font-display: swap; src: url({{ 'jost-var.woff2' | asset_url }}) format('woff2'); }
+  @font-face { font-family: 'Cormorant Garamond'; font-style: italic; font-weight: 400; font-display: swap; src: url({{ 'cormorant-italic.woff2' | asset_url }}) format('woff2'); }
+  @font-face { font-family: 'Cormorant Garamond'; font-style: normal; font-weight: 400; font-display: swap; src: url({{ 'cormorant.woff2' | asset_url }}) format('woff2'); }
+  {%- if settings.typeface == 'custom' -%}
+  {{ fh | font_face: font_display: 'swap' }}
+  {{ fh_italic | font_face: font_display: 'swap' }}
+  {{ fb | font_face: font_display: 'swap' }}
+  {{ fb_medium | font_face: font_display: 'swap' }}
+  {{ fb_semi | font_face: font_display: 'swap' }}
+  {{ fb_bold | font_face: font_display: 'swap' }}
+  {{ fb_italic | font_face: font_display: 'swap' }}
+  {%- endif -%}
+
   :root {
     --c-bg: {{ settings.color_background }};
     --c-subtle: {{ settings.color_subtle }};
-    --c-surface: {{ settings.color_surface }};
     --c-ink: {{ settings.color_ink }};
     --c-ink-rgb: {{ settings.color_ink.red }}, {{ settings.color_ink.green }}, {{ settings.color_ink.blue }};
     --c-muted: {{ settings.color_muted }};
     --c-border: {{ settings.color_border }};
-    --c-primary: {{ settings.color_primary }};
-    --c-primary-rgb: {{ settings.color_primary.red }}, {{ settings.color_primary.green }}, {{ settings.color_primary.blue }};
-    --c-primary-dark: {{ settings.color_primary | color_darken: 12 }};
-    --c-accent: {{ settings.color_accent }};
-    --c-accent-text: {{ settings.color_primary | color_darken: 18 }};
+    --c-gold: {{ settings.color_gold }};
+    --c-gold-rgb: {{ settings.color_gold.red }}, {{ settings.color_gold.green }}, {{ settings.color_gold.blue }};
+    --c-gold-text: {{ settings.color_gold_text }};
+    --c-gold-light: {{ settings.color_gold | color_mix: '#FFFFFF', 55 }};
+    --c-gold-pale: {{ settings.color_gold | color_mix: '#FFFFFF', 12 }};
+    --c-sapphire: {{ settings.color_sapphire }};
     --c-success: {{ settings.color_success }};
-    --c-success-soft: {{ settings.color_success | color_modify: 'alpha', 0.1 }};
-    --c-warning: {{ settings.color_warning }};
-    --c-warning-soft: {{ settings.color_warning | color_modify: 'alpha', 0.12 }};
     --c-error: {{ settings.color_error }};
-    --c-error-soft: {{ settings.color_error | color_modify: 'alpha', 0.1 }};
-    --c-night: {{ settings.color_ink }};
-    --c-photo: {{ settings.color_subtle }};
-    --c-on-ink: #FFFFFF;
-    --c-on-ink-muted: {{ settings.color_ink | color_mix: '#FFFFFF', 35 }};
-    --c-primary-on-ink: {{ settings.color_primary | color_mix: '#FFFFFF', 55 }};
-    --font-display: 'Archivo', 'Helvetica Neue', Arial, system-ui, sans-serif;
-    --font-body: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
-    --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
-    --logo-width: {{ settings.logo_width }}px;
-  }
-  /* Dark mode: surfaces go dark, text goes light. --c-night stays dark for bands
-     that are always dark, and product photos keep a light frame (--c-photo). */
-  html[data-theme="dark"] {
-    color-scheme: dark;
-    --c-bg: #0A0E17;
-    --c-subtle: #151C2B;
-    --c-surface: #111827;
-    --c-ink: #EDEFF5;
-    --c-muted: #A1A9BA;
-    --c-border: #263046;
-    --c-accent: #261447;
-    --c-accent-text: #CDB0FF;
-    --c-on-ink-muted: #A1A9BA;
-    --c-photo: #E9EBF0;
-    --c-success: #3FBF6E;
-    --c-success-soft: rgba(63, 191, 110, .16);
-    --c-warning: #E0A43A;
-    --c-warning-soft: rgba(224, 164, 58, .16);
-    --c-error: #F0645A;
+    --c-error-soft: {{ settings.color_error | color_modify: 'alpha', 0.08 }};
+    --gold-metal: linear-gradient(115deg, {{ settings.color_gold | color_darken: 14 }} 0%, {{ settings.color_gold | color_lighten: 22 }} 22%, {{ settings.color_gold }} 42%, {{ settings.color_gold | color_lighten: 30 }} 58%, {{ settings.color_gold | color_darken: 8 }} 78%, {{ settings.color_gold | color_lighten: 14 }} 100%);
+
+    {%- if settings.typeface == 'custom' %}
+    --font-heading: {{ fh.family }}, {{ fh.fallback_families }};
+    --font-heading-weight: {{ fh.weight }};
+    --font-body: {{ fb.family }}, {{ fb.fallback_families }};
+    --font-body-weight: {{ fb.weight }};
+    --font-serif: {{ fh.family }}, {{ fh.fallback_families }};
+    {%- elsif settings.typeface == 'atelier' %}
+    --font-heading: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+    --font-heading-weight: 600;
+    --font-body: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+    --font-body-weight: 400;
+    --font-serif: 'Cormorant Garamond', 'Didot', Georgia, serif;
+    {%- else %}
+    --font-heading: 'Jost', 'Futura', 'Helvetica Neue', Arial, sans-serif;
+    --font-heading-weight: 300;
+    --font-body: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+    --font-body-weight: 400;
+    --font-serif: 'Cormorant Garamond', 'Didot', Georgia, serif;
+    {%- endif %}
+    --heading-scale: {{ scale }};
+    --logo-h: {{ settings.logo_height }}px;
   }
 </style>

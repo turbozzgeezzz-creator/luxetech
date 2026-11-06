@@ -1,34 +1,30 @@
-<div class="container page">
-  <h1 class="page-title">All categories</h1>
-  {%- if collections.size > 0 -%}
-    <ul class="collection-list" role="list">
+<section class="section section--flush-top">
+  {% render 'page-banner', title: section.settings.heading, eyebrow: section.settings.eyebrow, art: 'ill-col-all', meta: true %}
+  <div class="container">
+    <div class="collection-tiles" data-stagger>
       {%- for c in collections -%}
-        {%- if c.handle == 'frontpage' or c.handle contains 'performance' or c.handle == 'new-arrivals' or c.handle == 'best-sellers' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
-        <li>
-          <a href="{{ c.url }}" class="collection-tile">
-            <span class="collection-tile__media ratio ratio--landscape">
-              {%- if c.image -%}
-                {{ c.image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,450,600', sizes: '(min-width: 990px) 25vw, 50vw', alt: '' }}
-              {%- elsif c.products.first.featured_media -%}
-                {{ c.products.first.featured_media.preview_image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300,450,600', sizes: '(min-width: 990px) 25vw, 50vw', alt: '' }}
-              {%- else -%}
-                {% render 'placeholder-art', type: 'hero', uid: c.id, caption: c.title %}
-              {%- endif -%}
-            </span>
-            <span class="collection-tile__title">{{ c.title | escape }}</span>
-            <span class="collection-tile__count">Shop now {% render 'icon', name: 'arrow-right', class: 'icon--xs' %}</span>
-          </a>
-        </li>
+        {%- if c.handle == 'frontpage' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
+        {%- liquid
+          assign img = c.featured_image
+          if img == blank and c.products.first.featured_media
+            assign img = c.products.first.featured_media.preview_image
+          endif
+        -%}
+        <a class="collection-tile" href="{{ c.url }}">
+          <div class="media collection-tile__media zoom-hover">{% render 'image', image: img, sizes: '(min-width: 990px) 25vw, 50vw', alt: c.title %}</div>
+          <span class="collection-tile__title">{{ c.title }}<span class="collection-tile__count">{{ c.products_count }}</span></span>
+        </a>
       {%- endfor -%}
-    </ul>
-  {%- else -%}
-    <p class="empty-state">No categories have been published yet.</p>
-  {%- endif -%}
-</div>
+    </div>
+  </div>
+</section>
 
 {% schema %}
 {
   "name": "Collections list",
-  "settings": []
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Explore" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "All collections" }
+  ]
 }
 {% endschema %}

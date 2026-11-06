@@ -1,0 +1,88 @@
+{%- comment -%} Free shipping bar, gift note, totals and checkout. Shared by drawer and cart page. {%- endcomment -%}
+{%- liquid
+  assign threshold = settings.free_shipping_threshold | times: 100
+  assign show_bar = false
+  assign local_bar = false
+  if threshold > 0
+    if cart.currency.iso_code == shop.currency
+      assign show_bar = true
+    else
+      assign local_bar = true
+    endif
+  endif
+  assign remaining = threshold | minus: cart.total_price
+  assign pct = 0
+  if threshold > 0
+    assign pct = cart.total_price | times: 100 | divided_by: threshold
+    if pct > 100
+      assign pct = 100
+    endif
+  endif
+-%}
+{%- comment -%} Only while the cart is short of free shipping; once it qualifies, the totals say Free. {%- endcomment -%}
+{%- if show_bar and remaining > 0 -%}
+  <div class="ship-bar">
+    <span>
+      {%- assign remaining_money = remaining | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' -%}{{ 'cart.free_shipping_remaining' | t: amount: remaining_money }}
+    </span>
+    <div class="ship-bar__track" aria-hidden="true"><div class="ship-bar__fill" style="--pct: {{ pct }}%"></div></div>
+  </div>
+{%- elsif local_bar -%}
+  {%- comment -%} Shopper paying in another currency: theme.js converts the threshold with the store's rate. {%- endcomment -%}
+  <div class="ship-bar" data-ship-bar data-threshold="{{ threshold }}" data-total="{{ cart.total_price }}" data-currency="{{ cart.currency.iso_code }}"
+    data-remaining="{{ 'cart.free_shipping_remaining' | t: amount: '%AMOUNT%' }}" data-unlocked="{{ 'cart.free_shipping_unlocked' | t }}" hidden>
+    <span></span>
+    <div class="ship-bar__track" aria-hidden="true"><div class="ship-bar__fill" style="--pct: 0%"></div></div>
+  </div>
+{%- endif -%}
+{% render 'tier-bar' %}
+{% render 'qty-bar' %}
+{%- if settings.cart_gift_note -%}
+  <details class="cart-gift"{% if cart.note != blank %} open{% endif %}>
+    <summary>{{ 'cart.gift_message' | t }} {% render 'icon', name: 'gift', class: 'icon--sm' %}</summary>
+    <label class="visually-hidden" for="CartNote-{{ context }}">{{ 'cart.gift_message' | t }}</label>
+    <textarea class="field__input" id="CartNote-{{ context }}" name="note" data-cart-note placeholder="{{ 'cart.gift_placeholder' | t }}">{{ cart.note }}</textarea>
+  </details>
+{%- endif -%}
+{%- if settings.cart_code_field -%}
+  <details class="cart-code"{% if cart.discount_codes.size > 0 %} open{% endif %} data-cart-code>
+    <summary>{{ 'cart.code_toggle' | t }} {% render 'icon', name: 'tag', class: 'icon--sm' %}</summary>
+    <div class="cart-code__row">
+      <label class="visually-hidden" for="CartCode-{{ context }}">{{ 'cart.code_label' | t }}</label>
+      <input class="field__input" id="CartCode-{{ context }}" type="text" autocomplete="off" autocapitalize="characters" placeholder="{{ 'cart.code_label' | t }}" data-cart-code-input>
+      <button type="button" class="btn btn--sm" data-cart-code-apply>{{ 'cart.code_apply' | t }}</button>
+    </div>
+    <p class="cart-code__error" data-cart-code-error hidden>{{ 'cart.code_invalid' | t }}</p>
+    {%- if cart.discount_codes.size > 0 -%}
+      <div class="cart-code__tags">
+        {%- for c in cart.discount_codes -%}
+          <button type="button" class="cart-code__tag{% unless c.applicable %} is-off{% endunless %}" data-cart-code-remove="{{ c.code | escape }}" aria-label="{{ 'cart.code_remove' | t: code: c.code | escape }}">{% render 'icon', name: 'tag', class: 'icon--sm' %}{{ c.code }} {% render 'icon', name: 'close', class: 'icon--sm' %}</button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </details>
+{%- endif -%}
+{%- for d in cart.cart_level_discount_applications -%}
+  <div class="cart-totals cart-totals--disc"><span>{% render 'icon', name: 'tag', class: 'icon--sm' %} {{ d.title }}</span><span>−{{ d.total_allocated_amount | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</span></div>
+{%- endfor -%}
+{%- assign saved = cart.original_total_price | minus: cart.total_price -%}
+{%- if saved > 0 -%}<div class="cart-totals cart-totals--save"><span>{{ 'cart.you_save' | t }}</span><strong>{{ saved | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</strong></div>{%- endif -%}
+<div class="bag-totals">
+  {%- liquid
+    assign fee = settings.shipping_fee_below_threshold | times: 100
+  -%}
+  <div class="cart-totals"><span>{{ 'cart.shipping' | t }}</span>
+    {%- if threshold == 0 or show_bar and remaining <= 0 -%}<span class="bag-totals__free">{{ 'cart.free' | t }}</span>
+    {%- elsif show_bar -%}<span>{{ fee | money }}</span>
+    {%- else -%}{%- comment -%} Other currency: theme.js shows the converted fee, or Free once the cart qualifies. {%- endcomment -%}
+      <span data-ship-cost data-threshold="{{ threshold }}" data-fee="{{ fee }}" data-total="{{ cart.total_price }}" data-currency="{{ cart.currency.iso_code }}" data-free="{{ 'cart.free' | t }}">{{ 'cart.shipping_at_checkout' | t }}</span>
+    {%- endif -%}</div>
+  <div class="cart-totals cart-totals--total"><span>{{ 'cart.total' | t }}</span><strong>{{ cart.total_price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</strong></div>
+</div>
+{%- assign tot = cart.total_price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' -%}
+<button type="submit" name="checkout" form="CartForm-{{ context }}" class="btn btn--gold btn--block bag-checkout">{% render 'icon', name: 'lock', class: 'icon--sm' %} {{ 'cart.checkout_total' | t: total: tot }}</button>
+<div class="bag-trust">
+  <span>{% render 'icon', name: 'return', class: 'icon--sm' %} {{ 'cart.guarantee' | t }}</span>
+  <ul class="bag-trust__pay" role="list">{%- for type in shop.enabled_payment_types limit: 6 -%}<li>{{ type | payment_type_svg_tag }}</li>{%- endfor -%}</ul>
+</div>
+{%- assign cnt = settings.cart_note_text | strip_html | strip -%}{%- if cnt != blank and cnt != 'Duties and taxes for your country are shown at checkout.' -%}<div class="cart-note rte">{{ settings.cart_note_text }}</div>{%- endif -%}

@@ -2,32 +2,30 @@
   "sections": {
     "main": {
       "type": "main-article",
-      "settings": {}
-    },
-    "shop": {
-      "type": "product-rail",
       "settings": {
-        "heading": "Shop the range",
-        "subheading": "",
-        "style": "default",
-        "source": "all",
-        "limit": 10,
-        "link_label": "Shop everything"
+        "show_author": true,
+        "shop_collection": "new-arrivals"
       }
     },
-    "newsletter": {
-      "type": "newsletter",
+    "signup": {
+      "type": "signup-offer",
       "settings": {
-        "heading": "Get 10% off your first order",
-        "text": "<p>Plus new guides, restocks and subscriber-only deals.</p>",
-        "button_label": "Get my code",
-        "fine_print": "By signing up you agree to get our emails. New subscribers only. Unsubscribe any time."
+        "illustration": "lx-envelope",
+        "illustration_offer": "lx-envelope",
+        "eyebrow": "The list",
+        "offer_eyebrow": "Welcome offer",
+        "heading": "First look at new drops",
+        "text": "Join the list for new arrivals, restocks and subscriber-only deals.",
+        "tick_1": "Early access to new arrivals",
+        "tick_2": "Subscriber-only deals",
+        "tick_3": "No spam, unsubscribe any time",
+        "card_title": "Join the list",
+        "card_text": "Enter your email and tick the box to subscribe."
       }
     }
   },
   "order": [
     "main",
-    "shop",
-    "newsletter"
+    "signup"
   ]
 }

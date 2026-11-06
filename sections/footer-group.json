@@ -4,59 +4,70 @@
   "sections": {
     "footer": {
       "type": "footer",
-      "settings": {
-        "show_payment_icons": true,
-        "show_policies": true,
-        "wordmark": "TECH.LUXEDEALERS"
-      },
       "blocks": {
-        "about": {
-          "type": "about",
+        "brand": {
+          "type": "brand",
           "settings": {
-            "show_logo": false
+            "title": "Tech.LuxeDealers",
+            "text": "<p>Everyday tech, chosen by people who use it: audio, charging, wearables, home and kitchen gear, with tracked delivery and real people to help.</p>",
+            "service_title": "Customer service",
+            "service_text": "Send us a message any time. We aim to reply within one business day.",
+            "page": "contact"
           }
         },
         "help": {
-          "type": "links",
+          "type": "menu",
           "settings": {
-            "heading": "Help",
-            "fallback": "help"
-          }
-        },
-        "account": {
-          "type": "links",
-          "settings": {
-            "heading": "My account",
-            "fallback": "account"
-          }
-        },
-        "company": {
-          "type": "links",
-          "settings": {
-            "heading": "About us",
-            "fallback": "company"
+            "title": "Help",
+            "menu": "support-menu"
           }
         },
         "shop": {
-          "type": "links",
+          "type": "menu",
           "settings": {
-            "heading": "Shop",
-            "fallback": "shop"
+            "title": "Shop",
+            "menu": "main-menu-1"
+          }
+        },
+        "legal": {
+          "type": "menu",
+          "settings": {
+            "title": "Legal",
+            "menu": "legal-menu"
           }
         },
         "news": {
           "type": "newsletter",
-          "settings": {}
+          "settings": {
+            "title": "Deal alerts",
+            "text": "Sign up for 10% off your first order, plus restocks and subscriber-only offers."
+          }
         }
       },
       "block_order": [
-        "about",
+        "brand",
         "help",
-        "account",
-        "company",
         "shop",
+        "legal",
         "news"
-      ]
+      ],
+      "settings": {
+        "show_promises": true,
+        "p_icon_1": "truck",
+        "p_title_1": "Tracked shipping",
+        "p_text_1": "Dispatched in 3-4 business days",
+        "p_icon_2": "return",
+        "p_title_2": "Refund or replacement",
+        "p_text_2": "If something's not right",
+        "p_icon_3": "lock",
+        "p_title_3": "Secure checkout",
+        "p_text_3": "PayPal, Shop Pay and cards",
+        "p_icon_4": "chat",
+        "p_title_4": "Real support",
+        "p_text_4": "People, not bots",
+        "show_payment": true,
+        "note": "Prices and stock can change without notice. Photos may differ slightly from the item you receive."
+      }
     }
   },
   "order": [

@@ -1,0 +1,27 @@
+{%- comment -%}
+  Our own cookie banner (replaces a paid app). Uses Shopify's Customer Privacy API, so Shopify and app
+  tracking follow the visitor's choice. Shopify decides where consent is needed (e.g. the EU, UK):
+  the banner only appears there. If another cookie app is still active, this stays hidden.
+{%- endcomment -%}
+{%- unless settings.cookie_banner == false -%}
+<div class="cookies" id="CookieBanner" role="dialog" aria-live="polite" aria-labelledby="CookieTitle" hidden data-cookie-banner>
+  <div class="cookies__card">
+    <div class="cookies__head">
+      <span class="cookies__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a3 3 0 0 0 3.5 3.5 3 3 0 0 0 3.5 3.5 3 3 0 0 0 2.5 2.5z"/><circle cx="8.5" cy="10.5" r="1"/><circle cx="12" cy="15.5" r="1"/><circle cx="16" cy="13" r="1"/></svg></span>
+      <h2 id="CookieTitle">{{ 'cookies.title' | t }}</h2>
+    </div>
+    <p class="cookies__text">{{ 'cookies.text' | t }} <a href="/pages/cookie-policy">{{ 'cookies.policy_link' | t }}</a></p>
+    <div class="cookies__prefs" data-cookie-panel hidden>
+      <label class="cookies__opt is-locked"><span><strong>{{ 'cookies.essential' | t }}</strong><small>{{ 'cookies.essential_text' | t }}</small></span><input type="checkbox" checked disabled><span class="cookies__sw" aria-hidden="true"></span></label>
+      <label class="cookies__opt"><span><strong>{{ 'cookies.preferences' | t }}</strong><small>{{ 'cookies.preferences_text' | t }}</small></span><input type="checkbox" data-cookie-cat="preferences"><span class="cookies__sw" aria-hidden="true"></span></label>
+      <label class="cookies__opt"><span><strong>{{ 'cookies.analytics' | t }}</strong><small>{{ 'cookies.analytics_text' | t }}</small></span><input type="checkbox" data-cookie-cat="analytics"><span class="cookies__sw" aria-hidden="true"></span></label>
+      <label class="cookies__opt"><span><strong>{{ 'cookies.marketing' | t }}</strong><small>{{ 'cookies.marketing_text' | t }}</small></span><input type="checkbox" data-cookie-cat="marketing"><span class="cookies__sw" aria-hidden="true"></span></label>
+    </div>
+    <div class="cookies__btns">
+      <button type="button" class="btn btn--gold btn--sm" data-cookie-accept>{{ 'cookies.accept' | t }}</button>
+      <button type="button" class="btn btn--outline btn--sm" data-cookie-reject>{{ 'cookies.reject' | t }}</button>
+      <button type="button" class="link cookies__more" data-cookie-more data-save="{{ 'cookies.save' | t | escape }}">{{ 'cookies.manage' | t }}</button>
+    </div>
+  </div>
+</div>
+{%- endunless -%}

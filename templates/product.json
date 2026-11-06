@@ -1,100 +1,101 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
       "type": "main-product",
       "blocks": {
-        "overview": {
-          "type": "description",
+        "buy": {
+          "type": "buy",
           "settings": {
-            "title": "Full description"
+            "qty": true,
+            "dynamic": true
           }
         },
-        "specs": {
-          "type": "specs",
+        "trust": {
+          "type": "trust",
           "settings": {
-            "title": "Specifications"
+            "icon_1": "truck",
+            "text_1": "Tracked shipping",
+            "icon_2": "return",
+            "text_2": "Refund or replacement",
+            "icon_3": "lock",
+            "text_3": "Secure checkout"
           }
         },
-        "shipping": {
-          "type": "custom",
+        "advisor": {
+          "type": "advisor",
           "settings": {
-            "title": "Shipping and refunds",
-            "content": "<p><strong>Dispatch:</strong> orders are dispatched within 3-4 business days, with a tracking number emailed when they ship.</p><p><strong>Refunds:</strong> if your item arrives damaged, is the wrong item or isn't up to quality standards, send us a photo and we'll refund you in full. We don't accept change-of-mind returns.</p><p>See our <a href=\"/pages/returns-warranty\">return and refund policy</a> for details.</p>",
-            "page": ""
+            "text": "Compatibility, plugs or delivery: real people reply by email.",
+            "page": "contact"
+          }
+        },
+        "set": {
+          "type": "set",
+          "settings": {
+            "title": "Complete your setup",
+            "fallback": "best-sellers",
+            "fallback_alt": "new-arrivals"
+          }
+        },
+        "tabs": {
+          "type": "accordions",
+          "settings": {
+            "open_first": true,
+            "shipping_text": "<p><strong>Dispatched within 3-4 business days.</strong> Every order is sent with tracking, and you'll get your tracking number by email as soon as it ships. Delivery options and costs for your address are shown at checkout before you pay.</p><p>Damaged, faulty or the wrong item? Send us a photo or video and we'll refund or replace it. See our <a href=\"/pages/returns-warranty\">refund policy</a>.</p>",
+            "care_text": ""
           }
         }
       },
       "block_order": [
-        "overview",
-        "specs",
-        "shipping"
+        "buy",
+        "trust",
+        "advisor",
+        "set",
+        "tabs"
       ],
       "settings": {
-        "show_sku": true,
-        "show_dynamic_checkout": true,
-        "sticky_atc": true,
-        "show_trust": true,
-        "trust_secure": "Secure, encrypted checkout",
-        "trust_warranty": "Faulty? We make it right",
-        "trust_returns": "Refund if damaged or wrong",
-        "show_dispatch": true,
-        "dispatch_label": "Dispatched in 3-4 business days",
-        "dispatch_min": 3,
-        "dispatch_max": 4,
-        "show_bundle": true,
-        "bundle_heading": "Often added together",
-        "bundle_note": "",
-        "specs_namespace": "custom",
-        "specs_key": "specs"
-      }
-    },
-    "overview": {
-      "type": "product-overview",
-      "settings": {
-        "dispatch": "3-4 business days",
-        "returns": "Refund if damaged or wrong"
+        "gallery": "slider",
+        "hover_zoom": false,
+        "sticky_bar": true
       }
     },
     "reviews": {
       "type": "product-reviews",
       "settings": {
-        "heading": "Customer reviews",
-        "empty_text": "No reviews yet. Bought this? We'd love to hear what you think.",
-        "button_label": "",
-        "button_link": ""
+        "eyebrow": "Reviews",
+        "heading": "What customers say",
+        "all_label": "All store reviews",
+        "all_link": ""
       }
     },
-    "related": {
+    "recommendations": {
       "type": "product-recommendations",
       "settings": {
+        "eyebrow": "Picked for you",
         "heading": "You might also like",
         "intent": "related",
-        "limit": 8
+        "limit": 12
       }
     },
-    "viewed": {
+    "recent": {
       "type": "recently-viewed",
       "settings": {
         "heading": "Recently viewed",
-        "show_recommended": false,
-        "recommended_heading": "Recommended for you"
+        "limit": 8
+      }
+    },
+    "more": {
+      "type": "product-more",
+      "settings": {
+        "eyebrow": "Keep browsing",
+        "limit": 16
       }
     }
   },
   "order": [
     "main",
-    "overview",
+    "recommendations",
     "reviews",
-    "related",
-    "viewed"
+    "more",
+    "recent"
   ]
 }

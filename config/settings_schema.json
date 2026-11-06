@@ -2,10 +2,10 @@
   {
     "name": "theme_info",
     "theme_name": "LuxeTech",
-    "theme_version": "2.0.0",
-    "theme_author": "Luxe Dealers",
+    "theme_version": "1.0.0",
+    "theme_author": "Tech.LuxeDealers",
     "theme_documentation_url": "https://tech.luxedealers.com",
-    "theme_support_url": "https://tech.luxedealers.com"
+    "theme_support_url": "https://tech.luxedealers.com/pages/contact"
   },
   {
     "name": "Logo",
@@ -13,24 +13,24 @@
       {
         "type": "image_picker",
         "id": "logo",
-        "label": "Logo image",
-        "info": "Leave empty to use the Tech.LuxeDealers logo that ships with the theme."
+        "label": "Logo",
+        "info": "Leave empty to use the bundled LD diamond mark."
       },
       {
         "type": "range",
-        "id": "logo_width",
-        "label": "Logo width",
-        "min": 80,
-        "max": 260,
-        "step": 10,
+        "id": "logo_height",
+        "label": "Logo height (desktop)",
+        "min": 32,
+        "max": 96,
+        "step": 2,
         "unit": "px",
-        "default": 170
+        "default": 56
       },
       {
         "type": "image_picker",
         "id": "favicon",
         "label": "Favicon",
-        "info": "Square image, 32 x 32px recommended."
+        "info": "Square, at least 64 x 64 px. Leave empty to use the LD mark."
       }
     ]
   },
@@ -38,100 +38,62 @@
     "name": "Colors",
     "settings": [
       {
-        "type": "paragraph",
-        "content": "Tech.LuxeDealers palette: cool paper and white surfaces, near-black ink from the logo, and the logo violet for primary actions, links, sale prices and the signal dot. Stock colors carry meaning on every product card, so keep them distinguishable from the brand color."
-      },
-      {
-        "type": "select",
-        "id": "dark_mode",
-        "label": "Dark mode",
-        "options": [
-          {
-            "value": "device",
-            "label": "Follow the device, with a toggle"
-          },
-          {
-            "value": "toggle",
-            "label": "Start light, with a toggle"
-          },
-          {
-            "value": "off",
-            "label": "Off"
-          }
-        ],
-        "default": "device"
-      },
-      {
-        "type": "header",
-        "content": "Base"
-      },
-      {
         "type": "color",
         "id": "color_background",
         "label": "Page background",
-        "default": "#F2F3F5"
-      },
-      {
-        "type": "color",
-        "id": "color_subtle",
-        "label": "Panels (image backgrounds, bands)",
-        "default": "#E7E9ED"
-      },
-      {
-        "type": "color",
-        "id": "color_surface",
-        "label": "Surface (cards, header)",
         "default": "#FFFFFF"
       },
       {
         "type": "color",
+        "id": "color_subtle",
+        "label": "Soft panels",
+        "info": "Image backgrounds and quiet bands.",
+        "default": "#F6F1FF"
+      },
+      {
+        "type": "color",
         "id": "color_ink",
-        "label": "Ink (text, footer, dark bands)",
-        "default": "#0B1220"
+        "label": "Text and dark buttons",
+        "default": "#2E1460"
       },
       {
         "type": "color",
         "id": "color_muted",
         "label": "Secondary text",
-        "default": "#586072"
+        "default": "#6B5E8C"
       },
       {
         "type": "color",
         "id": "color_border",
-        "label": "Hairlines",
-        "default": "#D3D7DE"
-      },
-      {
-        "type": "header",
-        "content": "Brand"
+        "label": "Lines and borders",
+        "default": "#ECE4FB"
       },
       {
         "type": "color",
-        "id": "color_primary",
-        "label": "Brand violet (actions, links, sale prices)",
-        "default": "#7D03FC"
+        "id": "color_gold",
+        "label": "Gold",
+        "info": "Taken from the logo. Used for accents, sale prices and highlights.",
+        "default": "#D9C4FF"
       },
       {
         "type": "color",
-        "id": "color_accent",
-        "label": "Signal tint (save labels, highlight chips)",
-        "default": "#EFE6FF"
+        "id": "color_gold_text",
+        "label": "Gold text",
+        "info": "A deeper gold that stays readable on white.",
+        "default": "#8048F5"
       },
       {
-        "type": "header",
-        "content": "Status"
+        "type": "color",
+        "id": "color_sapphire",
+        "label": "Sapphire",
+        "info": "The diamond blue. Used sparingly: focus rings and New badges.",
+        "default": "#7A3FF0"
       },
       {
         "type": "color",
         "id": "color_success",
         "label": "In stock",
         "default": "#1E7A3C"
-      },
-      {
-        "type": "color",
-        "id": "color_warning",
-        "label": "Low stock",
-        "default": "#8F5B00"
       },
       {
         "type": "color",
@@ -142,259 +104,181 @@
     ]
   },
   {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "select",
+        "id": "typeface",
+        "label": "Typeface",
+        "options": [
+          {
+            "value": "atelier",
+            "label": "Atelier (Poppins)"
+          },
+          {
+            "value": "maison",
+            "label": "Maison (Jost and Cormorant)"
+          },
+          {
+            "value": "custom",
+            "label": "Fonts below"
+          }
+        ],
+        "default": "atelier",
+        "info": "Atelier and Maison are bundled with the theme. Pick Fonts below to use Shopify's font library."
+      },
+      {
+        "type": "font_picker",
+        "id": "font_heading",
+        "label": "Headings",
+        "default": "playfair_display_n4",
+        "info": "Used when Typeface is set to Fonts below."
+      },
+      {
+        "type": "font_picker",
+        "id": "font_body",
+        "label": "Body and labels",
+        "default": "montserrat_n4"
+      },
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "label": "Heading size",
+        "min": 80,
+        "max": 130,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      }
+    ]
+  },
+  {
+    "name": "Animation",
+    "settings": [
+      {
+        "type": "select",
+        "id": "motion",
+        "label": "Animation level",
+        "options": [
+          {
+            "value": "off",
+            "label": "Off"
+          },
+          {
+            "value": "subtle",
+            "label": "Subtle"
+          },
+          {
+            "value": "full",
+            "label": "Full"
+          }
+        ],
+        "default": "full",
+        "info": "Visitors whose device asks for reduced motion always get animations off."
+      },
+      {
+        "type": "checkbox",
+        "id": "gold_shimmer",
+        "label": "Gold shimmer on the logo name and highlights",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "page_transitions",
+        "label": "Fade between pages",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "intro_splash",
+        "label": "Logo intro on first visit",
+        "default": false,
+        "info": "A short logo reveal, once per visit. Skipped for reduced motion."
+      },
+      {
+        "type": "checkbox",
+        "id": "view_cursor",
+        "label": "View cursor over products",
+        "default": true,
+        "info": "Desktop only."
+      }
+    ]
+  },
+  {
     "name": "Product cards",
     "settings": [
       {
         "type": "select",
-        "id": "card_label",
-        "label": "Small label above the title",
-        "options": [
-          {
-            "value": "vendor",
-            "label": "Brand (vendor)"
-          },
-          {
-            "value": "type",
-            "label": "Product type"
-          },
-          {
-            "value": "none",
-            "label": "None"
-          }
-        ],
-        "default": "vendor"
-      },
-      {
-        "type": "checkbox",
-        "id": "card_show_sku",
-        "label": "Show SKU",
-        "default": false
-      },
-      {
-        "type": "checkbox",
-        "id": "card_show_rating",
-        "label": "Show star rating when review data exists",
-        "default": true,
-        "info": "Reads the standard reviews.rating and reviews.rating_count product metafields written by Shopify Product Reviews and most review apps. Nothing is shown for products without review data."
-      },
-      {
-        "type": "checkbox",
-        "id": "card_quick_add",
-        "label": "Enable quick add",
-        "default": true
-      },
-      {
-        "type": "select",
-        "id": "card_quick_style",
-        "label": "Quick add button",
-        "options": [
-          {
-            "value": "button",
-            "label": "Always visible under the price"
-          },
-          {
-            "value": "hover",
-            "label": "Show on hover over the image"
-          }
-        ],
-        "default": "button"
-      },
-      {
-        "type": "checkbox",
-        "id": "card_second_image",
-        "label": "Show second image on hover",
-        "default": true
-      },
-      {
-        "type": "select",
-        "id": "card_image_ratio",
+        "id": "card_ratio",
         "label": "Image shape",
         "options": [
+          {
+            "value": "portrait",
+            "label": "Portrait 4:5"
+          },
           {
             "value": "square",
             "label": "Square"
           },
           {
-            "value": "portrait",
-            "label": "Portrait"
-          },
-          {
-            "value": "landscape",
-            "label": "Landscape"
+            "value": "tall",
+            "label": "Tall 2:3"
           }
         ],
         "default": "square"
       },
       {
-        "type": "header",
-        "content": "Category color code"
+        "type": "checkbox",
+        "id": "card_hover_image",
+        "label": "Show second photo on hover",
+        "default": true
       },
       {
-        "type": "textarea",
-        "id": "category_colors",
-        "label": "Product type colors",
-        "info": "Optional. One per line, as Product type: #hex (e.g. Audio: #1D4ED8). Cards show a small color tab next to the label so shoppers can scan categories at a glance. Types not listed get no tab."
-      }
-    ]
-  },
-  {
-    "name": "Stock and badges",
-    "settings": [
-      {
-        "type": "range",
-        "id": "low_stock_threshold",
-        "label": "Low stock when quantity is at or below",
-        "min": 1,
-        "max": 25,
-        "step": 1,
-        "default": 5,
-        "info": "Only applies to variants where Shopify tracks inventory."
+        "type": "checkbox",
+        "id": "card_vendor",
+        "label": "Show brand",
+        "default": false
       },
       {
-        "type": "text",
-        "id": "stock_in_text",
-        "label": "In stock message",
-        "default": "In stock"
+        "type": "checkbox",
+        "id": "card_quick_add",
+        "label": "Quick add button",
+        "default": true
       },
       {
-        "type": "text",
-        "id": "stock_shipping_note",
-        "label": "Shipping note after in stock",
-        "default": "dispatched in 3-4 business days",
-        "info": "Example: ships today. Leave empty to show only the in stock message."
+        "type": "checkbox",
+        "id": "card_button",
+        "label": "Show stock line and Add to bag button",
+        "default": true,
+        "info": "Replaces the hover Quick add."
       },
       {
-        "type": "text",
-        "id": "stock_backorder_text",
-        "label": "Backordered message",
-        "default": "Backordered, ships when restocked",
-        "info": "Shown when a variant is out of stock but set to continue selling."
+        "type": "checkbox",
+        "id": "card_swatches",
+        "label": "Colour swatches",
+        "info": "Shown for an option named Color, Colour or Dial.",
+        "default": true
       },
       {
         "type": "range",
-        "id": "new_badge_days",
-        "label": "Show New badge for products published in the last",
+        "id": "badge_new_days",
+        "label": "New badge for products published within",
         "min": 0,
         "max": 90,
         "step": 5,
         "unit": "d",
-        "default": 0,
-        "info": "0 turns the New badge off. Worth leaving off while the whole range is new, or every card says New."
-      }
-    ]
-  },
-  {
-    "name": "Welcome offer",
-    "settings": [
-      {
-        "type": "paragraph",
-        "content": "New subscribers see this code after signing up in the popup, the footer or the newsletter band. Create the same code first in Shopify admin > Discounts, or customers will be shown a code that doesn't work."
-      },
-      {
-        "type": "text",
-        "id": "welcome_code",
-        "label": "Discount code",
-        "default": "WELCOME10"
-      },
-      {
-        "type": "text",
-        "id": "welcome_label",
-        "label": "Offer in one line",
-        "default": "10% off your first order"
-      }
-    ]
-  },
-  {
-    "name": "Reviews",
-    "settings": [
-      {
-        "type": "paragraph",
-        "content": "Built for Judge.me. Install Judge.me, then turn on its app embed in Theme settings > App embeds. Stars on product cards and the reviews section on product pages fill in automatically."
-      },
-      {
-        "type": "checkbox",
-        "id": "judgeme_enabled",
-        "label": "Show Judge.me reviews and stars",
-        "default": true
-      }
-    ]
-  },
-  {
-    "name": "Volume and bundle deals",
-    "settings": [
-      {
-        "type": "paragraph",
-        "content": "These only change what the store shows. Create the matching automatic discounts in Shopify admin > Discounts first, then turn them on here, so the saving shown is the saving customers get at checkout."
-      },
-      {
-        "type": "header",
-        "content": "Buy more, save more"
-      },
-      {
-        "type": "checkbox",
-        "id": "qty_breaks_enabled",
-        "label": "Show quantity discounts on product pages",
-        "default": false
+        "default": 30,
+        "info": "0 turns the New badge off."
       },
       {
         "type": "range",
-        "id": "tier1_qty",
-        "label": "Tier 1 quantity",
-        "min": 2,
-        "max": 10,
-        "step": 1,
-        "default": 2
-      },
-      {
-        "type": "range",
-        "id": "tier1_pct",
-        "label": "Tier 1 saving",
-        "min": 1,
-        "max": 50,
-        "step": 1,
-        "unit": "%",
-        "default": 5
-      },
-      {
-        "type": "range",
-        "id": "tier2_qty",
-        "label": "Tier 2 quantity",
-        "min": 2,
-        "max": 10,
-        "step": 1,
-        "default": 3
-      },
-      {
-        "type": "range",
-        "id": "tier2_pct",
-        "label": "Tier 2 saving",
+        "id": "low_stock_threshold",
+        "label": "Low stock line at or below",
         "min": 0,
-        "max": 50,
+        "max": 10,
         "step": 1,
-        "unit": "%",
-        "default": 10,
-        "info": "Set to 0% to show only tier 1."
-      },
-      {
-        "type": "header",
-        "content": "Bundles"
-      },
-      {
-        "type": "checkbox",
-        "id": "bundle_enabled",
-        "label": "Show bundle saving",
-        "default": false,
-        "info": "Shown on Complete the set and the pair builder."
-      },
-      {
-        "type": "range",
-        "id": "bundle_pct",
-        "label": "Bundle saving",
-        "min": 1,
-        "max": 50,
-        "step": 1,
-        "unit": "%",
-        "default": 10
+        "default": 3,
+        "info": "Uses real tracked inventory only. 0 turns it off."
       }
     ]
   },
@@ -404,7 +288,7 @@
       {
         "type": "select",
         "id": "cart_type",
-        "label": "When a product is added",
+        "label": "When something is added",
         "options": [
           {
             "value": "drawer",
@@ -420,22 +304,200 @@
       {
         "type": "number",
         "id": "free_shipping_threshold",
-        "label": "Free shipping threshold",
+        "label": "Free shipping from (store currency)",
         "default": 0,
-        "info": "Order subtotal, in your store's default currency, that unlocks free shipping. Must match the free shipping rate you set up in Settings > Shipping and delivery (the theme cannot create shipping rates). Set to 0 to hide the progress bar, the buy box line and the utility bar message."
+        "info": "0 hides the progress bar. Create the matching free rate in Settings > Shipping and delivery first."
       },
       {
         "type": "number",
         "id": "shipping_fee_below_threshold",
-        "label": "Shipping fee under the threshold",
-        "default": 0,
-        "info": "Shown as the cart's shipping line while the order is under the free shipping threshold, in your store's default currency. Must match your shipping rate."
+        "label": "Shipping fee below the free-shipping amount (store currency)",
+        "default": 5.95,
+        "info": "Shown in the cart. Must match the rate in Settings > Shipping and delivery."
+      },
+      {
+        "type": "header",
+        "content": "Spend and save"
+      },
+      {
+        "type": "paragraph",
+        "content": "Create matching automatic discounts in Discounts first (Amount off order, minimum purchase amount). Leave Spend at 0 to hide."
+      },
+      {
+        "type": "number",
+        "id": "tier_1_spend",
+        "label": "Tier 1: spend (store currency)",
+        "default": 0
+      },
+      {
+        "type": "number",
+        "id": "tier_1_percent",
+        "label": "Tier 1: % off",
+        "default": 5
+      },
+      {
+        "type": "number",
+        "id": "tier_2_spend",
+        "label": "Tier 2: spend (store currency)",
+        "default": 0
+      },
+      {
+        "type": "number",
+        "id": "tier_2_percent",
+        "label": "Tier 2: % off",
+        "default": 10
+      },
+      {
+        "type": "header",
+        "content": "Cookie banner"
       },
       {
         "type": "checkbox",
-        "id": "cart_show_note",
-        "label": "Show order note on cart page",
+        "id": "cookie_banner",
+        "label": "Show our cookie banner",
+        "info": "Shown only where the law requires consent (Shopify decides, e.g. EU and UK). Stays hidden while another cookie app is active.",
         "default": true
+      },
+      {
+        "type": "header",
+        "content": "Buy more, save more"
+      },
+      {
+        "type": "paragraph",
+        "content": "Shows quantity offers on product pages and in the bag. Create matching automatic discounts in Discounts first (Amount off products, minimum quantity of items). Leave Pieces at 0 to hide."
+      },
+      {
+        "type": "number",
+        "id": "qty_1_count",
+        "label": "Offer 1: pieces",
+        "default": 0
+      },
+      {
+        "type": "number",
+        "id": "qty_1_percent",
+        "label": "Offer 1: % off",
+        "default": 10
+      },
+      {
+        "type": "number",
+        "id": "qty_2_count",
+        "label": "Offer 2: pieces",
+        "default": 0
+      },
+      {
+        "type": "number",
+        "id": "qty_2_percent",
+        "label": "Offer 2: % off",
+        "default": 15
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_code_field",
+        "label": "Discount code box in the bag",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_gift_note",
+        "label": "Gift message box",
+        "default": false
+      },
+      {
+        "type": "richtext",
+        "id": "cart_note_text",
+        "label": "Text under checkout button",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "name": "Welcome offer",
+    "settings": [
+      {
+        "type": "text",
+        "id": "welcome_code",
+        "label": "Discount code",
+        "info": "Shown after someone subscribes. Create the same code in Discounts first. Leave empty to show no offer."
+      },
+      {
+        "type": "checkbox",
+        "id": "welcome_personal",
+        "label": "LuxeMail gives each subscriber their own code",
+        "default": false,
+        "info": "Shows the welcome offer around the site without a shared code. The code appears after sign-up and is emailed too."
+      },
+      {
+        "type": "text",
+        "id": "welcome_offer",
+        "label": "Offer line",
+        "default": "10% off your first order"
+      },
+      {
+        "type": "text",
+        "id": "luxemail_endpoint",
+        "label": "LuxeMail address",
+        "info": "Filled in by the LuxeMail deploy. Leave empty if you don't use it."
+      }
+    ]
+  },
+  {
+    "name": "Client services",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Client advisor"
+      },
+      {
+        "type": "text",
+        "id": "advisor_whatsapp",
+        "label": "WhatsApp number",
+        "info": "International format, digits only, e.g. 447700900123. Shows a Contact an advisor button."
+      },
+      {
+        "type": "text",
+        "id": "advisor_label",
+        "label": "Advisor button text",
+        "default": "Contact an advisor"
+      },
+      {
+        "type": "checkbox",
+        "id": "advisor_float",
+        "label": "Floating advisor button",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Dispatch estimate"
+      },
+      {
+        "type": "range",
+        "id": "dispatch_days",
+        "label": "Business days to dispatch",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "default": 0,
+        "info": "0 hides the estimate. Use your real handling time."
+      },
+      {
+        "type": "range",
+        "id": "dispatch_cutoff",
+        "label": "Same-day cutoff hour (store time zone)",
+        "min": 0,
+        "max": 23,
+        "step": 1,
+        "default": 14
+      },
+      {
+        "type": "header",
+        "content": "Returning visitors"
+      },
+      {
+        "type": "checkbox",
+        "id": "welcome_back",
+        "label": "Welcome back panel",
+        "default": true,
+        "info": "Shows the last piece a returning visitor looked at. Uses their own browsing on this device."
       }
     ]
   },
@@ -443,29 +505,25 @@
     "name": "Store details",
     "settings": [
       {
-        "type": "paragraph",
-        "content": "Used in the footer business block. Anything left empty is simply not shown."
+        "type": "text",
+        "id": "support_email",
+        "label": "Support email",
+        "default": "support@luxedealers.com"
+      },
+      {
+        "type": "text",
+        "id": "support_phone",
+        "label": "Phone"
+      },
+      {
+        "type": "text",
+        "id": "support_hours",
+        "label": "Opening hours"
       },
       {
         "type": "textarea",
         "id": "store_address",
         "label": "Business address"
-      },
-      {
-        "type": "textarea",
-        "id": "support_hours",
-        "label": "Support hours",
-        "info": "Example: Mon-Fri 9am-6pm ET"
-      },
-      {
-        "type": "text",
-        "id": "support_email",
-        "label": "Support email"
-      },
-      {
-        "type": "text",
-        "id": "support_phone",
-        "label": "Support phone"
       }
     ]
   },
@@ -473,61 +531,37 @@
     "name": "Social media",
     "settings": [
       {
-        "type": "paragraph",
-        "content": "Only platforms with a URL get an icon in the footer."
-      },
-      {
         "type": "text",
         "id": "social_instagram",
         "label": "Instagram",
-        "placeholder": "https://instagram.com/"
+        "default": "https://www.instagram.com/tech.luxedealers/"
       },
       {
         "type": "text",
         "id": "social_tiktok",
         "label": "TikTok",
-        "placeholder": "https://tiktok.com/@"
-      },
-      {
-        "type": "text",
-        "id": "social_youtube",
-        "label": "YouTube",
-        "placeholder": "https://youtube.com/"
+        "default": ""
       },
       {
         "type": "text",
         "id": "social_facebook",
         "label": "Facebook",
-        "placeholder": "https://facebook.com/"
-      },
-      {
-        "type": "text",
-        "id": "social_x",
-        "label": "X (Twitter)",
-        "placeholder": "https://x.com/"
+        "default": "https://www.facebook.com/profile.php?id=61595062625090"
       },
       {
         "type": "text",
         "id": "social_pinterest",
-        "label": "Pinterest",
-        "placeholder": "https://pinterest.com/"
-      }
-    ]
-  },
-  {
-    "name": "Search",
-    "settings": [
-      {
-        "type": "text",
-        "id": "search_placeholder",
-        "label": "Search bar placeholder",
-        "default": "Search headphones, chargers, smart plugs..."
+        "label": "Pinterest"
       },
       {
-        "type": "checkbox",
-        "id": "predictive_search",
-        "label": "Show live product suggestions while typing",
-        "default": true
+        "type": "text",
+        "id": "social_youtube",
+        "label": "YouTube"
+      },
+      {
+        "type": "text",
+        "id": "social_x",
+        "label": "X"
       }
     ]
   },
@@ -535,81 +569,21 @@
     "name": "Search engines",
     "settings": [
       {
-        "type": "paragraph",
-        "content": "Used in page titles and Google results. Individual pages, products and collections still use their own SEO title and description when set in Shopify admin."
-      },
-      {
-        "type": "text",
-        "id": "seo_brand",
-        "label": "Brand name in titles",
-        "default": "Tech.LuxeDealers"
-      },
-      {
         "type": "text",
         "id": "seo_home_title",
         "label": "Homepage title",
-        "default": "Tech.LuxeDealers | Everyday Tech, Home & Lifestyle Gear"
+        "default": "Tech.LuxeDealers | Smart Gadgets, Audio, Charging & Home Tech"
       },
       {
         "type": "textarea",
         "id": "seo_home_description",
         "label": "Homepage description",
-        "default": "Shop hand-picked tech, home and lifestyle gear at Tech.LuxeDealers. Wireless earbuds, chargers, smart kitchen and hair care, dispatched in 3-4 business days with tracking."
-      }
-    ]
-  },
-  {
-    "name": "Spend and save",
-    "settings": [
-      {
-        "type": "paragraph",
-        "content": "Shows a progress bar in the cart. Keep these in line with your automatic discounts in Shopify (Discounts)."
+        "default": "Shop hand-picked smart gadgets: earbuds, chargers, smart watches, home and kitchen tech. Tracked shipping on every order and real people to help."
       },
       {
-        "type": "checkbox",
-        "id": "spend_bar_enabled",
-        "label": "Show spend-and-save bar in cart",
-        "default": true
-      },
-      {
-        "type": "number",
-        "id": "spend_tier1_amount",
-        "label": "Tier 1: spend (dollars)",
-        "default": 100
-      },
-      {
-        "type": "number",
-        "id": "spend_tier1_pct",
-        "label": "Tier 1: percent off",
-        "default": 5
-      },
-      {
-        "type": "number",
-        "id": "spend_tier2_amount",
-        "label": "Tier 2: spend (dollars)",
-        "info": "0 turns tier 2 off.",
-        "default": 150
-      },
-      {
-        "type": "number",
-        "id": "spend_tier2_pct",
-        "label": "Tier 2: percent off",
-        "default": 10
-      }
-    ]
-  },
-  {
-    "name": "Email tracking",
-    "settings": [
-      {
-        "type": "paragraph",
-        "content": "Connects the store to LuxeMail, our own email automation. Newsletter sign-ups (with the consent box ticked) join LuxeMail's list. For browsers that signed up, it records product views, add-to-cart and wishlist saves so emails can recommend the right products. Leave empty to turn it off."
-      },
-      {
-        "type": "text",
-        "id": "luxemail_endpoint",
-        "label": "LuxeMail tracking URL",
-        "info": "For example https://luxemail-tech.your-account.workers.dev/t"
+        "type": "image_picker",
+        "id": "share_image",
+        "label": "Social sharing image"
       }
     ]
   }

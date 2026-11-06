@@ -1,0 +1,70 @@
+{%- comment -%}
+  Department cards: an illustration, a short line, the lowest price and three
+  small photos of real products from the collection.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="section depts">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow">{{ s.eyebrow }}</span>{%- endif -%}
+        <h2 class="h2">{{ s.heading }}</h2>
+        {%- if s.text != blank -%}<p>{{ s.text }}</p>{%- endif -%}
+      </div>
+      {%- if s.link_label != blank -%}<a class="pill-link" href="{{ s.link | default: routes.collections_url }}">{{ s.link_label }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
+    </div>
+    <div class="depts__grid" style="--n: {{ section.blocks.size }}">
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        {%- assign c = b.collection -%}
+        <a class="dept tile tile--{{ b.theme }}" href="{{ c.url | default: '#' }}" {{ block.shopify_attributes }}>
+          <div class="tile__art">{% render 'illustration', name: b.illustration, image: b.image, sizes: '(min-width: 990px) 20vw, 50vw', class: 'tile__img' %}</div>
+          <div class="tile__text">
+            {%- if b.eyebrow != blank -%}<span class="tile__eyebrow">{{ b.eyebrow }}</span>{%- endif -%}
+            <h3 class="tile__title">{{ b.title | default: c.title }}</h3>
+            {%- if b.text != blank -%}<p class="tile__copy">{{ b.text }}</p>{%- endif -%}
+            {%- if c != blank -%}
+              {%- capture fp -%}{% render 'from-price', collection: c %}{%- endcapture -%}
+              {%- if fp != blank -%}<p class="tile__from">{{ 'sections.from_price' | t }} <strong>{{ fp }}</strong></p>{%- endif -%}
+              <div class="dept__thumbs">
+                {%- for p in c.products limit: 3 -%}{%- if p.featured_media -%}<span>{{ p.featured_media.preview_image | image_url: width: 120 | image_tag: width: 60, height: 60, loading: 'lazy', alt: p.title }}</span>{%- endif -%}{%- endfor -%}
+              </div>
+            {%- endif -%}
+            <span class="btn btn--sm btn--light">{{ 'sections.shop_now' | t }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</span>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Department cards",
+  "class": "section-depts",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Departments" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by department" },
+    { "type": "text", "id": "text", "label": "Text" },
+    { "type": "text", "id": "link_label", "label": "Link text", "default": "All departments" },
+    { "type": "url", "id": "link", "label": "Link" }
+  ],
+  "blocks": [
+    {
+      "type": "dept",
+      "name": "Department",
+      "settings": [
+        { "type": "select", "id": "illustration", "label": "Illustration", "options": [{"value": "none", "label": "None"}, {"value": "lx-watch", "label": "Smart watch"}, {"value": "lx-bag", "label": "Shopping bag"}, {"value": "lx-sneaker", "label": "Earbuds"}, {"value": "lx-diamond", "label": "Phone, watch and earbuds"}, {"value": "lx-gift", "label": "Gift"}, {"value": "lx-parcel", "label": "Parcel"}, {"value": "lx-ring", "label": "Charging pad"}, {"value": "lx-hoodie", "label": "Wireless charger"}, {"value": "lx-heel", "label": "Hair dryer"}, {"value": "lx-tote", "label": "Earbuds and case"}, {"value": "lx-necklace", "label": "Blender and toaster"}, {"value": "lx-perfume", "label": "Espresso machine"}, {"value": "lx-sunglasses", "label": "Hair dryer and tracker"}, {"value": "lx-coupon", "label": "Coupon"}, {"value": "lx-envelope", "label": "Envelope"}], "default": "lx-tote" },
+        { "type": "image_picker", "id": "image", "label": "Or your own image" },
+        { "type": "select", "id": "theme", "label": "Colour", "options": [{"value": "noir", "label": "Black and gold"}, {"value": "gold", "label": "Gold"}, {"value": "ivory", "label": "Ivory"}, {"value": "onyx", "label": "Deep brown"}], "default": "noir" },
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "eyebrow", "label": "Small heading" },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "text", "id": "text", "label": "Text" }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [{ "name": "Department cards", "blocks": [{ "type": "dept" }, { "type": "dept" }, { "type": "dept" }] }]
+}
+{% endschema %}

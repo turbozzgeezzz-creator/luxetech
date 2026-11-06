@@ -1,0 +1,60 @@
+{%- comment -%}
+  Image(s) for a menu item. Uses a "Menu images" header block whose title
+  matches the item; otherwise the linked collection's image or first product
+  photo. Params: link, blocks, mode ('mega' | 'overlay')
+{%- endcomment -%}
+{%- liquid
+  assign feature = nil
+  assign lt = link.title | strip | downcase
+  for b in blocks
+    assign bt = b.settings.menu_item | strip | downcase
+    if bt == lt
+      assign feature = b
+    endif
+  endfor
+  assign auto_img = nil
+  if link.type == 'collection_link' and link.object
+    assign auto_img = link.object.featured_image
+    if auto_img == blank and link.object.products.first.featured_media
+      assign auto_img = link.object.products.first.featured_media.preview_image
+    endif
+  endif
+-%}
+{%- if mode == 'overlay' -%}
+  {%- liquid
+    assign img = nil
+    if feature and feature.settings.image_1 != blank
+      assign img = feature.settings.image_1
+    elsif auto_img
+      assign img = auto_img
+    endif
+  -%}
+  {%- if img -%}{% render 'image', image: img, sizes: '40vw', alt: '' %}{%- else -%}{% render 'placeholder' %}{%- endif -%}
+{%- else -%}
+  {%- if feature -%}
+    {%- for i in (1..2) -%}
+      {%- liquid
+        assign ik = 'image_' | append: i
+        assign tk = 'title_' | append: i
+        assign uk = 'link_' | append: i
+      -%}
+      {%- if feature.settings[ik] != blank or feature.settings[tk] != blank -%}
+        <a class="mega__feature zoom-hover" href="{{ feature.settings[uk] | default: link.url }}">
+          <div class="media">{% render 'image', image: feature.settings[ik], sizes: '20vw', alt: feature.settings[tk] %}</div>
+          <span class="mega__feature-title">{{ feature.settings[tk] }}</span>
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- elsif auto_img -%}
+    <a class="mega__feature zoom-hover" href="{{ link.url }}">
+      <div class="media">{% render 'image', image: auto_img, sizes: '20vw', alt: link.title %}</div>
+      <span class="mega__feature-title">{{ 'header.shop_all' | t: title: link.title }}</span>
+    </a>
+    {%- for p in link.object.products limit: 1 -%}
+      <a class="mega__feature zoom-hover" href="{{ p.url }}">
+        <div class="media">{% render 'image', image: p.featured_media.preview_image, sizes: '20vw', alt: p.title %}</div>
+        <span class="mega__feature-title">{{ p.title }}</span>
+      </a>
+    {%- endfor -%}
+  {%- endif -%}
+{%- endif -%}

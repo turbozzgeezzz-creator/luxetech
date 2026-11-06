@@ -1,0 +1,61 @@
+{%- assign s = section.settings -%}
+<section class="section{% if s.subtle %} section--subtle{% endif %}">
+  <div class="container split{% if s.reverse %} split--reverse{% endif %}">
+    <div class="split__media">
+      <div class="media split__media-main" data-reveal="mask">{% render 'image', image: s.image, sizes: '(min-width: 990px) 55vw, 100vw', label: 'Editorial photo' %}</div>
+      {%- if s.image_2 != blank -%}
+        <div class="media split__media-accent" data-reveal="mask" style="--i: 3">{% render 'image', image: s.image_2, sizes: '25vw' %}</div>
+      {%- endif -%}
+    </div>
+    <div class="split__content">
+      {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+      {%- if s.heading != blank -%}<h2 class="h2" data-split>{{ s.heading | newline_to_br }}</h2>{%- endif -%}
+      {%- if s.text != blank -%}<div class="rte" data-reveal>{{ s.text }}</div>{%- endif -%}
+      {%- if section.blocks.size > 0 -%}
+        <div class="split__stats" data-stagger>
+          {%- for block in section.blocks -%}
+            <div class="split__stat" {{ block.shopify_attributes }}><strong class="gold-text">{{ block.settings.value }}</strong><span>{{ block.settings.label }}</span></div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+      {%- if s.button_1 != blank or s.button_2 != blank -%}
+        <div class="split__actions" data-reveal>
+          {%- if s.button_1 != blank -%}<a class="btn" href="{{ s.link_1 | default: routes.all_products_collection_url }}">{{ s.button_1 }}</a>{%- endif -%}
+          {%- if s.button_2 != blank -%}<a class="btn btn--outline" href="{{ s.link_2 | default: routes.collections_url }}">{{ s.button_2 }}</a>{%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Image with text",
+  "class": "section-split",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Main image" },
+    { "type": "image_picker", "id": "image_2", "label": "Overlapping image (optional)" },
+    { "type": "checkbox", "id": "reverse", "label": "Image on the right", "default": false },
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Our promise" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Checked by hand,\nbefore it ships" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Tell your customers how you choose and check each piece, and what comes in the box.</p>" },
+    { "type": "text", "id": "button_1", "label": "Button 1", "default": "About us" },
+    { "type": "url", "id": "link_1", "label": "Button 1 link" },
+    { "type": "text", "id": "button_2", "label": "Button 2" },
+    { "type": "url", "id": "link_2", "label": "Button 2 link" },
+    { "type": "checkbox", "id": "subtle", "label": "Soft background", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Fact",
+      "settings": [
+        { "type": "text", "id": "value", "label": "Value", "info": "Only use facts that are true, e.g. number of brands you stock." },
+        { "type": "text", "id": "label", "label": "Label" }
+      ]
+    }
+  ],
+  "max_blocks": 3,
+  "presets": [{ "name": "Image with text" }]
+}
+{% endschema %}

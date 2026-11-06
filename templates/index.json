@@ -9,106 +9,125 @@
  */
 {
   "sections": {
-    "bento": {
-      "type": "promo-bento",
-      "settings": {
-        "label": "Featured offers and categories",
-        "autoplay": true,
-        "speed": 6
-      },
+    "hero": {
+      "type": "promo-grid",
       "blocks": {
         "s1": {
           "type": "slide",
           "settings": {
-            "tone": "violet",
-            "art": "ill-devices",
-            "kicker": "New season tech",
-            "heading": "Upgrade your everyday tech",
-            "text": "Tech, home and lifestyle gear, hand-picked by people who use it every day.",
-            "button_label": "Shop now",
-            "link": "/collections/all",
-            "button_label_2": "Explore guides",
-            "link_2": "/blogs/news"
+            "illustration": "lx-diamond",
+            "theme": "noir",
+            "eyebrow": "New season tech",
+            "heading": "Upgrade your\neveryday tech.",
+            "text": "Earbuds, chargers, smart watches and home gadgets, hand-picked by people who use them every day.",
+            "collection": "new-arrivals",
+            "show_from": false,
+            "button": "Shop new arrivals",
+            "link": "",
+            "button_2": "Shop all",
+            "link_2": "/collections/all"
           }
         },
         "s2": {
           "type": "slide",
           "settings": {
-            "tone": "light",
-            "art": "ill-offer",
-            "kicker": "Welcome offer",
-            "heading": "10% off your first order",
-            "text": "Join the list and your code appears instantly. New subscribers only.",
-            "button_label": "Get my code",
-            "open_offer": true
+            "illustration": "lx-sneaker",
+            "theme": "onyx",
+            "eyebrow": "Audio",
+            "heading": "Sound that\ngoes everywhere.",
+            "text": "Wireless earbuds, headphones and speakers with clear sound and all-day comfort.",
+            "collection": "audio",
+            "show_from": false,
+            "button": "Shop audio",
+            "link": "",
+            "button_2": "Best sellers",
+            "link_2": "/collections/best-sellers"
           }
         },
         "s3": {
           "type": "slide",
           "settings": {
-            "tone": "ink",
-            "art": "ill-charge",
-            "kicker": "Charging",
-            "heading": "Power up, cable-free",
-            "text": "Fast magnetic wireless charging for phones, earbuds and more.",
-            "button_label": "Shop charging",
-            "link": "/collections/charging"
+            "illustration": "lx-perfume",
+            "theme": "noir",
+            "eyebrow": "Smart kitchen",
+            "heading": "Café at\nhome.",
+            "text": "Espresso machines, ice cream makers and kitchen helpers that make every day easier.",
+            "collection": "home-kitchen",
+            "show_from": false,
+            "button": "Shop home & kitchen",
+            "link": "",
+            "button_2": "All departments",
+            "link_2": "/collections"
+          }
+        },
+        "side": {
+          "type": "side",
+          "settings": {
+            "illustration": "lx-ring",
+            "theme": "gold",
+            "eyebrow": "Charging",
+            "heading": "Power up",
+            "text": "Fast chargers and magnetic pads.",
+            "collection": "charging",
+            "show_from": false,
+            "link": "",
+            "button": "Shop charging"
           }
         },
         "t1": {
           "type": "tile",
           "settings": {
-            "tone": "violet",
-            "art": "ill-buds",
-            "kicker": "Audio",
-            "heading": "Sound that goes everywhere",
-            "text": "Wireless earbuds with charging case.",
-            "button_label": "Shop audio",
-            "link": "/collections/audio"
+            "illustration": "lx-watch",
+            "theme": "noir",
+            "eyebrow": "Wearables",
+            "heading": "Track\nevery move",
+            "collection": "smart-watches-wearables",
+            "show_from": false,
+            "link": "",
+            "opens_popup": false,
+            "button": "Explore"
           }
         },
         "t2": {
           "type": "tile",
           "settings": {
-            "tone": "light",
-            "art": "ill-espresso",
-            "kicker": "Smart kitchen",
-            "heading": "Café at home",
-            "button_label": "Shop now",
-            "link": "/collections/smart-home"
+            "illustration": "lx-heel",
+            "theme": "onyx",
+            "eyebrow": "Hair & beauty",
+            "heading": "Salon tools,\nhome price",
+            "collection": "hair-beauty-tech",
+            "show_from": false,
+            "link": "",
+            "opens_popup": false,
+            "button": "Explore"
           }
         },
         "t3": {
           "type": "tile",
           "settings": {
-            "tone": "ink",
-            "art": "ill-watch",
-            "kicker": "Wearables",
-            "heading": "Track every move",
-            "button_label": "Shop accessories",
-            "link": "/collections/accessories"
+            "illustration": "lx-tote",
+            "theme": "gold",
+            "eyebrow": "Just landed",
+            "heading": "New this\nseason",
+            "collection": "new-arrivals",
+            "show_from": false,
+            "link": "",
+            "opens_popup": false,
+            "button": "See what's new"
           }
         },
         "t4": {
           "type": "tile",
           "settings": {
-            "tone": "grape",
-            "art": "ill-haircare",
-            "kicker": "Hair care",
-            "heading": "Salon tools, home price",
-            "button_label": "Shop now",
-            "link": "/collections/accessories"
-          }
-        },
-        "t5": {
-          "type": "tile",
-          "settings": {
-            "tone": "violet",
-            "art": "ill-shipping",
-            "kicker": "Shipping",
-            "heading": "Dispatched in 3-4 business days",
-            "button_label": "How delivery works",
-            "link": "/pages/shipping-delivery"
+            "illustration": "lx-parcel",
+            "theme": "noir",
+            "eyebrow": "Our promise",
+            "heading": "Tracked,\nevery order",
+            "collection": "",
+            "show_from": false,
+            "link": "/pages/about-us",
+            "opens_popup": false,
+            "button": "Why Tech.LuxeDealers"
           }
         }
       },
@@ -116,73 +135,126 @@
         "s1",
         "s2",
         "s3",
+        "side",
         "t1",
         "t2",
         "t3",
-        "t4",
-        "t5"
-      ]
-    },
-    "ticker": {
-      "type": "marquee",
+        "t4"
+      ],
       "settings": {
-        "tone": "ink",
-        "items": "Dispatched in 3-4 business days\nTracked delivery on every order\n10% off your first order\nSecure, encrypted checkout\nReal people answer your questions\nFull refund if it arrives damaged or wrong"
+        "flush": true,
+        "speed": 6
       }
     },
-    "departments": {
-      "type": "category-showcase",
-      "settings": {
-        "eyebrow": "Departments",
-        "heading": "Shop by department",
-        "subheading": "Every department, hand-picked, so every product earns its place.",
-        "link_label": "All departments",
-        "link": "/collections",
-        "show_products": true
+    "usp": {
+      "type": "marquee",
+      "blocks": {
+        "m0": {
+          "type": "text",
+          "settings": {
+            "text": "Hand-picked tech"
+          }
+        },
+        "m1": {
+          "type": "text",
+          "settings": {
+            "text": "Checked before it ships"
+          }
+        },
+        "m2": {
+          "type": "text",
+          "settings": {
+            "text": "Tracked shipping on every order"
+          }
+        },
+        "m3": {
+          "type": "text",
+          "settings": {
+            "text": "Secure checkout"
+          }
+        },
+        "m4": {
+          "type": "text",
+          "settings": {
+            "text": "Refund or replacement guarantee"
+          }
+        },
+        "m5": {
+          "type": "text",
+          "settings": {
+            "text": "Prices in your currency"
+          }
+        },
+        "m6": {
+          "type": "text",
+          "settings": {
+            "text": "Spend $100, save 5% · $150, save 10%"
+          }
+        }
       },
+      "block_order": [
+        "m0",
+        "m1",
+        "m2",
+        "m6",
+        "m3",
+        "m4",
+        "m5"
+      ],
+      "disabled": true,
+      "settings": {
+        "label": "Why Tech.LuxeDealers",
+        "style": "label",
+        "ink": true,
+        "reverse": false,
+        "speed": 40
+      }
+    },
+    "depts": {
+      "type": "dept-cards",
       "blocks": {
         "d1": {
-          "type": "department",
+          "type": "dept",
           "settings": {
+            "illustration": "lx-tote",
+            "theme": "ivory",
+            "collection": "audio",
+            "eyebrow": "Listen",
             "title": "Audio",
-            "kicker": "Listen",
-            "tagline": "Wireless earbuds and true-wireless sound",
-            "link": "/collections/audio",
-            "tone": "ink",
-            "art": "ill-dept-audio"
+            "text": "Earbuds, headphones, speakers and audio glasses"
           }
         },
         "d2": {
-          "type": "department",
+          "type": "dept",
           "settings": {
+            "illustration": "lx-hoodie",
+            "theme": "gold",
+            "collection": "charging",
+            "eyebrow": "Power",
             "title": "Charging",
-            "kicker": "Power",
-            "tagline": "Magnetic wireless pads and USB-C",
-            "link": "/collections/charging",
-            "tone": "violet",
-            "art": "ill-dept-charging"
+            "text": "Fast chargers, magnetic pads and battery grips"
           }
         },
         "d3": {
-          "type": "department",
+          "type": "dept",
           "settings": {
-            "title": "Smart home",
-            "kicker": "Kitchen",
-            "tagline": "Espresso, blending and desserts",
-            "link": "/collections/smart-home",
-            "tone": "light",
-            "art": "ill-dept-home"
+            "illustration": "lx-necklace",
+            "theme": "noir",
+            "collection": "home-kitchen",
+            "eyebrow": "Kitchen",
+            "title": "Home & Kitchen",
+            "text": "Espresso, ice cream makers and vacuums"
           }
         },
         "d4": {
-          "type": "department",
+          "type": "dept",
           "settings": {
-            "title": "Accessories",
-            "kicker": "Lifestyle",
-            "tagline": "Smartwatches, hair care and cooling",
-            "link": "/collections/accessories",
-            "tone": "grape",
-            "art": "ill-dept-accessories"
+            "illustration": "lx-watch",
+            "theme": "onyx",
+            "collection": "smart-watches-wearables",
+            "eyebrow": "Wear",
+            "title": "Wearables",
+            "text": "Smart watches, smart rings and more"
           }
         }
       },
@@ -191,207 +263,299 @@
         "d2",
         "d3",
         "d4"
-      ]
+      ],
+      "settings": {
+        "eyebrow": "Departments",
+        "heading": "Shop by department",
+        "text": "Every department, hand-picked and shipped with tracking.",
+        "link_label": "Shop all",
+        "link": "/collections/all"
+      }
     },
     "latest": {
-      "type": "product-rail",
-      "settings": {
-        "heading": "Shop the latest",
-        "subheading": "Fresh picks across every department.",
-        "style": "default",
-        "source": "all",
-        "limit": 12,
-        "link_label": "Shop everything"
-      }
-    },
-    "deals": {
-      "type": "deals-hub",
-      "settings": {
-        "eyebrow": "Offers",
-        "heading": "Deals, bundles and offers"
-      }
-    },
-    "viewed": {
-      "type": "recently-viewed",
-      "settings": {
-        "heading": "Recently viewed",
-        "show_recommended": true,
-        "recommended_heading": "Recommended for you"
-      }
-    },
-    "story": {
-      "type": "brand-story",
-      "settings": {
-        "eyebrow": "Why shop with us",
-        "heading": "Tech, chosen by people who know it",
-        "statement": "<p>We focus on the gear that earns a daily place in your life, from audio and charging to the kitchen, home and beyond. Every product is picked by our team, and we'll give you a straight answer on any of them.</p>",
-        "link_label": "About us",
-        "link": "/pages/about-us"
-      },
+      "type": "featured-collection",
       "blocks": {
-        "p1": {
-          "type": "principle",
+        "n": {
+          "type": "collection",
           "settings": {
-            "title": "Specialists, not a warehouse",
-            "text": "We stick to the departments we know well, so we can tell you what fits your device and what doesn't."
-          }
-        },
-        "p2": {
-          "type": "principle",
-          "settings": {
-            "title": "Real people, real answers",
-            "text": "Questions go to a person on our team, not a bot. We aim to reply within one business day."
-          }
-        },
-        "p3": {
-          "type": "principle",
-          "settings": {
-            "title": "Clear prices, secure checkout",
-            "text": "Delivery options and costs are shown before you pay, and checkout is encrypted end to end."
+            "collection": "new-arrivals",
+            "title": "New arrivals"
           }
         }
       },
       "block_order": [
-        "p1",
-        "p2",
-        "p3"
-      ]
-    },
-    "guides": {
-      "type": "blog-teaser",
+        "n"
+      ],
       "settings": {
-        "eyebrow": "Guides and news",
-        "heading": "From the tech desk",
-        "link_label": "All guides",
+        "eyebrow": "Just landed",
+        "heading": "Shop the latest",
+        "layout": "rail",
+        "limit": 8,
+        "view_all": false,
+        "subtle": false
+      }
+    },
+    "deals": {
+      "type": "deals",
+      "settings": {
+        "eyebrow": "Curated",
+        "heading": "Deals, bundles and new drops",
+        "offer_illustration": "lx-coupon",
+        "offer_eyebrow": "New here?",
+        "offer_text": "Join our email list and your code appears straight away.",
+        "offer_button": "Get my code",
+        "list_eyebrow": "The list",
+        "list_heading": "First look at new drops",
+        "list_text": "New arrivals and restocks by email. Unsubscribe any time.",
+        "list_button": "Join the list",
+        "bundle_eyebrow": "Better together",
+        "bundle_heading": "Charger and pad, perfectly paired",
+        "product_1": "35w-usb-c-fast-charger",
+        "product_2": "magnetic-wireless-charging-pad",
+        "new_collection": "new-arrivals",
+        "new_eyebrow": "Just landed",
+        "new_heading": "Fresh in",
+        "new_link": "See what's new"
+      }
+    },
+    "budget": {
+      "type": "budget-tiles",
+      "blocks": {
+        "a": {
+          "type": "tier",
+          "settings": {
+            "theme": "ivory",
+            "eyebrow": "Easy gifts",
+            "title": "Under $50",
+            "text": "Chargers, wallets and small upgrades.",
+            "min": 0,
+            "max": 50
+          }
+        },
+        "b": {
+          "type": "tier",
+          "settings": {
+            "theme": "gold",
+            "eyebrow": "Everyday upgrades",
+            "title": "$50 to $100",
+            "text": "Speakers, wearables and audio.",
+            "min": 50,
+            "max": 100
+          }
+        },
+        "c": {
+          "type": "tier",
+          "settings": {
+            "theme": "noir",
+            "eyebrow": "Treat yourself",
+            "title": "$100 and up",
+            "text": "Kitchen machines, vacuums and projectors.",
+            "min": 100,
+            "max": 0
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c"
+      ],
+      "disabled": true,
+      "settings": {
+        "eyebrow": "Shop by budget",
+        "heading": "Great tech at every price",
+        "text": "Pick a budget and see everything that fits it.",
+        "collection": "all"
+      }
+    },
+    "why": {
+      "type": "why-us",
+      "blocks": {
+        "a": {
+          "type": "point",
+          "settings": {
+            "title": "Checked before it ships",
+            "text": "Every order is checked before it's packed, so what arrives matches what you ordered."
+          }
+        },
+        "b": {
+          "type": "point",
+          "settings": {
+            "title": "Real people, real answers",
+            "text": "Questions about compatibility, an order or tracking go to a person on our team, not a bot."
+          }
+        },
+        "c": {
+          "type": "point",
+          "settings": {
+            "title": "Tracked, no surprises",
+            "text": "Every order is tracked from our warehouse to your door. If anything arrives faulty, we make it right."
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c"
+      ],
+      "settings": {
+        "eyebrow": "Why Tech.LuxeDealers",
+        "heading": "Tech, chosen by\npeople who use it",
+        "text": "<p>Smart gadgets for audio, charging, the kitchen, home and the car, picked by our team and sent with tracking. Ask us anything before you buy and you'll get a straight answer from a real person.</p>",
+        "button": "Why choose us",
+        "link": "/pages/about-us"
+      }
+    },
+    "journal": {
+      "type": "blog-posts",
+      "settings": {
+        "blog": "news",
+        "eyebrow": "The tech desk",
+        "heading": "Guides and how-tos",
         "limit": 3
       }
     },
     "help": {
-      "type": "help-desk",
+      "type": "help-cards",
+      "blocks": {
+        "a": {
+          "type": "q",
+          "settings": {
+            "question": "When will my order ship?",
+            "answer": "<p>Orders are dispatched within 3–4 business days, and your tracking number is emailed as soon as it leaves.</p>",
+            "link": "/policies/shipping-policy",
+            "link_label": "Shipping policy"
+          }
+        },
+        "b": {
+          "type": "q",
+          "settings": {
+            "question": "What if it arrives faulty?",
+            "answer": "<p>Email us your order number and a photo or video. We'll arrange a repair, replacement or refund.</p>",
+            "link": "/policies/refund-policy",
+            "link_label": "Refund policy"
+          }
+        },
+        "c": {
+          "type": "q",
+          "settings": {
+            "question": "Will it work in my country?",
+            "answer": "<p>Choose your plug type on the product page (US, UK or AU). If you're unsure, ask us before you order.</p>",
+            "link": "/pages/contact",
+            "link_label": "Ask us"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c"
+      ],
       "settings": {
         "eyebrow": "Help desk",
         "heading": "Before you buy",
         "link_label": "All FAQs",
-        "link": "/pages/faq"
-      },
-      "blocks": {
-        "q1": {
-          "type": "question",
-          "settings": {
-            "question": "Will it work in my country?",
-            "answer": "Check the product details for plug type, voltage and compatibility. If anything is unclear, ask us before you order.",
-            "link_label": "Full answer",
-            "link": "/pages/faq"
-          }
-        },
-        "q2": {
-          "type": "question",
-          "settings": {
-            "question": "When will my order ship?",
-            "answer": "Orders are dispatched within 3-4 business days, with tracking emailed as soon as they leave.",
-            "link_label": "Shipping and delivery",
-            "link": "/pages/shipping-delivery"
-          }
-        },
-        "q3": {
-          "type": "question",
-          "settings": {
-            "question": "What if it arrives faulty?",
-            "answer": "Send your order number and a photo or video of the problem and we'll arrange a repair, replacement or refund.",
-            "link_label": "Refund policy",
-            "link": "/pages/returns-warranty"
-          }
-        },
-        "c1": {
-          "type": "contact",
-          "settings": {
-            "heading": "Still not sure?",
-            "text": "Questions go to a real person on our team. Tell us the device you're using and we'll check compatibility.",
-            "link_label": "Ask a person",
-            "link": "/pages/contact"
-          }
-        }
-      },
-      "block_order": [
-        "q1",
-        "q2",
-        "q3",
-        "c1"
-      ]
-    },
-    "newsletter": {
-      "type": "newsletter",
-      "settings": {
-        "heading": "Get 10% off your first order",
-        "button_label": "Get my code",
-        "text": "<p>Join the list for your welcome code, plus restocks, new arrivals and subscriber-only deals.</p>",
-        "fine_print": "By signing up you agree to get our emails. New subscribers only. Unsubscribe any time.",
-        "kicker": "Welcome offer",
-        "perk_1": "10% off your first order",
-        "perk_2": "Early access to deals and restocks",
-        "perk_3": "Expert guides, never spam"
+        "link": "/pages/faq",
+        "cta_heading": "Still not sure?",
+        "cta_text": "Questions go to a real person on our team. Tell us the device you're using and we'll check compatibility.",
+        "cta_button": "Ask us",
+        "cta_link": "/pages/contact"
       }
     },
-    "budget": {
-      "type": "shop-by-budget",
+    "signup": {
+      "type": "signup-offer",
       "settings": {
-        "eyebrow": "Shop by budget",
-        "heading": "Great tech at every price",
-        "subheading": "Pick a budget and see everything that fits it."
-      },
+        "illustration": "lx-envelope",
+        "illustration_offer": "lx-envelope",
+        "eyebrow": "The list",
+        "offer_eyebrow": "Welcome offer",
+        "heading": "First look at new tech",
+        "text": "Join the list for new arrivals, restocks and subscriber-only deals.",
+        "tick_1": "Early access to new arrivals",
+        "tick_2": "Subscriber-only deals",
+        "tick_3": "No spam, unsubscribe any time",
+        "card_title": "Join the list",
+        "card_text": "Enter your email and tick the box to subscribe."
+      }
+    },
+    "recent": {
+      "type": "recently-viewed",
+      "settings": {
+        "heading": "Recently viewed",
+        "limit": 8
+      }
+    },
+    "reviews": {
+      "type": "reviews-strip",
+      "settings": {
+        "eyebrow": "Reviews",
+        "heading": "Real reviews from real customers",
+        "collection": "best-sellers",
+        "limit": 12,
+        "min_rating": 1,
+        "link_label": "",
+        "link": ""
+      }
+    },
+    "offers": {
+      "type": "offers",
+      "settings": {
+        "eyebrow": "Offers",
+        "heading": "Spend more, save more",
+        "text": "Spend-and-save discounts come off automatically at checkout. No code needed.",
+        "button": "Shop all",
+        "link": "/collections/all"
+      }
+    },
+    "ribbon": {
+      "type": "product-ribbon",
+      "disabled": true,
+      "settings": {
+        "eyebrow": "The edit",
+        "heading": "Build your setup",
+        "limit": 14,
+        "speed": 65
+      }
+    },
+    "deals_row": {
+      "type": "featured-collection",
       "blocks": {
-        "b1": {
-          "type": "band",
+        "d": {
+          "type": "collection",
           "settings": {
-            "kicker": "Easy gifts",
-            "label": "Under $50",
-            "text": "Small upgrades that make a big difference every day.",
-            "min": 0,
-            "max": 50,
-            "tone": "light"
-          }
-        },
-        "b2": {
-          "type": "band",
-          "settings": {
-            "kicker": "Everyday upgrades",
-            "label": "$50 to $80",
-            "text": "Kitchen helpers and comfort gear for around the home.",
-            "min": 50,
-            "max": 80,
-            "tone": "grape"
-          }
-        },
-        "b3": {
-          "type": "band",
-          "settings": {
-            "kicker": "Treat yourself",
-            "label": "$80 and up",
-            "text": "Pro-style hair tools and our top kitchen picks.",
-            "min": 80,
-            "max": 0,
-            "tone": "ink"
+            "collection": "best-sellers",
+            "title": "Best sellers"
           }
         }
       },
       "block_order": [
-        "b1",
-        "b2",
-        "b3"
-      ]
+        "d"
+      ],
+      "settings": {
+        "eyebrow": "Most loved",
+        "heading": "Best sellers",
+        "layout": "rail",
+        "limit": 10,
+        "view_all": true,
+        "subtle": true
+      }
     }
   },
   "order": [
-    "bento",
-    "ticker",
-    "departments",
+    "hero",
+    "usp",
+    "ribbon",
+    "reviews",
+    "depts",
+    "deals_row",
     "latest",
+    "offers",
     "deals",
-    "viewed",
-    "story",
     "budget",
-    "guides",
+    "why",
+    "journal",
     "help",
-    "newsletter"
+    "signup",
+    "recent"
   ]
 }

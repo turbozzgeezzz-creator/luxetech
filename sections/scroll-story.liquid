@@ -1,0 +1,45 @@
+{%- liquid
+  assign s = section.settings
+  assign has_media = false
+  if s.image != blank or s.video != blank
+    assign has_media = true
+  endif
+-%}
+<section class="story{% unless has_media %} story--light{% endunless %}" data-story style="--story-h: {{ s.length }}vh; --shade: {{ s.shade | divided_by: 100.0 }}; --s-min: {{ s.start_size | divided_by: 100.0 }}" aria-label="{{ s.eyebrow | default: s.text | strip_html | truncate: 60 | escape }}">
+  <div class="story__sticky">
+    <div class="story__frame">
+      {%- if s.video != blank -%}
+        {{ s.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, preload: 'metadata', image_size: '1920x' }}
+      {%- else -%}
+        {% render 'image', image: s.image, sizes: '100vw', label: 'Story photo or video' %}
+      {%- endif -%}
+      {%- if has_media -%}<div class="story__shade"></div>{%- endif -%}
+    </div>
+    {%- if s.eyebrow != blank -%}<span class="eyebrow eyebrow--plain story__eyebrow">{{ s.eyebrow }}</span>{%- endif -%}
+    <div class="story__content">
+      <p class="story__text" data-words>{{ s.text | newline_to_br }}</p>
+      {%- if s.button != blank -%}
+        <div class="story__cta"><a class="btn{% if has_media %} btn--light{% endif %}" href="{{ s.link | default: routes.all_products_collection_url }}">{{ s.button }}</a></div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Scroll story",
+  "class": "section-story",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Full-screen photo, 2400 px wide or more." },
+    { "type": "video", "id": "video", "label": "Video (instead of image)" },
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The Tech.LuxeDealers promise" },
+    { "type": "textarea", "id": "text", "label": "Statement", "default": "Every order is <em>hand-checked</em>, carefully packed and sent with tracking to most countries.", "info": "Words light up one by one as visitors scroll. Wrap a word in <em> for the italic serif." },
+    { "type": "text", "id": "button", "label": "Button", "default": "Discover the collection" },
+    { "type": "url", "id": "link", "label": "Button link" },
+    { "type": "range", "id": "start_size", "label": "Starting image size", "min": 20, "max": 80, "step": 5, "unit": "%", "default": 40 },
+    { "type": "range", "id": "shade", "label": "Darkening behind text", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 45 },
+    { "type": "range", "id": "length", "label": "Scroll length", "min": 200, "max": 500, "step": 50, "unit": "vh", "default": 300 }
+  ],
+  "presets": [{ "name": "Scroll story" }]
+}
+{% endschema %}

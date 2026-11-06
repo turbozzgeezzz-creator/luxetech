@@ -1,0 +1,78 @@
+{%- assign s = section.settings -%}
+<section class="section section--tight{% if s.subtle %} section--subtle{% endif %}">
+  <div class="container">
+    {%- if s.heading != blank -%}
+      <div class="section-head{% unless s.cards %} section-head--center{% endunless %}"><div class="section-head__text">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+        <h2 class="h2" data-split>{{ s.heading | newline_to_br }}</h2>
+      </div></div>
+    {%- endif -%}
+    <ul class="promises{% if s.cards %} promises--cards{% endif %}" role="list" data-stagger>
+      {%- for block in section.blocks -%}
+        <li class="promise" {{ block.shopify_attributes }}>
+          <span class="promise__icon">{% render 'icon', name: block.settings.icon %}</span>
+          <div class="promise__body">
+            <h3 class="promise__title">{{ block.settings.title }}</h3>
+            {%- if block.settings.text != blank -%}<div class="promise__text">{{ block.settings.text }}</div>{%- endif -%}
+            {%- if block.settings.link != blank -%}<a class="link" href="{{ block.settings.link }}">{% if block.settings.link_label != blank %}{{ block.settings.link_label }}{% else %}{{ 'general.learn_more' | t }}{% endif %} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
+          </div>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Promises",
+  "class": "section-promises",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading" },
+    { "type": "textarea", "id": "heading", "label": "Heading" },
+    { "type": "checkbox", "id": "subtle", "label": "Soft background", "default": false },
+    { "type": "checkbox", "id": "cards", "label": "Show as cards", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "promise",
+      "name": "Promise",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "diamond", "label": "Diamond" },
+            { "value": "globe", "label": "Globe" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "return", "label": "Returns" },
+            { "value": "lock", "label": "Secure" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "chat", "label": "Chat" },
+            { "value": "box", "label": "Box" },
+            { "value": "sparkle", "label": "Sparkle" }
+          ],
+          "default": "diamond"
+        },
+        { "type": "text", "id": "title", "label": "Title", "default": "Hand-checked" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Every order is checked before it ships.</p>" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "text", "id": "link_label", "label": "Link text" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Promises",
+      "blocks": [
+        { "type": "promise", "settings": { "icon": "diamond", "title": "Hand-checked", "text": "<p>Every order is checked before it ships.</p>" } },
+        { "type": "promise", "settings": { "icon": "globe", "title": "Tracked shipping", "text": "<p>Sent with tracking, priced in your currency.</p>" } },
+        { "type": "promise", "settings": { "icon": "return", "title": "Easy returns", "text": "<p>See our returns policy for the window and conditions.</p>" } },
+        { "type": "promise", "settings": { "icon": "lock", "title": "Secure checkout", "text": "<p>Cards, wallets and local payment methods.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

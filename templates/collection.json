@@ -2,7 +2,11 @@
   "sections": {
     "main": {
       "type": "main-collection",
-      "settings": {}
+      "settings": {
+        "per_page": 24,
+        "show_description": true,
+        "chips_menu": "main-menu-1"
+      }
     }
   },
   "order": [

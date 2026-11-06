@@ -1,0 +1,47 @@
+{%- comment -%} All-reviews page: the store score from Judge.me and real reviews from products, photo reviews first. {%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign c = s.collection | default: collections.all
+  assign avg = shop.metafields.judgeme.all_reviews_rating.value | default: shop.metafields.judgeme.all_reviews_rating
+  assign total = shop.metafields.judgeme.all_reviews_count.value | default: shop.metafields.judgeme.all_reviews_count
+  assign shown = 0
+-%}
+<section class="section section--flush-top reviews-wall">
+  <div class="container">
+    {%- if avg != blank -%}
+      <div class="reviews-wall__score">
+        <strong>{{ avg | times: 1 | round: 2 }}</strong>
+        <div><span class="rating__stars rating__stars--gold rating__stars--lg" aria-hidden="true"><span style="--pct: {{ avg | times: 20 }}%"></span></span><span>{{ 'reviews.from_count' | t: count: total }}</span></div>
+      </div>
+    {%- endif -%}
+    <div class="reviews-wall__grid">
+      {%- for pass in (1..2) -%}
+        {%- for p in c.products limit: 250 -%}
+          {%- if shown >= s.limit -%}{%- break -%}{%- endif -%}
+          {%- assign jd = p.metafields.judgeme.review_widget_data.value -%}
+          {%- if jd.number_of_reviews > 0 -%}
+            {%- for review in jd.reviews limit: 3 -%}
+              {%- if pass == 1 and review.pictures_urls.size > 0 -%}
+                {% render 'review-card', review: review, product_title: p.title, product_url: p.url, hero: true %}{%- assign shown = shown | plus: 1 -%}
+              {%- elsif pass == 2 and review.pictures_urls.size == 0 and review.body != blank -%}
+                {% render 'review-card', review: review, product_title: p.title, product_url: p.url %}{%- assign shown = shown | plus: 1 -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+    {%- for block in section.blocks -%}<div class="reviews__app" {{ block.shopify_attributes }}>{% render block %}</div>{%- endfor -%}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Reviews wall",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Take reviews from" },
+    { "type": "range", "id": "limit", "label": "Reviews to show", "min": 6, "max": 60, "step": 2, "default": 36 }
+  ],
+  "blocks": [{ "type": "@app" }],
+  "presets": [{ "name": "Reviews wall" }]
+}
+{% endschema %}

@@ -1,0 +1,63 @@
+{%- liquid
+  assign s = section.settings
+  assign p = s.product
+  assign img = s.image
+  if img == blank and p.featured_media
+    assign img = p.featured_media.preview_image
+  endif
+-%}
+<section class="section{% if s.subtle %} section--subtle{% endif %}">
+  <div class="container spotlight{% if s.reverse %} spotlight--reverse{% endif %}">
+    <a class="spotlight__media" href="{{ p.url | default: '#' }}" data-reveal="zoom" data-view-cursor tabindex="-1" aria-hidden="true">
+      <span class="spotlight__halo" aria-hidden="true"></span>
+      <div data-parallax style="position: absolute; inset: -6% 0; --parallax: 26px">{% render 'image', image: img, sizes: '(min-width: 990px) 55vw, 100vw', alt: p.title, label: 'Hero product photo' %}</div>
+    </a>
+    <div class="spotlight__info">
+      {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+      {%- if p.vendor != blank -%}<span class="product__vendor" data-reveal>{{ p.vendor }}</span>{%- endif -%}
+      <h2 class="spotlight__title" data-split>{{ s.heading | default: p.title | default: 'Choose a product' }}</h2>
+      {%- if s.text != blank -%}<div class="rte muted" data-reveal>{{ s.text }}</div>{%- endif -%}
+      {%- if section.blocks.size > 0 -%}
+        <ul class="spotlight__points" role="list" data-stagger>
+          {%- for block in section.blocks -%}
+            <li class="spotlight__point" {{ block.shopify_attributes }}><span>{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span><span>{{ block.settings.text }}</span></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      {%- if p != blank -%}
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 18px" data-reveal>
+          {% render 'price', product: p, show_from: true, class: 'product__price' %}
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px" data-reveal>
+          {%- if p.available and p.has_only_default_variant -%}
+            <button type="button" class="btn" data-add-variant="{{ p.selected_or_first_available_variant.id }}">{{ 'products.add_to_bag' | t }}</button>
+          {%- elsif p.available -%}
+            <button type="button" class="btn" data-quick-view="{{ p.url }}">{{ 'products.choose_options' | t }}</button>
+          {%- endif -%}
+          <a class="btn btn--outline" href="{{ p.url }}">{{ 'products.full_details' | t }}</a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product spotlight",
+  "class": "section-spotlight",
+  "settings": [
+    { "type": "product", "id": "product", "label": "Product" },
+    { "type": "image_picker", "id": "image", "label": "Image (optional)", "info": "Defaults to the product's first photo." },
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "In the spotlight" },
+    { "type": "text", "id": "heading", "label": "Heading", "info": "Defaults to the product title." },
+    { "type": "richtext", "id": "text", "label": "Text" },
+    { "type": "checkbox", "id": "reverse", "label": "Image on the right", "default": false },
+    { "type": "checkbox", "id": "subtle", "label": "Soft background", "default": false }
+  ],
+  "blocks": [
+    { "type": "point", "name": "Detail", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Hand-checked before it ships" }] }
+  ],
+  "max_blocks": 5,
+  "presets": [{ "name": "Product spotlight" }]
+}
+{% endschema %}

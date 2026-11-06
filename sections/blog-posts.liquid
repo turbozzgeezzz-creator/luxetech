@@ -1,0 +1,36 @@
+{%- assign s = section.settings -%}
+{%- assign blog = s.blog | default: blogs.news -%}
+{%- if blog.articles_count > 0 or request.design_mode -%}
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+        <h2 class="h2" data-split>{{ s.heading | newline_to_br }}</h2>
+      </div>
+      {%- if blog -%}<a class="link" href="{{ blog.url }}" data-reveal>{{ 'blog.all_stories' | t }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
+    </div>
+    <div class="posts" data-stagger>
+      {%- for article in blog.articles limit: s.limit -%}{% render 'article-card', article: article %}{%- else -%}
+        {%- for i in (1..3) -%}
+          <div class="post-card"><div class="media post-card__media">{% render 'placeholder' %}</div><span class="post-card__meta">{{ 'blog.journal' | t }}</span><h3 class="post-card__title">{{ 'blog.placeholder' | t }}</h3></div>
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Journal posts",
+  "class": "section-blog",
+  "settings": [
+    { "type": "blog", "id": "blog", "label": "Blog" },
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The Journal" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Stories and guides" },
+    { "type": "range", "id": "limit", "label": "Posts", "min": 2, "max": 6, "step": 1, "default": 3 }
+  ],
+  "presets": [{ "name": "Journal posts" }]
+}
+{% endschema %}

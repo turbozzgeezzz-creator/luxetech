@@ -10,44 +10,38 @@
 {
   "current": {
     "luxemail_endpoint": "https://luxemail-tech.turbozzgeezzz.workers.dev/t",
-    "color_background": "#FFFFFF",
-    "color_subtle": "#FAF7FF",
-    "color_surface": "#FFFFFF",
-    "color_ink": "#2E1460",
-    "color_muted": "#6B5E8C",
-    "color_border": "#ECE4FB",
-    "color_primary": "#8048F5",
-    "color_accent": "#F4EEFF",
-    "color_success": "#1E7A3C",
-    "color_warning": "#8F5B00",
-    "color_error": "#B42318",
-    "cart_type": "drawer",
+    "social_tiktok": "",
+    "cookie_banner": false,
+    "tier_1_spend": 100,
+    "tier_1_percent": 5,
+    "tier_2_spend": 150,
+    "tier_2_percent": 10,
+    "seo_home_title": "Tech.LuxeDealers | Smart Gadgets, Audio, Charging & Home Tech",
     "free_shipping_threshold": 0,
-    "support_email": "support@luxedealers.com",
-    "social_instagram": "https://www.instagram.com/tech.luxedealers/",
-    "social_facebook": "https://www.facebook.com/profile.php?id=61595062625090",
+    "shipping_fee_below_threshold": 0,
+    "seo_home_description": "Shop hand-picked smart gadgets: earbuds, chargers, smart watches, home and kitchen tech. Tracked shipping on every order and real people to help.",
     "sections": {
       "cart-drawer": {
         "type": "cart-drawer",
-        "settings": {}
+        "settings": {
+          "upsell_collection": "",
+          "upsell_title": "Complete the look",
+          "empty_link": ""
+        }
       },
       "newsletter-popup": {
         "type": "newsletter-popup",
         "settings": {
           "enabled": true,
           "trigger": "delay",
-          "delay": 9,
+          "delay": 25,
           "repeat_days": 0,
-          "preview": false,
-          "discount_code": "",
-          "offer_kicker": "Welcome offer",
-          "offer_heading": "Take 10% off your first order",
-          "offer_text": "<p>Join our email list and we'll show your code straight away. One use per customer.</p>",
-          "heading": "Hear about deals first",
-          "text": "<p>Occasional emails with restocks, new products and subscriber offers.</p>",
-          "button_label": "Sign up",
-          "decline_label": "No thanks",
-          "fine_print": "By signing up you agree to get our emails. Unsubscribe any time."
+          "art": "gift",
+          "show_offer": true,
+          "offer": "10% off your first order",
+          "eyebrow": "The private list",
+          "heading": "First to know, first to own",
+          "text": "<p>Join the list for new arrivals, restocks and subscriber-only offers. Unsubscribe any time.</p>"
         }
       }
     },
@@ -58,24 +52,54 @@
         "disabled": false,
         "settings": {}
       },
-      "13047258039897440615": {
-        "type": "shopify://apps/judge-me-reviews/blocks/cart_drawer_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+      "13768625480086291342": {
+        "type": "shopify://apps/forms/blocks/forms/8744a304-fcb1-4347-b211-bb6b4759a76a",
+        "disabled": false,
+        "settings": {}
+      },
+      "7079518687644006178": {
+        "type": "shopify://apps/checkout-blocks/blocks/app-embed/b0024ca5-9de8-4bf0-a92f-cd0783877ae2",
+        "disabled": false,
+        "settings": {
+          "utm_id": true,
+          "utm_source": true,
+          "utm_medium": true,
+          "utm_campaign": true,
+          "utm_term": true,
+          "ref": true
+        }
+      },
+      "15351435345818755577": {
+        "type": "shopify://apps/pandectes-gdpr/blocks/banner/58c0baa2-6cc1-480c-9ea6-38d6d559556a",
         "disabled": true,
         "settings": {
-          "widget_type": "review-widget"
+          "fast_load": false
+        }
+      },
+      "8605505498557855500": {
+        "type": "shopify://apps/bogos-io-free-gift/blocks/app-embed/0432bba6-720a-4e95-be5a-b868386f7aa6",
+        "disabled": true,
+        "settings": {}
+      },
+      "4015264832934714879": {
+        "type": "shopify://apps/cwillsendwill-popup-email/blocks/app/a5670cf8-5705-4b01-ad9e-447033feae26",
+        "disabled": true,
+        "settings": {
+          "enable_gdpr_mode": false,
+          "enable_cwtracks_listener": true
         }
       },
       "15683396631634586217": {
         "type": "shopify://apps/inbox/blocks/chat/841fc607-4181-4ad1-842d-e24d7f8bad6b",
         "disabled": false,
         "settings": {
-          "greeting_message": "Hi! 👋 Questions about a product, delivery or your order? Ask away. We usually reply within one business day.",
+          "greeting_message": "",
           "show_featured_products": true,
           "featured_products": [],
-          "background_color": "#FFFFFF",
-          "font_color": "#0B1220",
+          "background_color": "#ffffff",
+          "font_color": "#2E1460",
           "agent_invert_activator_colors": true,
-          "button_color": "#7D03FC",
+          "button_color": "#2E1460",
           "button_icon": "chat_bubble",
           "button_text": "chat_with_us",
           "button_horizontal_position": "bottom_right",
@@ -84,29 +108,24 @@
           "agent_font": "system_ui_n4",
           "agent_font_size": 14,
           "agent_activator_font_size": 16,
-          "agent_border_radius": 16
+          "agent_border_radius": 24
         }
       }
-    }
-  },
-  "presets": {
-    "Default": {
-      "color_background": "#F2F3F5",
-      "color_surface": "#FFFFFF",
-      "color_ink": "#0B1220",
-      "color_muted": "#586072",
-      "color_border": "#D3D7DE",
-      "color_primary": "#7D03FC",
-      "color_accent": "#EFE6FF",
-      "color_success": "#1E7A3C",
-      "color_warning": "#8F5B00",
-      "color_error": "#B42318",
-      "cart_type": "drawer",
-      "free_shipping_threshold": 0,
-      "color_subtle": "#E7E9ED",
-      "social_instagram": "https://www.instagram.com/tech.luxedealers/",
-      "social_facebook": "https://www.facebook.com/profile.php?id=61595062625090",
-      "support_email": "support@luxedealers.com"
-    }
+    },
+    "cart_gift_note": false,
+    "qty_1_count": 0,
+    "qty_1_percent": 10,
+    "qty_2_count": 0,
+    "qty_2_percent": 15,
+    "welcome_personal": true,
+    "welcome_offer": "10% off your first order",
+    "color_background": "#FFFFFF",
+    "color_subtle": "#F6F1FF",
+    "color_ink": "#2E1460",
+    "color_muted": "#6B5E8C",
+    "color_border": "#ECE4FB",
+    "color_gold": "#D9C4FF",
+    "color_gold_text": "#8048F5",
+    "color_sapphire": "#8048F5"
   }
 }

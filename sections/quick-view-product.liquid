@@ -1,0 +1,22 @@
+<div data-quick-view-content>
+  <button type="button" class="icon-btn popup__close" data-drawer-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button>
+  <div class="quick-view__media">
+    {%- if product.selected_or_first_available_variant.featured_media -%}
+      {%- assign m = product.selected_or_first_available_variant.featured_media -%}
+    {%- else -%}
+      {%- assign m = product.featured_media -%}
+    {%- endif -%}
+    {%- if m -%}{{ m.preview_image | image_url: width: 1000 | image_tag: widths: '400, 600, 800, 1000', sizes: '(min-width: 750px) 500px, 100vw', alt: product.title }}{%- else -%}{% render 'placeholder' %}{%- endif -%}
+  </div>
+  <div class="quick-view__body" data-product>
+    <h2 class="product__title quick-view__title">{{ product.title }}</h2>
+    {% render 'price', product: product, class: 'product__price' %}
+    <hr class="product__divider">
+    {% render 'product-form', product: product, form_id: 'QuickForm', show_dynamic: false, show_qty: false, breaks: false %}
+    <a href="{{ product.url }}" class="link quick-view__more">{{ 'products.full_details' | t }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>
+  </div>
+</div>
+
+{% schema %}
+{ "name": "Quick view" }
+{% endschema %}
