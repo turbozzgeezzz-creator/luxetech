@@ -1,13 +1,20 @@
-<div class="container container--narrow page{% if page.content == blank %} page--title-only{% endif %}{% unless section.settings.show_title %} page--no-title{% endunless %}">
-  {%- if section.settings.show_title -%}<h1 class="page-title">{{ page.title | escape }}</h1>{%- endif -%}
-  {%- if page.content != blank -%}<div class="rte">{{ page.content }}</div>{%- endif -%}
-</div>
+{%- if section.settings.show_title -%}
+  {% render 'page-banner', title: page.title, art: section.settings.art %}
+{%- endif -%}
+{%- if page.content != blank -%}
+  <div class="container page-body">
+    <div class="page-body__card rte" data-reveal>{{ page.content }}</div>
+  </div>
+{%- endif -%}
 
 {% schema %}
 {
   "name": "Page content",
   "settings": [
-    { "type": "checkbox", "id": "show_title", "label": "Show page title", "default": true, "info": "Turn off when a Page banner above already shows the title." }
+    { "type": "checkbox", "id": "show_title", "label": "Show page title", "default": true },
+    { "type": "select", "id": "art", "label": "Illustration", "default": "diamond", "options": [
+      { "value": "diamond", "label": "Diamond" }, { "value": "envelope", "label": "Envelope" }, { "value": "gift", "label": "Gift" },
+      { "value": "parcel", "label": "Parcel" }, { "value": "coupon", "label": "Coupon" } ] }
   ]
 }
 {% endschema %}

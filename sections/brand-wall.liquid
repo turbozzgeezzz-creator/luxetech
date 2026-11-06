@@ -1,0 +1,64 @@
+{%- assign s = section.settings -%}
+<section class="section{% if s.subtle %} section--subtle{% endif %}">
+  <div class="container">
+    {%- if s.heading != blank -%}
+      <div class="section-head section-head--center">
+        <div class="section-head__text">
+          {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+          <h2 class="h2" data-split>{{ s.heading | newline_to_br }}</h2>
+        </div>
+      </div>
+    {%- endif -%}
+    <div class="brand-wall" style="--cols: {{ s.columns }}" data-stagger>
+      {%- if section.blocks.size > 0 -%}
+        {%- for block in section.blocks -%}
+          {%- assign url = block.settings.link -%}
+          {%- if url == blank -%}{%- assign url = block.settings.name | url_for_vendor -%}{%- endif -%}
+          <a class="brand-tile" href="{{ url }}" {{ block.shopify_attributes }}>
+            {%- if block.settings.logo != blank -%}
+              {{ block.settings.logo | image_url: height: 120 | image_tag: height: 48, loading: 'lazy', alt: block.settings.name }}
+            {%- else -%}
+              <span class="brand-tile__name">{{ block.settings.name }}</span>
+            {%- endif -%}
+            <span class="brand-tile__more">{{ 'sections.shop_brand' | t }}</span>
+          </a>
+        {%- endfor -%}
+      {%- else -%}
+        {%- comment -%} No blocks: list the real vendors in the catalogue. {%- endcomment -%}
+        {%- for vendor in shop.vendors limit: s.auto_limit -%}
+          <a class="brand-tile" href="{{ vendor | url_for_vendor }}">
+            <span class="brand-tile__name">{{ vendor }}</span>
+            <span class="brand-tile__more">{{ 'sections.shop_brand' | t }}</span>
+          </a>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Brands",
+  "class": "section-brands",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The houses" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Brands we stock" },
+    { "type": "range", "id": "columns", "label": "Columns (desktop)", "min": 3, "max": 8, "step": 1, "default": 6 },
+    { "type": "range", "id": "auto_limit", "label": "Brands to show automatically", "min": 3, "max": 24, "step": 1, "default": 12, "info": "Used when no brand blocks are added: lists the vendors in your catalogue." },
+    { "type": "checkbox", "id": "subtle", "label": "Soft background", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Brand",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Brand name", "info": "Only list brands you actually sell." },
+        { "type": "image_picker", "id": "logo", "label": "Logo (optional)" },
+        { "type": "url", "id": "link", "label": "Link", "info": "Leave empty to link to all products from this vendor." }
+      ]
+    }
+  ],
+  "max_blocks": 24,
+  "presets": [{ "name": "Brands" }]
+}
+{% endschema %}

@@ -11,136 +11,107 @@
   "type": "header",
   "name": "Header group",
   "sections": {
-    "utility-bar": {
+    "announcement": {
       "type": "announcement-bar",
       "blocks": {
+        "m0": {
+          "type": "message",
+          "settings": {
+            "icon": "gift",
+            "text": "Spend $100 save 5% · $150 save 10%",
+            "link": "/collections/all",
+            "opens_popup": false,
+            "needs_code": false
+          }
+        },
         "m1": {
           "type": "message",
           "settings": {
-            "text": "10% off your first order",
-            "icon": "percent"
+            "icon": "tag",
+            "text": "Buy 2, save 10% · Buy 3+, save 15%",
+            "link": "/collections/all",
+            "opens_popup": false,
+            "needs_code": false,
+            "needs_qty": true
           }
         },
         "m2": {
           "type": "message",
           "settings": {
-            "text": "Dispatched in 3-4 business days",
-            "icon": "truck",
-            "link": "/pages/shipping-delivery"
-          }
-        },
-        "m3": {
-          "type": "message",
-          "settings": {
+            "icon": "return",
             "text": "Damaged or wrong item? Full refund",
-            "icon": "repeat",
-            "link": "/pages/returns-warranty"
+            "link": "/pages/returns-warranty",
+            "opens_popup": false,
+            "needs_code": false
           }
         },
         "m4": {
           "type": "message",
           "settings": {
-            "text": "Spend $100 save 5% · $150 save 10%",
-            "icon": "gift",
-            "link": "/collections/all"
+            "icon": "percent",
+            "text": "10% off your first order",
+            "link": "",
+            "opens_popup": true,
+            "needs_code": true
+          }
+        },
+        "m5": {
+          "type": "message",
+          "settings": {
+            "icon": "sparkle",
+            "text": "New arrivals every week",
+            "link": "/collections/new-arrivals",
+            "opens_popup": false,
+            "needs_code": false
+          }
+        },
+        "m6": {
+          "type": "message",
+          "settings": {
+            "icon": "truck",
+            "text": "Dispatched in 3-4 business days, tracked",
+            "link": "/pages/shipping-delivery",
+            "opens_popup": false,
+            "needs_code": false
           }
         }
       },
       "block_order": [
-        "m1",
         "m4",
+        "m0",
+        "m6",
         "m2",
-        "m3"
+        "m1",
+        "m5"
       ],
-      "settings": {}
+      "settings": {
+        "speed": 4,
+        "show_localization": true
+      }
     },
     "header": {
       "type": "header",
       "settings": {
-        "sticky": true,
-        "menu": "main-menu"
-      },
-      "blocks": {
-        "c1": {
-          "type": "mega",
-          "settings": {
-            "title": "Audio",
-            "icon": "headphones",
-            "link": "/collections/audio"
-          }
-        },
-        "c2": {
-          "type": "mega",
-          "settings": {
-            "title": "Charging",
-            "icon": "plug",
-            "link": "/collections/charging"
-          }
-        },
-        "c3": {
-          "type": "mega",
-          "settings": {
-            "title": "Smart home",
-            "icon": "home-device",
-            "link": "/collections/smart-home"
-          }
-        },
-        "c4": {
-          "type": "mega",
-          "settings": {
-            "title": "Accessories",
-            "icon": "case",
-            "link": "/collections/accessories"
-          }
-        },
-        "c5": {
-          "type": "link",
-          "settings": {
-            "title": "New arrivals",
-            "icon": "sparkle",
-            "link": "/collections/all?sort_by=created-descending"
-          }
-        },
-        "c6": {
-          "type": "link",
-          "settings": {
-            "title": "Deals",
-            "icon": "tag",
-            "link": "/#deals",
-            "highlight": true
-          }
-        },
-        "c7": {
-          "type": "link",
-          "settings": {
-            "title": "Guides",
-            "icon": "sparkle",
-            "link": "/blogs/news"
-          }
-        },
-        "c0": {
-          "type": "mega",
-          "settings": {
-            "title": "Shop all",
-            "icon": "grid",
-            "link": "/collections/all"
-          }
-        }
-      },
-      "block_order": [
-        "c0",
-        "c1",
-        "c2",
-        "c3",
-        "c4",
-        "c5",
-        "c7",
-        "c6"
-      ]
+        "contact_label": "Help",
+        "contact_page": "contact",
+        "help_label": "Help",
+        "help_menu": "support-menu",
+        "hide_on_scroll": false,
+        "highlight_item": "Best sellers",
+        "menu": "main-menu-2",
+        "nav_hide": "Help",
+        "overlay_home": false,
+        "pill_label": "New in",
+        "pill_link": "/collections/new-arrivals",
+        "show_localization": false,
+        "show_nav": true,
+        "popular_searches": "Earbuds, Chargers, Smart watch, Espresso, Hair dryer, Projector",
+        "search_collection": "new-arrivals"
+      }
     }
   },
   "order": [
-    "utility-bar",
+    "announcement",
     "header"
   ]
 }

@@ -1,18 +1,25 @@
 {%- comment -%}
-  "Welcome back" modal for returning visitors (30+ minutes since the last visit)
-  who looked at products before. Filled in by assets/experience.js from the
-  visitor's own browsing history; nothing is stored on the server.
+  Welcome back: a returning visitor (30+ minutes away) sees the last piece
+  they looked at, with its live price and stock. Uses only their own
+  browsing, stored on their device. Filled by theme.js.
 {%- endcomment -%}
-<welcome-back>
-  <dialog class="modal welcome" aria-labelledby="WelcomeBackTitle">
-    <button type="button" class="modal__close" data-welcome-close aria-label="Close">{% render 'icon', name: 'close' %}</button>
-    <div class="welcome__head">
-      <p class="eyebrow">Welcome back</p>
-      <h2 class="welcome__title" id="WelcomeBackTitle">Pick up where you left off</h2>
+{%- if settings.welcome_back and request.page_type != 'product' and request.page_type != 'cart' and request.page_type != 'password' -%}
+<div class="popup wb-modal" id="WelcomeBack" aria-hidden="true" data-welcome-back hidden>
+  <div class="popup__overlay" data-drawer-close></div>
+  <div class="popup__card wb-modal__card" role="dialog" aria-modal="true" aria-labelledby="WelcomeBackTitle" tabindex="-1">
+    <button type="button" class="icon-btn popup__close" data-drawer-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button>
+    <div class="wb-modal__body">
+      <span class="eyebrow">{{ 'welcome.back' | t }}</span>
+      <h2 class="h2" id="WelcomeBackTitle">{{ 'welcome.heading' | t }}</h2>
+      <div class="wb-card">
+        <a class="wb-card__media" href="#" data-wb-link tabindex="-1" aria-hidden="true"><img alt="Product you viewed" data-wb-img width="400" height="400"></a>
+        <a class="wb-card__title" href="#" data-wb-link data-wb-title></a>
+        <span class="wb-card__stock"><span class="dot"></span>{{ 'products.in_stock' | t }}</span>
+        <span class="wb-card__price" data-wb-price></span>
+        <a class="btn btn--gold btn--block" href="#" data-wb-link>{{ 'welcome.view' | t }}</a>
+      </div>
+      <a class="link" href="{{ routes.all_products_collection_url }}">{{ 'welcome.browse' | t }}</a>
     </div>
-    <ul class="welcome__track" role="list" data-track></ul>
-    <div class="welcome__foot">
-      <a href="{{ routes.all_products_collection_url }}" class="link-btn">Browse everything</a>
-    </div>
-  </dialog>
-</welcome-back>
+  </div>
+</div>
+{%- endif -%}

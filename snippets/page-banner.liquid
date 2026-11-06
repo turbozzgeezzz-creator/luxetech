@@ -1,0 +1,32 @@
+{%- comment -%}
+  The shared banner at the top of every page (pages, policies' look, track order, contact).
+  Params: title, eyebrow, text, art (illustration name, e.g. 'envelope'), meta (bool: rating + free shipping chips)
+{%- endcomment -%}
+{%- liquid
+  assign a = art | default: 'diamond'
+  # Full illustration names (ill-…) are used as they are; short names (diamond, parcel…) are the lx- set.
+  assign art_file = a | append: '.svg'
+  unless a contains 'ill-'
+    assign art_file = 'lx-' | append: a | append: '.svg'
+  endunless
+  assign avg = shop.metafields.judgeme.all_reviews_rating.value | default: shop.metafields.judgeme.all_reviews_rating
+  assign total = shop.metafields.judgeme.all_reviews_count.value | default: shop.metafields.judgeme.all_reviews_count | default: 0 | plus: 0
+-%}
+<div class="container page-banner">
+  <div class="coll-hero tile tile--noir">
+    <div class="tile__text">
+      <nav class="breadcrumbs breadcrumbs--left" aria-label="{{ 'general.breadcrumbs' | t }}"><a href="{{ routes.root_url }}">{{ 'general.home' | t }}</a><span aria-hidden="true">/</span><span aria-current="page">{{ title | strip_html }}</span></nav>
+      {%- if eyebrow != blank -%}<span class="page-banner__eyebrow">{{ eyebrow }}</span>{%- endif -%}
+      <h1 class="coll-hero__title page-banner__title">{{ title }}</h1>
+      {%- if text != blank -%}<p class="page-banner__text">{{ text }}</p>{%- endif -%}
+      {%- if meta -%}
+        <p class="coll-hero__meta">
+          {%- if total > 0 -%}<span><span class="rating__stars rating__stars--gold" aria-hidden="true"><span style="--pct: {{ avg | times: 20 }}%"></span></span> <strong>{{ avg }}</strong> {{ 'sections.from_reviews' | t: count: total }}</span>{%- endif -%}
+          <span>{% render 'icon', name: 'truck', class: 'icon--sm' %} {{ 'products.free_shipping' | t }}</span>
+          <span>{% render 'icon', name: 'return', class: 'icon--sm' %} {{ 'products.refund_reship' | t }}</span>
+        </p>
+      {%- endif -%}
+    </div>
+    <div class="tile__art coll-hero__art"><img src="{{ art_file | asset_url }}" alt="{{ title | escape }}" width="600" height="600" class="tile__img" fetchpriority="high"></div>
+  </div>
+</div>

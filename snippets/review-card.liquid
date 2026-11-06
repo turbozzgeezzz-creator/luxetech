@@ -1,0 +1,19 @@
+{%- comment -%} One real Judge.me review. Params: review (object from review_widget_data), product_title, product_url {%- endcomment -%}
+<article class="review-card{% if hero and review.pictures_urls.size > 0 %} review-card--photo{% endif %}">
+  {%- if hero and review.pictures_urls.size > 0 -%}<a class="review-card__hero" href="{{ review.pictures_urls.first.huge }}" target="_blank" rel="noopener"><img src="{{ review.pictures_urls.first.original | replace: 'width=1024', 'width=600' }}" alt="{{ 'reviews.photo_alt' | t }}" width="600" height="600" loading="lazy"></a>{%- endif -%}
+  <div class="review-card__top">
+    <span class="rating__stars rating__stars--gold" aria-label="{{ review.rating }} / 5"><span style="--pct: {{ review.rating | times: 20 }}%"></span></span>
+    {%- if review.verified_buyer -%}<span class="review-card__verified">{% render 'icon', name: 'check', class: 'icon--sm' %}{{ 'reviews.verified' | t }}</span>{%- endif -%}
+  </div>
+  {%- if review.title != blank -%}<h3 class="review-card__title">{{ review.title }}</h3>{%- endif -%}
+  {%- if review.body != blank -%}<p class="review-card__body">{{ review.body | strip_html | truncate: 260 }}</p>{%- endif -%}
+  {%- if review.pictures_urls.size > 0 and hero != true -%}
+    <div class="review-card__pics">
+      {%- for pic in review.pictures_urls limit: 3 -%}<a href="{{ pic.huge }}" target="_blank" rel="noopener"><img src="{{ pic.small }}" alt="Customer photo" width="80" height="80" loading="lazy"></a>{%- endfor -%}
+    </div>
+  {%- endif -%}
+  <div class="review-card__meta">
+    <span class="review-card__avatar" aria-hidden="true">{{ review.reviewer_initial | default: 'A' }}</span>
+    <span><strong>{{ review.reviewer_name }}</strong>{%- if product_title != blank -%}<a href="{{ product_url }}">{{ product_title }}</a>{%- else -%}<small>{{ review.created_at | date: '%b %-d, %Y' }}</small>{%- endif -%}</span>
+  </div>
+</article>

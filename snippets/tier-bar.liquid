@@ -1,0 +1,38 @@
+{%- comment -%}
+  Spend-and-save progress (Theme settings > Cart). Only shown when tiers are
+  set and the shopper pays in the store currency, so amounts are exact.
+{%- endcomment -%}
+{%- liquid
+  assign t1 = settings.tier_1_spend | times: 100
+  assign t2 = settings.tier_2_spend | times: 100
+  assign total = cart.total_price
+-%}
+{%- if t1 > 0 and cart.currency.iso_code == shop.currency -%}
+  {%- liquid
+    assign top = t1
+    if t2 > t1
+      assign top = t2
+    endif
+    assign pct = total | times: 100 | divided_by: top
+    if pct > 100
+      assign pct = 100
+    endif
+    assign m1 = t1 | times: 100 | divided_by: top
+  -%}
+  <div class="tier-bar">
+    <p class="tier-bar__msg">
+      {%- if total < t1 -%}
+        {%- assign need = t1 | minus: total | money_without_trailing_zeros -%}{{ 'cart.tier_need' | t: amount: need, percent: settings.tier_1_percent }}
+      {%- elsif t2 > t1 and total < t2 -%}
+        {%- assign need = t2 | minus: total | money_without_trailing_zeros -%}{{ 'cart.tier_next' | t: current: settings.tier_1_percent, amount: need, percent: settings.tier_2_percent }}
+      {%- else -%}
+        {%- if t2 > t1 -%}{{ 'cart.tier_done' | t: percent: settings.tier_2_percent }}{%- else -%}{{ 'cart.tier_done' | t: percent: settings.tier_1_percent }}{%- endif -%}
+      {%- endif -%}
+    </p>
+    <div class="tier-bar__track" aria-hidden="true">
+      <div class="tier-bar__fill" style="width: {{ pct }}%"></div>
+      <span class="tier-bar__mark{% if total >= t1 %} is-hit{% endif %}" style="left: {{ m1 }}%">{{ settings.tier_1_percent }}%</span>
+      {%- if t2 > t1 -%}<span class="tier-bar__mark{% if total >= t2 %} is-hit{% endif %}" style="left: 100%">{{ settings.tier_2_percent }}%</span>{%- endif -%}
+    </div>
+  </div>
+{%- endif -%}

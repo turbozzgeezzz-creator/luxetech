@@ -1,32 +1,33 @@
-<div class="container page page--blog">
-  {%- if section.settings.show_title -%}<h1 class="page-title">{{ blog.title | escape }}</h1>{%- endif -%}
-  {%- paginate blog.articles by 12 -%}
-    {%- if blog.articles.size > 0 -%}
-      {%- if blog.all_tags.size > 0 -%}
-        <ul class="blog-tags" role="list">
-          <li><a href="{{ blog.url }}" class="blog-tag{% if current_tags == blank %} is-active{% endif %}">All</a></li>
-          {%- for tag in blog.all_tags -%}
-            <li><a href="{{ blog.url }}/tagged/{{ tag | handleize }}" class="blog-tag{% if current_tags contains tag %} is-active{% endif %}">{{ tag | escape }}</a></li>
-          {%- endfor -%}
-        </ul>
+{% render 'page-banner', title: blog.title, eyebrow: section.settings.eyebrow, text: section.settings.text, art: 'ill-guides' %}
+<div class="container blog">
+  {%- if blog.all_tags.size > 0 -%}
+    <nav class="blog__tags" aria-label="{{ 'blog.topics' | t }}">
+      <a class="search-chip{% unless current_tags %} is-active{% endunless %}" href="{{ blog.url }}">{{ 'blog.all' | t }}</a>
+      {%- for tag in blog.all_tags limit: section.settings.tag_limit -%}<a class="search-chip{% if current_tags contains tag %} is-active{% endif %}" href="{{ blog.url }}/tagged/{{ tag | handleize }}">{{ tag }}</a>{%- endfor -%}
+    </nav>
+  {%- endif -%}
+  {%- paginate blog.articles by 10 -%}
+    {%- for article in blog.articles -%}
+      {%- if forloop.first and paginate.current_page == 1 and current_tags == blank -%}
+        {% render 'article-card', article: article, featured: true %}
+        <div class="posts">
+      {%- else -%}
+        {%- if forloop.first -%}<div class="posts">{%- endif -%}
+        {% render 'article-card', article: article %}
       {%- endif -%}
-      <ul class="post-grid post-grid--page" role="list" data-stagger>
-        {%- for article in blog.articles -%}
-          <li>{% render 'article-card-v2', article: article, lead: forloop.first %}</li>
-        {%- endfor -%}
-      </ul>
-      {% render 'pagination', paginate: paginate %}
-    {%- else -%}
-      <p class="empty-state">No posts yet. Check back soon.</p>
-    {%- endif -%}
+      {%- if forloop.last -%}</div>{%- endif -%}
+    {%- endfor -%}
+    {%- if paginate.pages > 1 -%}{% render 'pagination', paginate: paginate %}{%- endif -%}
   {%- endpaginate -%}
 </div>
 
 {% schema %}
 {
-  "name": "Blog posts",
+  "name": "Blog",
   "settings": [
-    { "type": "checkbox", "id": "show_title", "label": "Show blog title", "default": true, "info": "Turn off when a Page banner above already shows it." }
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The style desk" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Guides, care tips and style inspiration from the Tech.LuxeDealers team." },
+    { "type": "range", "id": "tag_limit", "label": "Topics to show", "min": 0, "max": 20, "step": 1, "default": 8 }
   ]
 }
 {% endschema %}

@@ -1,0 +1,7 @@
+{%- comment -%}
+  Shown in any image slot that has no photo yet: a soft warm-grey plate with a
+  light sheen. Disappears as soon as a photo is chosen.
+{%- endcomment -%}
+<div class="ph{% if class %} {{ class }}{% endif %}" role="presentation">
+  {%- if label != blank and request.design_mode -%}<span class="ph__text">{{ label }}</span>{%- endif -%}
+</div>

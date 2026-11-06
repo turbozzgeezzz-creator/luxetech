@@ -1,64 +1,85 @@
-<cart-drawer class="drawer drawer--right" id="CartDrawer" hidden>
+<div class="drawer" id="CartDrawer" aria-hidden="true">
   <div class="drawer__overlay" data-drawer-close></div>
   <div class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="CartDrawerTitle" tabindex="-1">
-    <div id="CartDrawerInner" class="cart-drawer__inner" data-cart-count="{{ cart.item_count }}" data-cart-total="{{ cart.total_price | money | escape }}">
-      <div class="drawer__head">
-        <h2 class="drawer__title" id="CartDrawerTitle">Your cart{% if cart.item_count > 0 %} <span class="drawer__count">({{ cart.item_count }})</span>{% endif %}</h2>
-        <button type="button" class="header__icon" data-drawer-close aria-label="Close cart">{% render 'icon', name: 'close' %}</button>
+    <div data-cart-drawer-inner style="display: contents">
+      <div class="drawer__head bag__head">
+        <h2 class="drawer__title" id="CartDrawerTitle">{{ 'cart.title' | t }}{% if cart.item_count > 0 %} <span class="bag__count">{{ cart.item_count }}</span>{% endif %}</h2>
+        <button type="button" class="bag__close" data-drawer-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button>
       </div>
-
       {%- if cart.item_count > 0 -%}
-        <div class="drawer__body">
-          {% render 'free-shipping-bar' %}
-          {% render 'spend-bar' %}
-          <cart-items data-context="drawer">
-            <ul class="cart-lines" role="list">
-              {%- for item in cart.items -%}
-                {% render 'cart-line', item: item, line: forloop.index, context: 'drawer' %}
-              {%- endfor -%}
-            </ul>
-          </cart-items>
-        </div>
-        <div class="drawer__foot cart-summary">
-          {%- for discount in cart.cart_level_discount_applications -%}
-            <p class="cart-summary__row cart-summary__row--discount"><span>{{ discount.title | escape }}</span><span>-{{ discount.total_allocated_amount | money_with_currency | replace: '.00 ', ' ' }}</span></p>
-          {%- endfor -%}
-          {% render 'shipping-line' %}
-          <p class="cart-summary__row cart-summary__row--total"><span>Subtotal</span><span>{{ cart.total_price | money_with_currency | replace: '.00 ', ' ' }}</span></p>
-          <p class="cart-summary__note">Shipping and any discount codes are added at checkout.</p>
-          <form action="{{ routes.cart_url }}" method="post" class="cart-summary__actions">
-            <button type="submit" name="checkout" class="btn btn--primary btn--lg btn--block cart-checkout">
-              {% render 'icon', name: 'lock', class: 'icon--sm' %}<span>Secure checkout</span><span class="cart-checkout__total">{{ cart.total_price | money_with_currency | replace: '.00 ', ' ' }}</span>
-            </button>
-            <a href="{{ routes.cart_url }}" class="btn btn--outline btn--block">View cart</a>
+        <div class="drawer__body bag__body">
+          <form action="{{ routes.cart_url }}" method="post" id="CartForm-drawer" class="bag__lines" novalidate>
+            {%- for item in cart.items -%}{% render 'cart-line', item: item, ctx: 'drawer' %}{%- endfor -%}
           </form>
-          <ul class="cart-trust" role="list">
-            <li>{% render 'icon', name: 'truck', class: 'icon--sm' %}Dispatched in 3-4 business days</li>
-            <li>{% render 'icon', name: 'repeat', class: 'icon--sm' %}Full refund if it arrives damaged or wrong</li>
-          </ul>
-          {%- if shop.enabled_payment_types.size > 0 -%}
-            <ul class="cart-pay" role="list" aria-label="Payment methods accepted">
-              {%- for type in shop.enabled_payment_types -%}
-                <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+          {%- liquid
+            assign up = section.settings.upsell_collection
+            assign ups_title = section.settings.upsell_title
+            if up == blank and collections['deals'].products_count > 0
+              assign up = collections['deals']
+              assign ups_title = 'cart.deals_title' | t
+            endif
+            if up == blank
+              assign up = cart.items.first.product.collections.first
+            endif
+            assign in_cart = cart.items | map: 'product_id'
+            assign shown = 0
+          -%}
+          {%- if up != blank -%}
+            {%- capture ups -%}
+              {%- for p in up.products limit: 12 -%}
+                {%- if in_cart contains p.id or p.available == false -%}{%- continue -%}{%- endif -%}
+                {%- if shown >= 6 -%}{%- break -%}{%- endif -%}
+                {%- assign shown = shown | plus: 1 -%}
+                <div class="bag-up">
+                  <a class="bag-up__img" href="{{ p.url }}">{%- if p.featured_media -%}{{ p.featured_media | image_url: width: 240 | image_tag: loading: 'lazy', alt: p.title, width: 120, height: 120 }}{%- endif -%}</a>
+                  <a class="bag-up__title" href="{{ p.url }}">{{ p.title }}</a>
+                  <strong class="bag-up__price">{{ p.price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}{%- if p.compare_at_price > p.price -%} <s class="bag-up__was">{{ p.compare_at_price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</s>{%- endif -%}</strong>
+                  {%- if p.has_only_default_variant -%}
+                    <button type="button" class="bag-up__add" data-add-variant="{{ p.selected_or_first_available_variant.id }}" aria-label="{{ 'products.add_title' | t: title: p.title | escape }}">{% render 'icon', name: 'plus', class: 'icon--sm' %} {{ 'cart.add' | t }}</button>
+                  {%- else -%}
+                    <button type="button" class="bag-up__add" data-quick-view="{{ p.url }}" aria-label="{{ 'products.quick_view' | t }}: {{ p.title | escape }}">{% render 'icon', name: 'plus', class: 'icon--sm' %} {{ 'cart.choose' | t }}</button>
+                  {%- endif -%}
+                </div>
               {%- endfor -%}
-            </ul>
+            {%- endcapture -%}
+            {%- if shown > 0 -%}
+              <div class="bag__ups">
+                <p class="bag__ups-title">{{ ups_title }}</p>
+                <div class="bag__ups-row">{{ ups }}</div>
+              </div>
+            {%- endif -%}
           {%- endif -%}
         </div>
+        <div class="drawer__foot bag__foot">
+          {% render 'cart-summary', context: 'drawer' %}
+        </div>
       {%- else -%}
-        <div class="drawer__body cart-empty">
-          {% render 'icon', name: 'cart', class: 'empty-state__icon' %}
-          <p class="cart-empty__title">Your cart is empty</p>
-          <p>Find something you'll actually use every day.</p>
-          <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Start shopping</a>
+        <div class="drawer__body">
+          <div class="bag-empty">
+            <img src="{{ 'ill-about.svg' | asset_url }}" alt="Empty cart" width="200" height="200" loading="lazy">
+            <p class="h3">{{ 'cart.empty' | t }}</p>
+            <p class="muted">{{ 'cart.empty_sub' | t }}</p>
+            <a href="{{ section.settings.empty_link | default: routes.all_products_collection_url }}" class="btn btn--gold">{{ 'cart.continue' | t }}</a>
+            <div class="bag-empty__chips">
+              {%- assign eh = 'new-arrivals,audio,charging,home-kitchen,smart-watches-wearables' | split: ',' -%}
+              {%- for h in eh -%}
+                {%- assign c = collections[h] -%}{%- if c != blank and c.products_count > 0 -%}<a class="search-chip" href="{{ c.url }}">{{ c.title | downcase | capitalize }}</a>{%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
         </div>
       {%- endif -%}
     </div>
   </div>
-</cart-drawer>
+</div>
 
 {% schema %}
 {
   "name": "Cart drawer",
-  "settings": []
+  "settings": [
+    { "type": "collection", "id": "upsell_collection", "label": "Suggestions collection", "info": "Up to three products not already in the bag." },
+    { "type": "text", "id": "upsell_title", "label": "Suggestions heading", "default": "Complete the look" },
+    { "type": "url", "id": "empty_link", "label": "Empty bag button link" }
+  ]
 }
 {% endschema %}

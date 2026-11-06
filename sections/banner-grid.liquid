@@ -1,0 +1,96 @@
+{%- comment -%}
+  Photo banners in a row (2 to 4 per row, or 6 small tiles). Each tile uses
+  its own image, or the photo of the product picked in the tile, so every
+  pbanner can show a different real product. Tiles register their product
+  so product rows further down the page skip it (no repeated photos).
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="section banners banners--{{ s.style }}{% if s.flush_top %} section--flush-top{% endif %}" style="--cols: {{ s.columns }}">
+  <div class="container">
+    {%- if s.heading != blank -%}
+      <div class="section-head"><div class="section-head__text"><h2 class="h2">{{ s.heading }}</h2></div></div>
+    {%- endif -%}
+    <div class="banners__grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign img = b.image
+          assign pid = ''
+          if img == blank and b.product != blank
+            assign idx = b.photo | minus: 1
+            assign m = b.product.media[idx] | default: b.product.featured_media
+            assign img = m.preview_image
+            assign pid = b.product.id
+          endif
+          if img == blank and b.collection != blank
+            assign img = b.collection.image | default: b.collection.products.first.featured_media.preview_image
+          endif
+          assign url = b.link | default: b.collection.url | default: b.product.url
+          assign sizes = '(min-width: 990px) 50vw, 100vw'
+          if s.style == 'tiles'
+            assign sizes = '(min-width: 990px) 17vw, 45vw'
+          endif
+        -%}
+        <a class="pbanner{% if b.dark_text %} pbanner--dark-text{% endif %}" href="{{ url | default: '#' }}"{% if pid != '' %} data-pid="{{ pid }}"{% endif %} {{ block.shopify_attributes }}>
+          <span class="pbanner__media">
+            {%- if img != blank -%}
+              {{ img | image_url: width: 1800 | image_tag: widths: '360, 540, 720, 960, 1200, 1500, 1800', sizes: sizes, loading: 'lazy', alt: '', style: b.focal_css }}
+            {%- else -%}
+              {% render 'placeholder' %}
+            {%- endif -%}
+          </span>
+          <span class="pbanner__body">
+            {%- if b.badge != blank -%}<span class="pbanner__badge">{{ b.badge }}</span>{%- endif -%}
+            {%- if b.heading != blank -%}<span class="pbanner__title">{{ b.heading | newline_to_br }}</span>{%- endif -%}
+            {%- if b.text != blank -%}<span class="pbanner__text">{{ b.text }}</span>{%- endif -%}
+            {%- if b.button != blank -%}<span class="btn btn--gold btn--sm pbanner__btn">{{ b.button }}</span>{%- endif -%}
+          </span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Photo banners",
+  "class": "section-banners",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        { "value": "hero", "label": "Large banners" },
+        { "value": "wide", "label": "Wide banners" },
+        { "value": "tiles", "label": "Small tiles" }
+      ],
+      "default": "hero"
+    },
+    { "type": "range", "id": "columns", "label": "Per row on desktop", "min": 1, "max": 6, "step": 1, "default": 2 },
+    { "type": "checkbox", "id": "flush_top", "label": "No space above", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "banner",
+      "name": "Banner",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave empty to use the product photo below." },
+        { "type": "product", "id": "product", "label": "Product photo" },
+        { "type": "range", "id": "photo", "label": "Which product photo", "min": 1, "max": 6, "step": 1, "default": 1 },
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "Used for the link, and for the photo when nothing else is set." },
+        { "type": "url", "id": "link", "label": "Link (overrides collection)" },
+        { "type": "text", "id": "badge", "label": "Label", "default": "New in" },
+        { "type": "textarea", "id": "heading", "label": "Heading", "default": "Banner heading" },
+        { "type": "text", "id": "text", "label": "Text" },
+        { "type": "text", "id": "button", "label": "Button", "default": "Shop now" },
+        { "type": "checkbox", "id": "dark_text", "label": "Dark text (for light photos)", "default": false },
+        { "type": "text", "id": "focal_css", "label": "Image position (advanced)", "info": "For example object-position: 50% 30%" }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [{ "name": "Photo banners", "blocks": [{ "type": "banner" }, { "type": "banner" }] }]
+}
+{% endschema %}

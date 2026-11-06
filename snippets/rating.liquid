@@ -1,37 +1,15 @@
 {%- comment -%}
-  Star rating from the standard reviews metafields
-  (reviews.rating = rating type, reviews.rating_count = integer).
-  Renders nothing at all when a product has no review data. Without that
-  data, falls back to the Judge.me preview badge when Judge.me is enabled.
-
-  Params:
-  - product: product object (required)
-  - show_count: optional, default true
+  Stars only when a reviews app has written real ratings to the standard
+  reviews.rating / reviews.rating_count metafields. Nothing is shown otherwise.
 {%- endcomment -%}
-{%- liquid
-  assign rating = product.metafields.reviews.rating.value
-  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
--%}
-{%- if rating != blank and rating.rating != blank -%}
+{%- if product.metafields.reviews.rating.value != blank and product.metafields.reviews.rating_count.value > 0 -%}
   {%- liquid
-    assign scale_max = rating.scale_max | default: 5 | times: 1.0
-    assign rating_value = rating.rating | times: 1.0
-    assign pct = rating_value | divided_by: scale_max | times: 100 | round: 1
-    assign display = rating_value | divided_by: scale_max | times: 5 | round: 1
+    assign r = product.metafields.reviews.rating.value
+    assign pct = r.rating | divided_by: r.scale_max | times: 100
   -%}
-  <div class="rating" role="img" aria-label="Rated {{ display }} out of 5{% if rating_count > 0 %}, {{ rating_count }} reviews{% endif %}">
-    <span class="rating__stars" style="--rating: {{ pct }}%;" aria-hidden="true">
-      <span class="rating__base">{% for i in (1..5) %}{% render 'icon', name: 'star' %}{% endfor %}</span>
-      <span class="rating__fill">{% for i in (1..5) %}{% render 'icon', name: 'star' %}{% endfor %}</span>
-    </span>
-    <span class="rating__value" aria-hidden="true">{{ display }}</span>
-    {%- if rating_count > 0 and show_count != false -%}
-      <span class="rating__count" aria-hidden="true">({{ rating_count }})</span>
-    {%- endif -%}
-  </div>
-{%- elsif settings.judgeme_enabled and product.metafields.judgeme.badge contains 'data-number-of-reviews' -%}
-  {%- assign jm_badge = product.metafields.judgeme.badge | append: '' -%}
-  {%- unless jm_badge contains "data-number-of-reviews='0'" or jm_badge contains 'data-number-of-reviews="0"' -%}
-  <div class="jdgm-widget jdgm-preview-badge" data-id="{{ product.id }}"{% if template.name == 'product' %} data-template="product"{% endif %}>{{ product.metafields.judgeme.badge }}</div>
-  {%- endunless -%}
+  <span class="rating">
+    <span class="rating__stars" aria-hidden="true"><span style="--pct: {{ pct }}%"></span></span>
+    <span class="visually-hidden">{{ 'products.rating' | t: rating: r.rating, max: r.scale_max }}</span>
+    <span>({{ product.metafields.reviews.rating_count.value }})</span>
+  </span>
 {%- endif -%}

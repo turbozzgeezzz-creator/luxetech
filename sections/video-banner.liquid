@@ -1,0 +1,38 @@
+{%- assign s = section.settings -%}
+<section class="banner{% if s.image == blank and s.video == blank and s.video_url == blank %} banner--noimg{% endif %}" style="--shade: {{ s.shade | divided_by: 100.0 }}; --banner-h: {{ s.height }}svh">
+  <div class="banner__media" data-parallax style="--parallax: 60px">
+    {%- if s.video != blank -%}
+      {{ s.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, preload: 'metadata', image_size: '1920x' }}
+    {%- elsif s.video_url != blank -%}
+      <video src="{{ s.video_url }}" autoplay muted loop playsinline preload="metadata"{% if s.image != blank %} poster="{{ s.image | image_url: width: 1920 }}"{% endif %}></video>
+    {%- else -%}
+      {% render 'image', image: s.image, sizes: '100vw', label: 'Banner photo or video' %}
+    {%- endif -%}
+  </div>
+  <div class="container banner__content">
+    {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+    {%- if s.heading != blank -%}<h2 class="h1" data-split>{{ s.heading | newline_to_br }}</h2>{%- endif -%}
+    {%- if s.text != blank -%}<p data-reveal>{{ s.text }}</p>{%- endif -%}
+    {%- if s.button != blank -%}<a class="btn btn--light" href="{{ s.link | default: routes.all_products_collection_url }}" data-reveal>{{ s.button }}</a>{%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Video banner",
+  "class": "section-banner",
+  "settings": [
+    { "type": "video", "id": "video", "label": "Video", "info": "Plays muted on a loop. Upload in Content > Files." },
+    { "type": "url", "id": "video_url", "label": "Or video file URL (.mp4)" },
+    { "type": "image_picker", "id": "image", "label": "Image (or video cover)" },
+    { "type": "range", "id": "height", "label": "Height", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 80 },
+    { "type": "range", "id": "shade", "label": "Darkening", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 35 },
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The Edit" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Gifts that\noutlast the occasion" },
+    { "type": "text", "id": "text", "label": "Text", "default": "A short list of pieces to give, and to keep." },
+    { "type": "text", "id": "button", "label": "Button", "default": "Shop gifts" },
+    { "type": "url", "id": "link", "label": "Button link" }
+  ],
+  "presets": [{ "name": "Video banner" }]
+}
+{% endschema %}

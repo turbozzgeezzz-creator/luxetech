@@ -1,0 +1,50 @@
+{%- liquid
+  assign s = section.settings
+  assign c = s.collection
+  assign total = 0
+  if c != blank
+    assign total = c.products.size
+    if total > s.limit
+      assign total = s.limit
+    endif
+  endif
+-%}
+<section class="runway" data-runway aria-label="{{ s.heading | escape }}">
+  <div class="runway__sticky">
+    <div class="container runway__head">
+      <div class="section-head__text">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow">{{ s.eyebrow }}</span>{%- endif -%}
+        <h2 class="h2" data-split>{{ s.heading | newline_to_br }}</h2>
+      </div>
+      <div style="display: flex; align-items: flex-end; gap: 28px">
+        {%- if total > 0 -%}<p class="runway__count" aria-hidden="true"><b data-runway-index>01</b> / {{ total | prepend: '0' | slice: -2, 2 }}</p>{%- endif -%}
+        {%- if c != blank -%}<a class="link" href="{{ c.url }}">{{ s.link_label }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
+      </div>
+    </div>
+    <div class="runway__track" data-runway-track>
+      {%- if c != blank -%}
+        {%- for product in c.products limit: s.limit -%}
+          <div class="runway__item">{% render 'product-card', product: product, reveal: false %}</div>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..6) -%}<div class="runway__item">{% render 'card-placeholder', n: i %}</div>{%- endfor -%}
+      {%- endif -%}
+    </div>
+    <div class="runway__bar" aria-hidden="true"><span></span></div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Runway",
+  "class": "section-runway",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 16, "step": 1, "default": 10 },
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The runway" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "New this season" },
+    { "type": "text", "id": "link_label", "label": "Link text", "default": "Shop all" }
+  ],
+  "presets": [{ "name": "Runway" }]
+}
+{% endschema %}

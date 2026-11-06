@@ -1,0 +1,29 @@
+<div class="search-overlay" id="SearchOverlay" aria-hidden="true">
+  <div class="drawer__overlay" data-drawer-close></div>
+  <div class="search-overlay__panel" role="dialog" aria-modal="true" aria-label="{{ 'header.search' | t }}" tabindex="-1">
+    <div class="container">
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-form">
+        {% render 'icon', name: 'search', class: 'icon--lg' %}
+        <label class="visually-hidden" for="SearchOverlayInput">{{ 'search.label' | t }}</label>
+        <input id="SearchOverlayInput" type="search" name="q" placeholder="{{ 'search.placeholder' | t }}" autocomplete="off" data-autofocus>
+        <input type="hidden" name="options[prefix]" value="last">
+        <button type="button" class="icon-btn" data-drawer-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button>
+      </form>
+      <div class="predictive" data-predictive hidden aria-live="polite"></div>
+      <div class="predictive" data-search-defaults>
+        {%- assign search_menu = linklists['search-suggestions'] -%}
+        {%- if search_menu.links.size > 0 -%}
+          <p class="label muted" style="margin-bottom: 14px">{{ 'search.popular' | t }}</p>
+          <div class="predictive__terms">
+            {%- for link in search_menu.links -%}<a class="chip" href="{{ link.url }}">{{ link.title | escape }}</a>{%- endfor -%}
+          </div>
+        {%- endif -%}
+        <p class="label muted" style="margin-bottom: 14px">{{ 'search.departments' | t }}</p>
+        <div class="predictive__terms">
+          {%- for link in linklists['main-menu'].links -%}<a class="chip" href="{{ link.url }}">{{ link.title | escape }}</a>{%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

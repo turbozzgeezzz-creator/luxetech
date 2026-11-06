@@ -1,0 +1,9 @@
+{%- comment -%} Shown in the theme editor until a collection is picked. Params: n {%- endcomment -%}
+<div class="card">
+  <div class="card__media ratio-{{ settings.card_ratio | default: 'portrait' }}">{% render 'placeholder' %}</div>
+  <div class="card__body">
+    {%- if settings.card_vendor -%}<span class="card__vendor">{{ 'sections.placeholder_brand' | t }}</span>{%- endif -%}
+    <h3 class="card__title">{{ 'sections.placeholder_product' | t }} {{ n }}</h3>
+    <div class="price"><span class="price__current muted">—</span></div>
+  </div>
+</div>

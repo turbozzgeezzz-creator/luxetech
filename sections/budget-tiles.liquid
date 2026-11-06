@@ -1,0 +1,80 @@
+{%- comment -%}
+  Shop by price: each tier opens the collection filtered to that price range
+  (needs the Price filter in Search & Discovery) and shows three real
+  products in the range.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- assign c = s.collection | default: collections.all -%}
+<section class="section budget2">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow">{{ s.eyebrow }}</span>{%- endif -%}
+        <h2 class="h2">{{ s.heading }}</h2>
+      </div>
+      {%- if s.text != blank -%}<p class="muted">{{ s.text }}</p>{%- endif -%}
+    </div>
+    <div class="budget2__grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign lo = b.min | times: 100
+          assign hi = b.max | times: 100
+          assign url = c.url | append: '?filter.v.price.gte=' | append: b.min
+          if b.max > 0
+            assign url = url | append: '&filter.v.price.lte=' | append: b.max
+          endif
+        -%}
+        <a class="budget2__tile tile tile--{{ b.theme }}" href="{{ url }}" {{ block.shopify_attributes }}>
+          <div class="tile__text">
+            {%- if b.eyebrow != blank -%}<span class="tile__eyebrow">{{ b.eyebrow }}</span>{%- endif -%}
+            <h3 class="tile__title tile__title--lg">{{ b.title }}</h3>
+            {%- if b.text != blank -%}<p class="tile__copy">{{ b.text }}</p>{%- endif -%}
+            <span class="btn btn--sm btn--light">{{ 'sections.shop_now' | t }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</span>
+          </div>
+          <div class="budget2__stack">
+            {%- assign n = 0 -%}
+            {%- for p in c.products limit: 60 -%}
+              {%- if p.available and p.price >= lo and p.featured_media -%}
+                {%- if b.max == 0 or p.price <= hi -%}
+                  <span style="--k: {{ n }}">{{ p.featured_media.preview_image | image_url: width: 240 | image_tag: width: 120, height: 120, loading: 'lazy', alt: p.title }}</span>
+                  {%- assign n = n | plus: 1 -%}
+                  {%- if n >= 3 -%}{%- break -%}{%- endif -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Shop by price",
+  "class": "section-budget2",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Shop by budget" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Luxury at every price" },
+    { "type": "text", "id": "text", "label": "Text" },
+    { "type": "collection", "id": "collection", "label": "Collection to filter" }
+  ],
+  "blocks": [
+    {
+      "type": "tier",
+      "name": "Price range",
+      "settings": [
+        { "type": "select", "id": "theme", "label": "Colour", "options": [{"value": "noir", "label": "Black and gold"}, {"value": "gold", "label": "Gold"}, {"value": "ivory", "label": "Ivory"}, {"value": "onyx", "label": "Deep brown"}], "default": "ivory" },
+        { "type": "text", "id": "eyebrow", "label": "Small heading" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Under $50" },
+        { "type": "text", "id": "text", "label": "Text" },
+        { "type": "number", "id": "min", "label": "From (store currency)", "default": 0 },
+        { "type": "number", "id": "max", "label": "Up to (0 = no limit)", "default": 50 }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [{ "name": "Shop by price", "blocks": [{ "type": "tier" }, { "type": "tier" }, { "type": "tier" }] }]
+}
+{% endschema %}

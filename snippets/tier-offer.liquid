@@ -1,0 +1,9 @@
+{%- comment -%} Spend-and-save line for product pages and banners. {%- endcomment -%}
+{%- if settings.tier_1_spend > 0 -%}
+  {%- assign a1 = settings.tier_1_spend | times: 100 | money_without_trailing_zeros -%}
+  <div class="tier-offer">
+    <span class="tier-offer__icon">{% render 'icon', name: 'tag', class: 'icon--sm' %}</span>
+    <span>{{ 'cart.tier_offer_1' | t: amount: a1, percent: settings.tier_1_percent }}{%- if settings.tier_2_spend > settings.tier_1_spend -%}{%- assign a2 = settings.tier_2_spend | times: 100 | money_without_trailing_zeros -%} · {{ 'cart.tier_offer_1' | t: amount: a2, percent: settings.tier_2_percent }}{%- endif -%}</span>
+    <small>{{ 'cart.tier_auto' | t }}</small>
+  </div>
+{%- endif -%}

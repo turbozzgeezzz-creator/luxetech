@@ -1,0 +1,82 @@
+{%- comment -%}
+  Build your set: this piece plus pieces from matching departments (or the
+  products picked in the block / Search & Discovery complementary products).
+  Shoppers tap to add, choose an option for each, and add everything at once.
+  Totals are the real sum of prices. Params: product, block
+{%- endcomment -%}
+{%- liquid
+  assign current = product.selected_or_first_available_variant
+  assign picks = block.settings.products
+  if picks == blank or picks.size == 0
+    assign picks = product.metafields['shopify--discovery--product_recommendation'].complementary_products.value
+  endif
+
+  comment
+    Pair by department: what people usually buy alongside this kind of piece.
+  endcomment
+  assign handles = ''
+  for c in product.collections
+    assign handles = handles | append: ' ' | append: c.handle
+  endfor
+  assign pair = 'accessories,fragrances'
+  if handles contains 'bag'
+    assign pair = 'accessories,fragrances'
+  elsif handles contains 'shoe' or handles contains 'sneaker' or handles contains 'boot' or handles contains 'slide'
+    assign pair = 'clothing,accessories'
+  elsif handles contains 'cloth' or handles contains 'hood' or handles contains 'shirt' or handles contains 'jacket' or handles contains 'denim' or handles contains 'jersey'
+    assign pair = 'sneakers-1,accessories'
+  elsif handles contains 'jewel' or handles contains 'watch'
+    assign pair = 'jewellery,fragrances'
+  elsif handles contains 'fragr' or handles contains 'fragance'
+    assign pair = 'fragrances,handbags'
+  elsif handles contains 'access'
+    assign pair = 'handbags,clothing'
+  endif
+  assign pair_list = pair | split: ','
+  assign limit_each = 3
+  assign shown = 0
+-%}
+<div class="bset" data-set>
+  <div class="bset__head">
+    <div>
+      <span class="eyebrow">{{ 'bundle.eyebrow' | t }}</span>
+      <h2 class="bset__title">{{ block.settings.title }}</h2>
+      <p class="muted">{{ 'bundle.intro' | t }}</p>
+    </div>
+  </div>
+  <div class="bset__grid">
+    <div class="bset__item is-main">
+      <span class="bset__check is-on" aria-hidden="true">{% render 'icon', name: 'check', class: 'icon--sm' %}</span>
+      <span class="bset__img">{%- if product.featured_media -%}{{ product.featured_media | image_url: width: 400 | image_tag: width: 200, height: 200, loading: 'lazy', alt: product.title }}{%- endif -%}</span>
+      <span class="bset__tag">{{ 'bundle.this_item' | t }}</span>
+      <span class="bset__name">{{ product.title }}</span>
+      <strong class="bset__price">{{ current.price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</strong>
+      <input type="checkbox" checked disabled hidden data-set-main data-price="{{ current.price }}">
+    </div>
+    {%- capture cards -%}
+      {%- if picks != blank and picks.size > 0 -%}
+        {%- for p in picks limit: 6 -%}{%- if p.available and p.id != product.id -%}{% render 'set-item', p: p %}{%- assign shown = shown | plus: 1 -%}{%- endif -%}{%- endfor -%}
+      {%- else -%}
+        {%- for h in pair_list -%}
+          {%- assign n = 0 -%}
+          {%- for p in collections[h].products limit: 24 -%}
+            {%- if n >= limit_each -%}{%- break -%}{%- endif -%}
+            {%- if p.available == false or p.id == product.id or p.featured_media == blank -%}{%- continue -%}{%- endif -%}
+            {% render 'set-item', p: p %}
+            {%- assign n = n | plus: 1 -%}{%- assign shown = shown | plus: 1 -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endcapture -%}
+    {{ cards }}
+  </div>
+  {%- comment -%} The saving shown is the store's buy-more discount (Theme settings > Cart), applied automatically at checkout. {%- endcomment -%}
+  <div class="bset__bar" data-q1="{{ settings.qty_1_count | default: 0 }}" data-p1="{{ settings.qty_1_percent | default: 0 }}" data-q2="{{ settings.qty_2_count | default: 0 }}" data-p2="{{ settings.qty_2_percent | default: 0 }}">
+    <div class="bset__sum">
+      <span class="bset__count"><span data-set-count>1</span> {{ 'bundle.selected' | t }}</span>
+      <span class="bset__prices"><s data-set-was hidden></s> <strong data-set-total>{{ current.price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</strong></span>
+      <span class="bset__save" data-set-save data-text="{{ 'bundle.you_save' | t: percent: '[pct]', amount: '[amt]' | escape }}" hidden></span>
+    </div>
+    <button type="button" class="btn btn--gold" data-set-add disabled>{% render 'icon', name: 'cart', class: 'icon--sm' %} <span data-set-label data-one="{{ 'bundle.add_one' | t | escape }}" data-many="{{ 'bundle.add_many' | t | escape }}">{{ 'bundle.add_one' | t }}</span></button>
+  </div>
+</div>

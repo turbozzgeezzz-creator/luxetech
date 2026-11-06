@@ -1,75 +1,94 @@
 {%- comment -%}
-  Customer reviews. Shows nothing at all until the product has real reviews,
-  so shoppers never see an empty "no reviews" block. The rating comes from the
-  standard reviews.rating / reviews.rating_count metafields (Judge.me keeps
-  these in sync) or Judge.me's own badge data. With reviews, Judge.me's widget
-  loads inside this section, including its "Write a review" button.
+  Real reviews from Judge.me (the app writes them to the product's
+  judgeme.review_widget_data metafield). Nothing is shown when a product has
+  no reviews. Add Judge.me's own app block here to let shoppers write one.
 {%- endcomment -%}
 {%- liquid
-  assign rating = product.metafields.reviews.rating.value
-  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
-  assign has_reviews = false
-  if rating != blank and rating_count > 0
-    assign has_reviews = true
+  assign jd = product.metafields.judgeme.review_widget_data.value
+  assign count = jd.number_of_reviews | default: 0
+  assign store_avg = shop.metafields.judgeme.all_reviews_rating.value | default: shop.metafields.judgeme.all_reviews_rating
+  assign store_total = shop.metafields.judgeme.all_reviews_count.value | default: shop.metafields.judgeme.all_reviews_count | default: 0 | plus: 0
+  assign need = 4 | minus: count
+  if count == 0
+    assign need = 4
   endif
-  assign jm_badge = product.metafields.judgeme.badge | append: ''
-  if has_reviews == false and settings.judgeme_enabled and jm_badge contains 'data-number-of-reviews'
-    unless jm_badge contains "data-number-of-reviews='0'" or jm_badge contains 'data-number-of-reviews="0"'
-      assign has_reviews = true
-    endunless
-  endif
-  if request.design_mode and section.settings.preview
-    assign has_reviews = true
-  endif
+  assign shown = 0
 -%}
-{%- if has_reviews -%}
-<section class="section product-reviews" id="reviews" aria-labelledby="ReviewsHeading-{{ section.id }}">
+{%- comment -%} Few reviews on this piece: top up with real reviews of other pieces, clearly labelled with the product they're for. {%- endcomment -%}
+{%- capture extra -%}
+  {%- if need > 0 -%}
+    {%- for pass in (1..2) -%}
+      {%- for p in collections.all.products limit: 30 -%}
+        {%- if shown >= need -%}{%- break -%}{%- endif -%}
+        {%- if p.id == product.id -%}{%- continue -%}{%- endif -%}
+        {%- assign pj = p.metafields.judgeme.review_widget_data.value -%}
+        {%- if pj.number_of_reviews > 0 -%}
+          {%- for review in pj.reviews limit: 1 -%}
+            {%- assign has_pic = false -%}{%- if review.pictures_urls.size > 0 -%}{%- assign has_pic = true -%}{%- endif -%}
+            {%- if review.rating >= 4 and review.body != blank -%}
+              {%- assign take = false -%}
+              {%- if pass == 1 -%}{%- if has_pic -%}{%- assign take = true -%}{%- endif -%}{%- elsif has_pic == false -%}{%- assign take = true -%}{%- endif -%}
+              {%- if take -%}
+                {% render 'review-card', review: review, product_title: p.title, product_url: p.url %}
+                {%- assign shown = shown | plus: 1 -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+<section class="section reviews" id="reviews">
   <div class="container">
-    <div class="reviews">
-      <div class="reviews__summary">
-        <p class="eyebrow eyebrow--muted">Reviews</p>
-        <h2 class="reviews__title" id="ReviewsHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
-        {%- if rating != blank and rating_count > 0 -%}
-          {%- assign avg = rating.rating | round: 1 -%}
-          {%- assign pct = rating.rating | divided_by: rating.scale_max | times: 100 -%}
-          <p class="reviews__score"><span class="reviews__avg">{{ avg }}</span><span class="reviews__of">/ {{ rating.scale_max }}</span></p>
-          <span class="rating__stars reviews__stars" style="--rating: {{ pct }}%;" aria-hidden="true">
-            <span class="rating__base">{%- for i in (1..5) -%}{% render 'icon', name: 'star' %}{%- endfor -%}</span>
-            <span class="rating__fill">{%- for i in (1..5) -%}{% render 'icon', name: 'star' %}{%- endfor -%}</span>
-          </span>
-          <p class="reviews__count">Based on {{ rating_count }} {{ rating_count | pluralize: 'review', 'reviews' }}</p>
-        {%- else -%}
-          <p class="reviews__empty">{{ section.settings.empty_text | escape }}</p>
-        {%- endif -%}
-        {%- if section.settings.button_label != blank -%}
-          <a href="{{ section.settings.button_link | default: pages.contact.url | default: routes.root_url }}" class="btn btn--outline">{{ section.settings.button_label | escape }}</a>
-        {%- endif -%}
+    {%- if count > 0 or shown > 0 -%}
+      <div class="reviews__grid">
+        <div class="reviews__summary">
+          <span class="eyebrow">{{ section.settings.eyebrow }}</span>
+          <h2 class="h2">{{ section.settings.heading }}</h2>
+          {%- if count > 0 -%}
+            <div class="reviews__score">
+              <strong>{{ jd.average_rating | times: 1 | round: 1 }}</strong>
+              <div><span class="rating__stars rating__stars--gold rating__stars--lg" aria-hidden="true"><span style="--pct: {{ jd.average_rating | times: 20 }}%"></span></span><span class="muted">{{ jd.review_summary_text }}</span></div>
+            </div>
+            <ul class="reviews__bars" role="list">
+              {%- for h in jd.histogram -%}
+                <li><span>{{ h.rating }} ★</span><span class="reviews__bar"><span style="width: {{ h.percentage }}%"></span></span><span class="muted">{{ h.frequency }}</span></li>
+              {%- endfor -%}
+            </ul>
+          {%- else -%}
+            <p class="muted">{{ 'products.no_reviews_yet' | t }}</p>
+          {%- endif -%}
+          {%- if store_total > 0 -%}
+            <div class="reviews__store">
+              <span class="rating__stars rating__stars--gold" aria-hidden="true"><span style="--pct: {{ store_avg | times: 20 }}%"></span></span>
+              <span>{{ 'products.store_rating' | t: rating: store_avg, count: store_total }}</span>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.all_link != blank -%}<a class="pill-link" href="{{ section.settings.all_link }}">{{ section.settings.all_label }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
+        </div>
+        <div class="reviews__list">
+          {%- for review in jd.reviews limit: 6 -%}{% render 'review-card', review: review %}{%- endfor -%}
+          {%- if shown > 0 -%}
+            <p class="reviews__more-label">{{ 'products.more_reviews' | t }}</p>
+            {{ extra }}
+          {%- endif -%}
+        </div>
       </div>
-      <div class="reviews__list">
-        {%- for block in section.blocks -%}
-          {%- case block.type -%}
-            {%- when '@app' -%}
-              {% render block %}
-          {%- endcase -%}
-        {%- endfor -%}
-        {%- if settings.judgeme_enabled and section.blocks.size == 0 -%}
-          <div id="judgeme_product_reviews" class="jdgm-widget jdgm-review-widget jdgm-outside-widget" data-id="{{ product.id }}">{{ product.metafields.judgeme.widget }}</div>
-        {%- endif -%}
-      </div>
-    </div>
+    {%- endif -%}
+    {%- for block in section.blocks -%}<div class="reviews__app" {{ block.shopify_attributes }}>{% render block %}</div>{%- endfor -%}
   </div>
 </section>
-{%- endif -%}
 
 {% schema %}
 {
   "name": "Product reviews",
+  "class": "section-reviews",
   "settings": [
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Customer reviews" },
-    { "type": "text", "id": "empty_text", "label": "No reviews text", "default": "No reviews yet. Bought this? We'd love to hear what you think." },
-    { "type": "checkbox", "id": "preview", "label": "Preview in the editor", "info": "The section is hidden on the live store until a product has reviews. Tick to see it while editing.", "default": false },
-    { "type": "text", "id": "button_label", "label": "Button", "default": "Share your experience" },
-    { "type": "url", "id": "button_link", "label": "Button link", "info": "Defaults to your contact page. Hidden while Judge.me reviews are showing." }
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Reviews" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "What customers say" },
+    { "type": "text", "id": "all_label", "label": "Link text", "default": "All store reviews" },
+    { "type": "url", "id": "all_link", "label": "Link" }
   ],
   "blocks": [{ "type": "@app" }],
   "presets": [{ "name": "Product reviews" }]

@@ -1,0 +1,30 @@
+{%- comment -%} Filters: a sticky sidebar on desktop, a drawer on phones. Params: results, form_id, count_text {%- endcomment -%}
+<aside class="drawer drawer--left drawer--sidebar coll__side" id="FacetDrawer" aria-hidden="true">
+  <div class="drawer__overlay" data-drawer-close></div>
+  <div class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="FacetTitle" tabindex="-1">
+    <div class="drawer__head">
+      <h2 class="drawer__title" id="FacetTitle">{{ 'collections.filter' | t }}</h2>
+      <button type="button" class="icon-btn" data-drawer-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button>
+    </div>
+    <div class="drawer__body" data-facets>
+      {%- comment -%} Category: the collections in the main menu (and their sub-collections), so shoppers can jump straight to a department. {%- endcomment -%}
+      {%- capture catlinks -%}
+        {%- for l in linklists['main-menu-2'].links -%}
+          {%- if l.type == 'collection_link' and l.object.handle != collection.handle -%}<a class="facet-cat" href="{{ l.url }}">{{ l.title | escape }}</a>{%- endif -%}
+          {%- if l.active or l.child_active -%}{%- for c in l.links -%}{%- if c.type == 'collection_link' and c.object.handle != collection.handle -%}<a class="facet-cat facet-cat--sub" href="{{ c.url }}">{{ c.title }}</a>{%- endif -%}{%- endfor -%}{%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- if catlinks != blank -%}
+        <details class="facets__group facet-cats" open>
+          <summary>{{ 'collections.category' | t }} {% render 'icon', name: 'plus', class: 'icon-plus' %}</summary>
+          <div class="facet-cats__list">{{ catlinks }}</div>
+        </details>
+      {%- endif -%}
+      {% render 'facets', results: results, id: form_id %}
+    </div>
+    <div class="drawer__foot">
+      <button type="button" class="btn btn--block btn--gold" data-drawer-close>{{ 'collections.show_results' | t }} <span data-product-count>{{ count_text }}</span></button>
+    </div>
+  </div>
+</aside>
+

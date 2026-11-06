@@ -1,0 +1,93 @@
+<section class="section{% if section.settings.subtle %} section--subtle{% endif %}">
+  <div class="container">
+    {%- if section.settings.heading != blank -%}
+      <div class="section-head">
+        <div class="section-head__text">
+          {%- if section.settings.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ section.settings.eyebrow }}</span>{%- endif -%}
+          <h2 class="h2" data-split>{{ section.settings.heading | newline_to_br }}</h2>
+        </div>
+        {%- if section.settings.link_label != blank -%}<a class="link" href="{{ section.settings.link | default: routes.collections_url }}" data-reveal>{{ section.settings.link_label }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
+      </div>
+    {%- endif -%}
+    <div class="doors{% if section.settings.feature_first %} doors--feature-first{% endif %}{% if section.settings.labels == 'below' %} doors--below{% endif %}" style="--cols: {{ section.settings.columns }}">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign c = block.settings.collection
+          assign img = block.settings.image
+          if img == blank and c != blank
+            assign img = c.featured_image
+            if img == blank and c.products.first.featured_media
+              assign img = c.products.first.featured_media.preview_image
+            endif
+          endif
+          assign title = block.settings.title | default: c.title
+          assign url = block.settings.link | default: c.url | default: routes.collections_url
+          assign sizes = '(min-width: 990px) 25vw, 50vw'
+          if section.settings.feature_first and forloop.first
+            assign sizes = '(min-width: 990px) 50vw, 100vw'
+          endif
+        -%}
+        <a class="door{% if img == blank %} door--light-ph{% endif %}" href="{{ url }}" data-reveal="mask" style="--i: {{ forloop.index0 }}" {{ block.shopify_attributes }}>
+          <div class="door__media">{% render 'image', image: img, sizes: sizes, alt: title %}</div>
+          <div class="door__label">
+            <span class="door__title">{{ title }}</span>
+            <span class="door__cta">{{ block.settings.cta | default: 'Shop' }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</span>
+          </div>
+          <span class="door__line" aria-hidden="true"></span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Department tiles",
+  "class": "section-doors",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The departments" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Shop by department" },
+    { "type": "text", "id": "link_label", "label": "Link text", "default": "All collections" },
+    { "type": "url", "id": "link", "label": "Link" },
+    { "type": "range", "id": "columns", "label": "Columns (desktop)", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "checkbox", "id": "feature_first", "label": "Make the first tile large", "default": true },
+    {
+      "type": "select",
+      "id": "labels",
+      "label": "Titles",
+      "options": [
+        { "value": "overlay", "label": "On the image" },
+        { "value": "below", "label": "Under the image" }
+      ],
+      "default": "overlay"
+    },
+    { "type": "checkbox", "id": "subtle", "label": "Soft background", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "door",
+      "name": "Department",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Optional. Uses the collection image, or its first product photo." },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "text", "id": "cta", "label": "Hover text", "default": "Shop" },
+        { "type": "url", "id": "link", "label": "Link (optional)" }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "Department tiles",
+      "blocks": [
+        { "type": "door", "settings": { "title": "Watches" } },
+        { "type": "door", "settings": { "title": "Jewellery" } },
+        { "type": "door", "settings": { "title": "Bags" } },
+        { "type": "door", "settings": { "title": "Fashion" } },
+        { "type": "door", "settings": { "title": "Accessories" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

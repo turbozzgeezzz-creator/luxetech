@@ -1,0 +1,115 @@
+{%- liquid
+  assign tabs = section.blocks
+  assign limit = section.settings.limit
+  assign uid = 'fc-' | append: section.id
+  assign fetch = limit | plus: 4
+  assign show = true
+  if tabs.size > 0 and request.design_mode == false
+    assign c0 = tabs.first.settings.collection
+    if c0 == blank or c0.products_count == 0
+      assign show = false
+    endif
+  endif
+-%}
+{%- if show -%}
+<section class="section{% if section.settings.subtle %} section--subtle{% endif %}">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        {%- if section.settings.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ section.settings.eyebrow }}</span>{%- endif -%}
+        {%- if section.settings.heading != blank -%}<h2 class="h2" data-split>{{ section.settings.heading | newline_to_br }}</h2>{%- endif -%}
+        {%- if tabs.size > 1 -%}
+          <div class="tabs" role="tablist" data-tabs aria-label="{{ section.settings.heading | escape }}" data-reveal>
+            {%- for block in tabs -%}
+              <button type="button" class="tab" role="tab" id="{{ uid }}-tab-{{ forloop.index }}" aria-controls="{{ uid }}-panel-{{ forloop.index }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" tabindex="{% if forloop.first %}0{% else %}-1{% endif %}" {{ block.shopify_attributes }}>{{ block.settings.title | default: block.settings.collection.title }}</button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+      <div style="display: flex; align-items: center; gap: 24px">
+        {%- if section.settings.layout == 'rail' -%}
+          <div class="rail__controls">
+            <button type="button" class="rail__btn" data-rail-prev aria-label="{{ 'general.previous' | t }}">{% render 'icon', name: 'arrow-left', class: 'icon--sm' %}</button>
+            <button type="button" class="rail__btn" data-rail-next aria-label="{{ 'general.next' | t }}">{% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</button>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if tabs.size == 0 -%}
+      {%- comment -%} Editor preview without blocks: show cards only in the theme editor. {%- endcomment -%}
+      {%- if request.design_mode -%}<p class="muted">{{ 'sections.add_collection' | t }}</p>{%- endif -%}
+    {%- endif -%}
+
+    {%- for block in tabs -%}
+      {%- assign c = block.settings.collection -%}
+      <div {% if tabs.size > 1 %}role="tabpanel" id="{{ uid }}-panel-{{ forloop.index }}" aria-labelledby="{{ uid }}-tab-{{ forloop.index }}"{% endif %} class="tab-panel" data-dedupe="{{ limit }}"{% unless forloop.first %} hidden{% endunless %}>
+        {%- if section.settings.layout == 'rail' -%}
+          <div class="rail" data-rail>
+            <div class="rail__track" data-stagger>
+              {%- if c != blank -%}{%- for product in c.products limit: fetch -%}{%- liquid
+                assign extra = false
+                if forloop.index > limit
+                  assign extra = true
+                endif
+              -%}{% render 'product-card', product: product, reveal: false, extra: extra %}{%- endfor -%}{%- else -%}{%- for i in (1..4) -%}{% render 'card-placeholder', n: i %}{%- endfor -%}{%- endif -%}
+            </div>
+            <div class="rail__progress" aria-hidden="true"><span></span></div>
+          </div>
+        {%- else -%}
+          <div class="product-grid product-grid--4" data-stagger>
+            {%- if c != blank -%}{%- for product in c.products limit: fetch -%}{%- liquid
+                assign extra = false
+                if forloop.index > limit
+                  assign extra = true
+                endif
+              -%}{% render 'product-card', product: product, reveal: false, extra: extra %}{%- endfor -%}{%- else -%}{%- for i in (1..4) -%}{% render 'card-placeholder', n: i %}{%- endfor -%}{%- endif -%}
+          </div>
+        {%- endif -%}
+        {%- if c.products_count == 0 and request.design_mode -%}<p class="muted">{{ 'sections.empty_collection' | t }}</p>{%- endif -%}
+        {%- if section.settings.view_all and c != blank -%}
+          <p style="margin-top: 48px; text-align: center"><a href="{{ c.url }}" class="btn btn--outline">{{ 'sections.view_all' | t: title: c.title }}</a></p>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product rail",
+  "class": "section-products",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Just landed" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "New arrivals" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "rail", "label": "Sliding row" },
+        { "value": "grid", "label": "Grid" }
+      ],
+      "default": "rail"
+    },
+    { "type": "range", "id": "limit", "label": "Products per tab", "min": 4, "max": 16, "step": 1, "default": 8 },
+    { "type": "checkbox", "id": "view_all", "label": "Show View all button", "default": true },
+    { "type": "checkbox", "id": "subtle", "label": "Soft background", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Tab",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "title", "label": "Tab name" }
+      ]
+    }
+  ],
+  "max_blocks": 5,
+  "presets": [
+    { "name": "Product rail", "blocks": [{ "type": "collection" }] }
+  ]
+}
+{% endschema %}

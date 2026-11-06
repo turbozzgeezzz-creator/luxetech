@@ -2,7 +2,10 @@
   "sections": {
     "main": {
       "type": "main-search",
-      "settings": {}
+      "settings": {
+        "popular": "Earbuds, Chargers, Smart watch, Espresso, Hair dryer, Projector",
+        "collection": "new-arrivals"
+      }
     }
   },
   "order": [

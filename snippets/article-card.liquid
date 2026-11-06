@@ -1,0 +1,18 @@
+{%- comment -%} Params: article, featured (bool) {%- endcomment -%}
+{%- assign words = article.content | strip_html | split: ' ' | size -%}
+{%- assign mins = words | divided_by: 200 | at_least: 1 -%}
+<article class="post-card{% if featured %} post-card--featured{% endif %}">
+  <a class="post-card__media" href="{{ article.url }}" tabindex="-1" aria-hidden="true">
+    {%- if article.image -%}{{ article.image | image_url: width: 1200 | image_tag: widths: '400, 600, 800, 1000, 1200', sizes: '(min-width: 990px) 40vw, 100vw', loading: 'lazy', alt: article.title }}{%- else -%}<img src="{{ 'lx-diamond.svg' | asset_url }}" alt="" width="600" height="600" loading="lazy" class="post-card__ill">{%- endif -%}
+  </a>
+  <div class="post-card__body">
+    <div class="post-card__meta">
+      {%- if article.tags.size > 0 -%}<span class="post-card__tag">{{ article.tags.first }}</span>{%- endif -%}
+      <span>{{ 'blog.read_time' | t: count: mins }}</span>
+    </div>
+    <h3 class="post-card__title"><a href="{{ article.url }}">{{ article.title }}</a></h3>
+    {%- assign ex = article.excerpt | default: article.content | strip_html | truncate: 170 -%}
+    {%- if ex != blank -%}<p class="post-card__excerpt">{{ ex }}</p>{%- endif -%}
+    <span class="post-card__more">{{ 'blog.read' | t }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</span>
+  </div>
+</article>

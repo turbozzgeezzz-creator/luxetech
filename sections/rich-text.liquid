@@ -1,26 +1,56 @@
-<section class="section">
-  <div class="container container--narrow rich-text rich-text--{{ section.settings.align }}">
-    {%- if section.settings.heading != blank -%}<h2 class="section-head__title">{{ section.settings.heading | escape }}</h2>{%- endif -%}
-    {%- if section.settings.text != blank -%}<div class="rte">{{ section.settings.text }}</div>{%- endif -%}
-    {%- if section.settings.button_label != blank -%}
-      <a href="{{ section.settings.button_link | default: routes.all_products_collection_url }}" class="btn btn--primary">{{ section.settings.button_label | escape }}</a>
-    {%- endif -%}
+{%- assign s = section.settings -%}
+<section class="section rich-text{% if s.align == 'left' %} rich-text--left{% endif %}{% if s.subtle %} section--subtle{% endif %}">
+  <div class="container">
+    <div class="rich-text__inner">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'eyebrow' -%}<span class="eyebrow" data-reveal {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+          {%- when 'heading' -%}<h2 class="h2" data-split {{ block.shopify_attributes }}>{{ block.settings.text | newline_to_br }}</h2>
+          {%- when 'quote' -%}<p class="rich-text__quote" data-split {{ block.shopify_attributes }}>{{ block.settings.text | newline_to_br }}</p>
+          {%- when 'text' -%}<div class="rte muted" data-reveal {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+          {%- when 'button' -%}<a class="btn{% if block.settings.outline %} btn--outline{% endif %}" href="{{ block.settings.link | default: routes.all_products_collection_url }}" data-reveal {{ block.shopify_attributes }}>{{ block.settings.label }}</a>
+          {%- when 'logo' -%}<span class="eyebrow eyebrow--plain" aria-hidden="true" {{ block.shopify_attributes }}></span>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
   </div>
 </section>
 
 {% schema %}
 {
   "name": "Rich text",
+  "class": "section-rich-text",
   "settings": [
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Tech we'd buy ourselves" },
-    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Tell customers what makes your store different.</p>" },
-    { "type": "text", "id": "button_label", "label": "Button label" },
-    { "type": "url", "id": "button_link", "label": "Button link" },
-    { "type": "select", "id": "align", "label": "Alignment", "options": [
-      { "value": "left", "label": "Left" },
-      { "value": "center", "label": "Center" }
-    ], "default": "center" }
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Alignment",
+      "options": [
+        { "value": "center", "label": "Centre" },
+        { "value": "left", "label": "Left" }
+      ],
+      "default": "center"
+    },
+    { "type": "checkbox", "id": "subtle", "label": "Soft background", "default": false }
   ],
-  "presets": [{ "name": "Rich text" }]
+  "blocks": [
+    { "type": "logo", "name": "Spacer", "limit": 1, "settings": [] },
+    { "type": "eyebrow", "name": "Small heading", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Our story" }] },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "textarea", "id": "text", "label": "Text", "default": "Considered style" }] },
+    { "type": "quote", "name": "Large statement", "settings": [{ "type": "textarea", "id": "text", "label": "Text", "default": "Every order is hand-checked, carefully packed and sent with tracking." }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "text", "label": "Text", "default": "<p>Tell your story here.</p>" }] },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Discover" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "checkbox", "id": "outline", "label": "Outline style", "default": true }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Rich text", "blocks": [{ "type": "quote" }, { "type": "button" }] }
+  ]
 }
 {% endschema %}

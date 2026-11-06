@@ -1,0 +1,16 @@
+{%- comment -%} Saved pieces, stored on the shopper's device. Filled by theme.js when opened. {%- endcomment -%}
+<div class="drawer" id="WishlistDrawer" aria-hidden="true">
+  <div class="drawer__overlay" data-drawer-close></div>
+  <div class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="WishlistTitle" tabindex="-1">
+    <div class="drawer__head"><h2 class="drawer__title" id="WishlistTitle">{{ 'wishlist.title' | t }} <span class="muted" data-wish-count-text></span></h2><button type="button" class="icon-btn" data-drawer-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button></div>
+    <div class="drawer__body">
+      <ul class="wish-list" role="list" data-wish-drawer-list></ul>
+      <div class="wish-empty" data-wish-drawer-empty hidden>
+        <span class="wish-empty__icon">{% render 'icon', name: 'heart', class: 'icon--lg' %}</span>
+        <p class="h4">{{ 'wishlist.empty' | t }}</p>
+        <p class="muted">{{ 'wishlist.empty_hint' | t }}</p>
+        <a class="btn btn--gold" href="{{ routes.all_products_collection_url }}">{{ 'wishlist.browse' | t }}</a>
+      </div>
+    </div>
+  </div>
+</div>

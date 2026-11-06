@@ -1,30 +1,25 @@
-{%- comment -%}
-  Newsletter sign-up card: illustration, offer and perks, and the form on its
-  own white panel so it reads clearly in light and dark mode.
-{%- endcomment -%}
-<section class="section" id="newsletter">
+{%- liquid
+  assign s = section.settings
+  assign img = s.image
+  assign pid = ''
+  if img == blank and s.product != blank
+    assign img = s.product.featured_media.preview_image
+    assign pid = s.product.id
+  endif
+-%}
+<section class="section newsletter{% if s.style == 'ink' %} section--ink{% elsif s.style == 'subtle' %} section--subtle{% elsif s.style == 'panel' %} newsletter--panel{% endif %}">
   <div class="container">
-    <div class="news-card tone tone--violet">
-      <div class="news-card__art art-box">{% render 'ill', name: 'ill-newsletter', image: section.settings.image, sizes: '(min-width: 990px) 22vw, 50vw' %}</div>
-      <div class="news-card__copy">
-        {%- if section.settings.kicker != blank -%}<p class="tone-kicker">{{ section.settings.kicker | escape }}</p>{%- endif -%}
-        <h2 class="news-card__title">{{ section.settings.heading | escape }}</h2>
-        {%- if section.settings.text != blank -%}<div class="news-card__text">{{ section.settings.text }}</div>{%- endif -%}
-        <ul class="news-card__perks" role="list">
-          {%- for i in (1..3) -%}
-            {%- assign perk_key = 'perk_' | append: i -%}
-            {%- if section.settings[perk_key] != blank -%}
-              <li>{% render 'icon', name: 'check-circle', class: 'icon--sm' %}<span>{{ section.settings[perk_key] | escape }}</span></li>
-            {%- endif -%}
-          {%- endfor -%}
-        </ul>
+    <div class="newsletter__wrap{% if img != blank %} newsletter__wrap--image{% endif %}">
+      <div class="newsletter__inner">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+        {%- if s.heading != blank -%}<h2 class="h2" data-split>{{ s.heading | newline_to_br }}</h2>{%- endif -%}
+        {%- if s.text != blank -%}<div class="rte newsletter__text" data-reveal>{{ s.text }}</div>{%- endif -%}
+        {%- if s.show_offer and settings.welcome_offer != blank and settings.welcome_code != blank or settings.welcome_personal -%}<p data-reveal><strong class="gold-text" style="font-size: 18px; letter-spacing: .06em">{{ settings.welcome_offer }}</strong></p>{%- endif -%}
+        <div style="width: 100%" data-reveal>{% render 'newsletter-form', id: 'NewsletterSection', source: 'homepage' %}</div>
       </div>
-      <div class="news-card__panel">
-        <p class="news-card__panel-title">{{ settings.welcome_label | escape }}</p>
-        <p class="news-card__panel-sub">{{ section.settings.panel_text | escape }}</p>
-        {% render 'newsletter-form', id: section.id, button_label: section.settings.button_label, discount_code: settings.welcome_code, tags: 'newsletter,homepage' %}
-        <p class="news-card__fine">{{ section.settings.fine_print | escape }}</p>
-      </div>
+      {%- if img != blank -%}
+        <div class="newsletter__media"{% if pid != '' %} data-pid="{{ pid }}"{% endif %}>{{ img | image_url: width: 1400 | image_tag: widths: '480, 720, 960, 1200, 1400', sizes: '(min-width: 990px) 50vw, 100vw', loading: 'lazy', alt: '' }}</div>
+      {%- endif -%}
     </div>
   </div>
 </section>
@@ -32,17 +27,26 @@
 {% schema %}
 {
   "name": "Newsletter",
+  "class": "section-newsletter",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image", "info": "Replaces the illustration." },
-    { "type": "text", "id": "kicker", "label": "Small line above heading", "default": "Welcome offer" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Hear about deals and new arrivals first" },
-    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Occasional emails with restocks, new products and subscriber offers.</p>" },
-    { "type": "text", "id": "perk_1", "label": "Perk 1", "default": "10% off your first order" },
-    { "type": "text", "id": "perk_2", "label": "Perk 2", "default": "Early access to deals and restocks" },
-    { "type": "text", "id": "perk_3", "label": "Perk 3", "default": "Expert guides, never spam" },
-    { "type": "text", "id": "panel_text", "label": "Form text", "default": "Enter your email and your code appears straight away." },
-    { "type": "text", "id": "button_label", "label": "Button label", "default": "Get my code" },
-    { "type": "text", "id": "fine_print", "label": "Fine print", "default": "By signing up you agree to get our emails. Unsubscribe any time." }
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Background",
+      "options": [
+        { "value": "white", "label": "White" },
+        { "value": "subtle", "label": "Soft" },
+        { "value": "ink", "label": "Black" },
+        { "value": "panel", "label": "Black panel with photo" }
+      ],
+      "default": "subtle"
+    },
+    { "type": "image_picker", "id": "image", "label": "Photo (black panel)" },
+    { "type": "product", "id": "product", "label": "Or use a product photo" },
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The private list" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "First to know,\nfirst to own" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>New arrivals and members-only offers by email. Unsubscribe any time.</p>" },
+    { "type": "checkbox", "id": "show_offer", "label": "Show welcome offer line", "default": true, "info": "Only appears when a code is set in Theme settings > Welcome offer." }
   ],
   "presets": [{ "name": "Newsletter" }]
 }

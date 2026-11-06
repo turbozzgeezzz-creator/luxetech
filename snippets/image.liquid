@@ -1,0 +1,23 @@
+{%- comment -%}
+  Responsive image, or the placeholder plate when no image is set.
+  Params: image, sizes (default 100vw), class, alt, loading ('lazy'|'eager'),
+  widths (comma list), label (placeholder caption), attrs (extra attributes).
+{%- endcomment -%}
+{%- if image != blank -%}
+  {%- liquid
+    assign w = widths | default: '360, 540, 720, 960, 1200, 1500, 1800, 2200'
+    assign s = sizes | default: '100vw'
+    assign l = loading | default: 'lazy'
+    assign a = alt | default: image.alt | escape
+    assign fp = 'eager'
+    if l == 'lazy'
+      assign fp = 'auto'
+    endif
+    if l == 'eager'
+      assign fp = 'high'
+    endif
+  -%}
+  {{ image | image_url: width: 2400 | image_tag: widths: w, sizes: s, loading: l, alt: a, class: class, fetchpriority: fp, style: attrs }}
+{%- else -%}
+  {% render 'placeholder', label: label, class: class %}
+{%- endif -%}

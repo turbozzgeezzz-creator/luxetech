@@ -1,0 +1,25 @@
+{%- comment -%}
+  Prints the handle of a product's main category for breadcrumbs (visible and schema), skipping catch-all
+  collections like Shop All, Mens, Womens and Deals. Usage: capture crumb_handle, then collections[crumb_handle].
+{%- endcomment -%}
+{%- liquid
+  assign preferred = 'shoes,bags-3,handbags,jewellery,watches,fragrances,accessories,clothing,collectibles' | split: ','
+  assign skip = 'all,shop-all,mens,womens,new-arrivals,deals,frontpage,best-sellers' | split: ','
+  assign handles = product.collections | map: 'handle'
+  assign found = ''
+  for h in preferred
+    if handles contains h
+      assign found = h
+      break
+    endif
+  endfor
+  if found == ''
+    for c in product.collections
+      unless skip contains c.handle
+        assign found = c.handle
+        break
+      endunless
+    endfor
+  endif
+  echo found
+-%}

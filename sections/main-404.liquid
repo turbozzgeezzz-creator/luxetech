@@ -2,21 +2,45 @@
   // Old order-status and account links (/orders/…, /profile) now live in customer accounts.
   if (/^\/(orders|profile)(\/|$)/.test(location.pathname)) location.replace({{ routes.account_url | json }});
 </script>
-<div class="container container--narrow empty-state empty-state--page">
-  <p class="empty-state__code">404</p>
-  <h1 class="empty-state__title">This page isn't plugged in</h1>
-  <p>The link may be broken or the product may have moved. Try a search instead.</p>
-  <form action="{{ routes.search_url }}" method="get" role="search" class="search-form search-form--page">
-    <label for="Search404" class="visually-hidden">Search</label>
-    <input type="search" id="Search404" name="q" class="search-form__input" placeholder="{{ settings.search_placeholder | escape }}">
-    <button type="submit" class="search-form__submit" aria-label="Search">{% render 'icon', name: 'search' %}</button>
-  </form>
-  <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Shop all products</a>
-</div>
+<section class="container not-found">
+  <div class="page-hero__inner">
+    <p class="not-found__num gold-text" aria-hidden="true">404</p>
+    <h1 class="h2">{{ 'general.not_found' | t }}</h1>
+    <p class="muted">{{ 'general.not_found_sub' | t }}</p>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center">
+      <a class="btn" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue' | t }}</a>
+      <button type="button" class="btn btn--outline" data-drawer-open="SearchOverlay">{{ 'header.search' | t }}</button>
+    </div>
+  </div>
+</section>
+
+
+<template id="TrackOrderView">{% render 'track-order' %}</template>
+<script>
+  (function () {
+    if (!/track-(your-)?order/.test(location.pathname)) return;
+    var t = document.getElementById('TrackOrderView'), nf = document.querySelector('.not-found');
+    if (!t || !nf) return;
+    nf.replaceWith(t.content.cloneNode(true));
+    document.title = {{ 'track.title' | t | json }} + ' – ' + {{ shop.name | json }};
+  })();
+</script>
+
+<template id="CookiePolicyView">
+  {%- assign cpt = 'cookies.policy_title' | t -%}{%- assign cpx = 'cookies.policy_intro' | t -%}
+  {% render 'page-banner', title: cpt, eyebrow: 'Legal', text: cpx, art: 'ill-terms' %}
+  <div class="container page-body"><div class="page-body__card rte">{% render 'cookie-policy-content' %}</div></div>
+</template>
+<script>
+  (function () {
+    if (!/\/pages\/cookie-policy\/?$/.test(location.pathname)) return;
+    var t = document.getElementById('CookiePolicyView'), nf = document.querySelector('.not-found');
+    if (!t || !nf) return;
+    nf.replaceWith(t.content.cloneNode(true));
+    document.title = {{ 'cookies.policy_title' | t | json }} + ' – ' + {{ shop.name | json }};
+  })();
+</script>
 
 {% schema %}
-{
-  "name": "404",
-  "settings": []
-}
+{ "name": "404" }
 {% endschema %}

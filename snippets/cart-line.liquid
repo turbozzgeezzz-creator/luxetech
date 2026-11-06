@@ -1,62 +1,34 @@
-{%- comment -%}
-  One cart line, used by the drawer and the cart page.
-  Params: item, line (1-based index), context ('drawer' | 'page')
-{%- endcomment -%}
-<li class="cart-line cart-line--{{ context }}" data-line="{{ line }}">
-  <a href="{{ item.url }}" class="cart-line__media" tabindex="-1" aria-hidden="true">
-    {%- if item.image -%}
-      {{ item.image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120,240', sizes: '120px', alt: '' }}
-    {%- else -%}
-      {% render 'placeholder-art', type: 'product', uid: item.product_id %}
-    {%- endif -%}
+{%- comment -%} One line in the bag. Params: item, ctx {%- endcomment -%}
+<div class="cart-line">
+  <a class="cart-line__media" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+    {%- if item.image -%}{{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.product.title, widths: '120, 200, 300', sizes: '96px' }}{%- else -%}{% render 'placeholder' %}{%- endif -%}
   </a>
   <div class="cart-line__info">
-    {%- if item.vendor != blank and item.vendor != shop.name -%}<p class="card__label">{{ item.vendor | escape }}</p>{%- endif -%}
-    <a href="{{ item.url }}" class="cart-line__title">{{ item.product.title | escape }}</a>
+    <div class="cart-line__top">
+      <a class="cart-line__title" href="{{ item.url }}">{{ item.product.title }}</a>
+      <button type="button" class="cart-line__x" data-line-remove="{{ item.key }}" aria-label="{{ 'cart.remove' | t }} {{ item.product.title | escape }}">{% render 'icon', name: 'close', class: 'icon--sm' %}</button>
+    </div>
     {%- unless item.product.has_only_default_variant -%}
-      <p class="cart-line__meta">{{ item.variant.title | escape }}</p>
+      <div class="cart-line__opts">
+        {%- for o in item.options_with_values -%}<span>{{ o.name | replace: 'Collection', 'Style' }}: {{ o.value }}</span>{%- endfor -%}
+      </div>
     {%- endunless -%}
-    {%- for property in item.properties -%}
-      {%- assign first_char = property.first | slice: 0 -%}
-      {%- if property.last != blank and first_char != '_' -%}
-        <p class="cart-line__meta">{{ property.first | escape }}: {{ property.last | escape }}</p>
-      {%- endif -%}
+    {%- for p in item.properties -%}
+      {%- assign first = p.first | slice: 0 -%}
+      {%- if p.last != blank and first != '_' -%}<span class="cart-line__props">{{ p.first }}: {{ p.last }}</span>{%- endif -%}
     {%- endfor -%}
-    {%- if item.selling_plan_allocation -%}
-      <p class="cart-line__meta">{{ item.selling_plan_allocation.selling_plan.name | escape }}</p>
-    {%- endif -%}
-    {%- if item.sku != blank -%}<p class="card__sku">SKU {{ item.sku | escape }}</p>{%- endif -%}
-    {%- for discount in item.line_level_discount_allocations -%}
-      <p class="cart-line__discount">{% render 'icon', name: 'tag', class: 'icon--xs' %} {{ discount.discount_application.title | escape }} (-{{ discount.amount | money_with_currency | replace: '.00 ', ' ' }})</p>
-    {%- endfor -%}
-
-    <div class="cart-line__controls">
-      <quantity-input class="qty qty--sm">
-        <button type="button" class="qty__btn" name="minus" aria-label="Decrease quantity of {{ item.product.title | escape }}">{% render 'icon', name: 'minus', class: 'icon--xs' %}</button>
-        <label for="Qty-{{ context }}-{{ line }}" class="visually-hidden">Quantity of {{ item.product.title | escape }}</label>
-        <input
-          type="number"
-          id="Qty-{{ context }}-{{ line }}"
-          class="qty__input"
-          {% if context == 'page' %}name="updates[]"{% endif %}
-          value="{{ item.quantity }}"
-          min="0"
-          step="1"
-          inputmode="numeric"
-          data-line-qty="{{ line }}"
-        >
-        <button type="button" class="qty__btn" name="plus" aria-label="Increase quantity of {{ item.product.title | escape }}">{% render 'icon', name: 'plus', class: 'icon--xs' %}</button>
-      </quantity-input>
-      <a href="{{ item.url_to_remove }}" class="cart-line__remove" data-line-remove="{{ line }}" aria-label="Remove {{ item.product.title | escape }}">
-        {% render 'icon', name: 'trash', class: 'icon--sm' %}<span>Remove</span>
-      </a>
+    {%- for d in item.line_level_discount_allocations -%}<span class="cart-line__discount">{% render 'icon', name: 'tag', class: 'icon--sm' %} {{ d.discount_application.title }} (−{{ d.amount | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }})</span>{%- endfor -%}
+    <div class="cart-line__bottom">
+      <div class="qty qty--sm">
+        <button type="button" data-qty-step="-1" aria-label="{{ 'cart.decrease' | t: title: item.product.title | escape }}">{% render 'icon', name: 'minus', class: 'icon--sm' %}</button>
+        <label class="visually-hidden" for="Qty-{{ ctx }}-{{ item.key | handle }}">{{ 'cart.quantity' | t }}</label>
+        <input id="Qty-{{ ctx }}-{{ item.key | handle }}" type="number" min="0" value="{{ item.quantity }}" data-line-qty="{{ item.key }}" inputmode="numeric">
+        <button type="button" data-qty-step="1" aria-label="{{ 'cart.increase' | t: title: item.product.title | escape }}">{% render 'icon', name: 'plus', class: 'icon--sm' %}</button>
+      </div>
+      <div class="price cart-line__price{% if item.original_line_price > item.final_line_price %} price--sale{% endif %}">
+        {%- if item.original_line_price > item.final_line_price -%}<s class="price__compare">{{ item.original_line_price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</s>{%- endif -%}
+        <span class="price__current">{{ item.final_line_price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</span>
+      </div>
     </div>
   </div>
-  <div class="cart-line__price">
-    {%- if item.original_line_price > item.final_line_price -%}
-      <s class="price__compare"><span class="visually-hidden">Regular price</span>{{ item.original_line_price | money_with_currency | replace: '.00 ', ' ' }}</s>
-    {%- endif -%}
-    <span class="cart-line__total">{{ item.final_line_price | money_with_currency | replace: '.00 ', ' ' }}</span>
-    {%- if item.quantity > 1 -%}<span class="cart-line__each">{{ item.final_price | money_with_currency | replace: '.00 ', ' ' }} each</span>{%- endif -%}
-  </div>
-</li>
+</div>

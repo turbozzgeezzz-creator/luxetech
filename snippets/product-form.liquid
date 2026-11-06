@@ -1,0 +1,120 @@
+{%- comment -%}
+  Variant picker, price, stock line and buttons.
+  Params: product, form_id, show_dynamic (bool), show_qty (bool), threshold, size_page, breaks (false hides Buy more, save more)
+  Add to bag sits straight after the options so it stays close to the photos; the quantity offers follow it.
+  Stock lines use real tracked inventory only.
+{%- endcomment -%}
+{%- liquid
+  assign current = product.selected_or_first_available_variant
+  assign threshold = threshold | default: settings.low_stock_threshold
+-%}
+<script type="application/json" data-product-json>
+  {
+    "id": {{ product.id }},
+    "variants": [
+      {%- for v in product.variants -%}
+        {"id": {{ v.id }}, "options": {{ v.options | json }}, "price": {{ v.price }}, "compare_at_price": {{ v.compare_at_price | default: 0 }}, "available": {{ v.available }}, "sku": {{ v.sku | json }}, "featured_media": {% if v.featured_media %}{"id": {{ v.featured_media.id }}, "src": {{ v.featured_media | image_url: width: 1000 | json }}}{% else %}null{% endif %}}{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ],
+    "inventory": {
+      {%- for v in product.variants -%}
+        "{{ v.id }}": {"managed": {% if v.inventory_management == 'shopify' %}true{% else %}false{% endif %}, "qty": {{ v.inventory_quantity | default: 0 }}, "policy": {{ v.inventory_policy | json }}}{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    }
+  }
+</script>
+
+{%- unless product.has_only_default_variant -%}
+  {%- for option in product.options_with_values -%}
+    {%- liquid
+      assign oname = option.name | downcase
+      assign is_color = false
+      if oname == 'color' or oname == 'colour' or oname contains 'dial' or oname == 'metal' or oname == 'finish' or oname == 'leather'
+        assign is_color = true
+      endif
+      assign has_swatch = false
+      for val in option.values
+        if val.swatch.color or val.swatch.image
+          assign has_swatch = true
+        endif
+      endfor
+      if has_swatch == false
+        assign is_color = false
+      endif
+    -%}
+    {%- assign many = false -%}{%- assign lim = 14 -%}{%- if oname contains 'size' -%}{%- assign lim = 24 -%}{%- endif -%}{%- if option.values.size > lim -%}{%- assign many = true -%}{%- endif -%}
+    <fieldset class="option{% if many %} option--many{% endif %}" data-option-index="{{ forloop.index0 }}"{% if many %} data-option-many{% endif %}>
+      <legend class="option__legend">{{ option.name }}: <span data-option-label>{{ option.selected_value }}</span>
+
+      </legend>
+      <div class="option__values">
+        {%- for val in option.values -%}
+          {%- assign oid = form_id | append: '-' | append: option.position | append: '-' | append: forloop.index0 -%}
+          <input type="radio" id="{{ oid }}" name="{{ form_id }}-option-{{ option.position }}" value="{{ val | escape }}"{% if option.selected_value == val %} checked{% endif %}>
+          {%- assign vimg = nil -%}
+          {%- unless oname contains 'size' -%}
+            {%- comment -%} The variant this value leads to (no loop over every variant). {%- endcomment -%}
+            {%- assign vimg = val.variant.featured_media -%}
+          {%- endunless -%}
+          {%- if vimg -%}
+            <label class="img-pill" for="{{ oid }}" title="{{ option.name | escape }} {{ val | escape }}">{{ vimg | image_url: width: 160 | image_tag: width: 72, height: 72, loading: 'lazy', alt: val }}<span class="img-pill__label">{{ val }}</span></label>
+          {%- elsif is_color -%}
+            <label class="swatch-pill" for="{{ oid }}" title="{{ val | escape }}"><span style="--sw: {% if val.swatch.color %}{{ val.swatch.color }}{% elsif val.swatch.image %}url({{ val.swatch.image | image_url: width: 80 }}){% endif %}"></span><span class="visually-hidden">{{ val }}</span></label>
+          {%- else -%}
+            <label class="pill" for="{{ oid }}">{{ val }}</label>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {%- if size_page != blank and oname contains 'size' -%}
+        <button type="button" class="size-cta" data-drawer-open="SizeGuide">{% render 'icon', name: 'ruler', class: 'icon--sm' %}<span><strong>{{ 'products.size_guide' | t }}</strong><small>{{ 'products.size_cta' | t }}</small></span>{% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</button>
+      {%- endif -%}
+      {%- if many -%}
+        <button type="button" class="option__more" data-option-more aria-expanded="false" data-less="{{ 'products.show_fewer' | t }}">{{ 'products.show_all_options' | t: count: option.values.size, name: option.name }} {% render 'icon', name: 'chevron-down', class: 'icon--sm' %}</button>
+      {%- endif -%}
+    </fieldset>
+  {%- endfor -%}
+{%- endunless -%}
+
+{%- liquid
+  assign low = 'products.low_stock' | t: count: '[count]'
+  assign inv = current.inventory_quantity
+  assign stock_class = 'stock'
+  assign stock_text = 'products.in_stock' | t
+  if current.available == false
+    assign stock_class = 'stock stock--out'
+    assign stock_text = 'products.sold_out' | t
+  elsif current.inventory_management == 'shopify' and inv > 0 and threshold > 0 and inv <= threshold
+    assign stock_class = 'stock stock--low'
+    assign stock_text = 'products.low_stock' | t: count: inv
+  elsif current.inventory_management == 'shopify' and inv <= 0 and current.inventory_policy == 'continue'
+    assign stock_class = 'stock stock--low'
+    assign stock_text = 'products.backorder' | t
+  endif
+-%}
+{%- if settings.dispatch_days > 0 and current.available -%}
+  <p class="dispatch" data-dispatch data-days="{{ settings.dispatch_days }}" data-cutoff="{{ settings.dispatch_cutoff }}" data-offset="{{ 'now' | date: '%z' }}" data-label="{{ 'products.dispatch' | t | escape }}" hidden>{% render 'icon', name: 'truck', class: 'icon--sm' %} <span></span></p>
+{%- endif -%}
+<p class="{{ stock_class }}" data-stock data-threshold="{{ threshold }}" data-in="{{ 'products.in_stock' | t | escape }}" data-out="{{ 'products.sold_out' | t | escape }}" data-low="{{ low | escape }}" data-backorder="{{ 'products.backorder' | t | escape }}">{{ stock_text }}</p>
+
+{%- form 'product', product, id: form_id, class: 'buy-buttons', data-product-form: '', novalidate: 'novalidate' -%}
+  <input type="hidden" name="id" value="{{ current.id }}">
+  {%- unless show_qty -%}{%- if settings.qty_1_count > 1 -%}<input type="hidden" name="quantity" value="1" data-qty-hidden>{%- endif -%}{%- endunless -%}
+  <div class="buy-buttons__row">
+    {%- if show_qty -%}
+      <div class="qty">
+        <button type="button" data-qty-step="-1" aria-label="{{ 'cart.decrease_generic' | t }}">{% render 'icon', name: 'minus', class: 'icon--sm' %}</button>
+        <label class="visually-hidden" for="{{ form_id }}-qty">{{ 'cart.quantity' | t }}</label>
+        <input id="{{ form_id }}-qty" type="number" name="quantity" value="1" min="1" inputmode="numeric">
+        <button type="button" data-qty-step="1" aria-label="{{ 'cart.increase_generic' | t }}">{% render 'icon', name: 'plus', class: 'icon--sm' %}</button>
+      </div>
+    {%- endif -%}
+    <button type="submit" name="add" class="btn" data-add-button{% unless current.available %} disabled{% endunless %}>
+      <span data-add-label>{% if current.available %}{{ 'products.add_to_bag' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</span>
+    </button>
+    <button type="button" class="wish-inline" data-wish="{{ product.handle }}" aria-pressed="false" aria-label="{{ 'products.save_wishlist' | t: title: product.title | escape }}" data-added-text="{{ 'products.wish_added' | t }}" data-removed-text="{{ 'products.wish_removed' | t }}">
+      <svg viewBox="0 0 24 24" stroke-width="1.4" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.4A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.8c0 5.8-7.5 10.4-7.5 10.4z"/></svg>
+    </button>
+  </div>
+  {%- if show_dynamic -%}{{ form | payment_button }}{%- endif -%}
+{%- endform -%}
+{%- unless breaks == false -%}{% render 'qty-breaks', product: product, form_id: form_id %}{%- endunless -%}

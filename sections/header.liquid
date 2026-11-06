@@ -1,406 +1,413 @@
 {%- liquid
-  assign fallback_menu = section.settings.menu
-  assign use_blocks = false
-  if section.blocks.size > 0
-    assign use_blocks = true
+  assign menu = section.settings.menu
+  assign overlay = false
+  if section.settings.overlay_home and request.page_type == 'index'
+    assign overlay = true
+  endif
+  assign contact_url = section.settings.contact_page.url
+  if settings.advisor_whatsapp != blank
+    assign contact_url = 'https://wa.me/' | append: settings.advisor_whatsapp
   endif
 -%}
-
-<header class="header" data-sticky="{{ section.settings.sticky }}">
-  <div class="header__main container">
-    <button type="button" class="header__icon header__burger" aria-label="Open menu" aria-controls="MenuDrawer" aria-expanded="false" data-drawer-open="MenuDrawer">
-      {% render 'icon', name: 'menu' %}
-    </button>
-
-    <a href="{{ routes.root_url }}" class="header__logo" aria-label="{{ shop.name | escape }} home">
-      {%- if settings.logo != blank -%}
-        {{ settings.logo | image_url: width: 520 | image_tag:
-          loading: 'eager',
-          widths: '160,260,390,520',
-          sizes: '(min-width: 750px) var(--logo-width), 130px',
-          alt: shop.name,
-          class: 'header__logo-img'
-        }}
-      {%- else -%}
-        <img src="{{ 'logo-tech-luxedealers-purple.png' | asset_url }}" width="653" height="178" alt="{{ shop.name | escape }}" class="header__logo-img logo-dark" loading="eager">
-        <img src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="653" height="178" alt="" aria-hidden="true" class="header__logo-img logo-light" loading="lazy">
-      {%- endif -%}
-    </a>
-
-    <predictive-search class="header__search" data-enabled="{{ settings.predictive_search }}">
-      <form action="{{ routes.search_url }}" method="get" role="search" class="search-form">
-        <label for="HeaderSearch" class="visually-hidden">Search the store</label>
-        <input
-          id="HeaderSearch"
-          class="search-form__input"
-          type="search"
-          name="q"
-          value="{{ search.terms | escape }}"
-          placeholder="{{ settings.search_placeholder | escape }}"
-          autocomplete="off"
-          role="combobox"
-          aria-expanded="false"
-          aria-controls="PredictiveResults"
-          aria-autocomplete="list"
-        >
-        <input type="hidden" name="options[prefix]" value="last">
-        <button type="submit" class="search-form__submit" aria-label="Search">
-          {% render 'icon', name: 'search' %}
+<div class="header-wrapper{% if overlay %} header-wrapper--overlay{% endif %}" data-header data-hide-on-scroll="{{ section.settings.hide_on_scroll }}">
+  <header class="site-header">
+    <div class="container header__inner">
+      <div class="header__left">
+        <button type="button" class="icon-btn header__burger" data-drawer-open="MenuOverlay" aria-controls="MenuOverlay" aria-expanded="false" aria-label="{{ 'header.menu' | t }}">
+          {% render 'icon', name: 'menu' %}
         </button>
-      </form>
-      <div class="predictive" id="PredictiveResults" hidden></div>
-    </predictive-search>
-
-    <div class="header__actions">
-      {%- if settings.dark_mode != 'off' -%}
-        <button type="button" class="header__icon header__theme" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
-          {% render 'icon', name: 'moon', class: 'icon-when-light' %}
-          {% render 'icon', name: 'sun', class: 'icon-when-dark' %}
-        </button>
-      {%- endif -%}
-      <a href="{{ routes.root_url }}pages/wishlist" class="header__icon header__wishlist" aria-label="Wishlist">
-        {% render 'icon', name: 'heart' %}
-        <span class="cart-count wishlist-count" data-wishlist-count hidden>0</span>
-      </a>
-      {%- if shop.customer_accounts_enabled -%}
-        <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="header__icon header__account">
-          {% render 'icon', name: 'user' %}
-          <span class="header__icon-label">
-            {%- if customer -%}<small>Hi, {{ customer.first_name | default: 'there' | escape }}</small>Account{%- else -%}<small>Sign in</small>Account{%- endif -%}
-          </span>
+        <a href="{{ routes.root_url }}" class="header__logo" aria-label="{{ shop.name | escape }}">
+          {% render 'logo' %}
         </a>
-      {%- endif -%}
-      <a href="{{ routes.cart_url }}" class="header__icon header__cart" data-cart-toggle aria-label="Cart, {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}">
-        {% render 'icon', name: 'cart' %}
-        <span class="cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
-        <span class="header__icon-label"><small>{{ cart.total_price | money_with_currency | replace: '.00 ', ' ' }}</small>Cart</span>
-      </a>
-    </div>
-  </div>
-
-  <mega-menu class="mega-nav" role="navigation" aria-label="Shop by category">
-    <ul class="mega-nav__list container" role="list">
-      {%- if use_blocks -%}
-        {%- for block in section.blocks -%}
-          {%- liquid
-            assign panel_id = 'MegaPanel-' | append: block.id
-            assign panel_links = nil
-            if block.type == 'mega'
-              if block.settings.menu != blank and block.settings.menu.links.size > 0
-                assign panel_links = block.settings.menu.links
-              else
-                assign menu_handle = block.settings.title | handle
-                if linklists[menu_handle].links.size > 0
-                  assign panel_links = linklists[menu_handle].links
-                else
-                  for main_link in fallback_menu.links
-                    if main_link.title == block.settings.title and main_link.links.size > 0
-                      assign panel_links = main_link.links
-                      break
-                    endif
-                  endfor
-                endif
-              endif
-            endif
-            assign has_panel = false
-            if panel_links.size > 0
-              assign has_panel = true
-            endif
-            assign auto_c = nil
-            if block.type == 'mega' and has_panel == false and block.settings.link contains '/collections/'
-              assign auto_handle = block.settings.link | split: '/collections/' | last | split: '?' | first | split: '/' | first
-              assign auto_c = collections[auto_handle]
-              if auto_c.products_count > 0
-                assign has_panel = true
-              endif
-            endif
-            assign all_depts = false
-            if auto_c != blank and auto_handle == 'all'
-              assign all_depts = true
-            endif
-          -%}
-          <li class="mega-nav__item{% if block.type == 'link' and block.settings.highlight %} mega-nav__item--highlight{% endif %}" {{ block.shopify_attributes }}>
-            {%- if has_panel -%}
-              <button type="button" class="mega-nav__top" aria-expanded="false" aria-controls="{{ panel_id }}"{% if block.settings.color != blank %} style="--cat: {{ block.settings.color }};"{% endif %}>
-                {% render 'icon', name: block.settings.icon, class: 'mega-nav__icon' %}
-                <span>{{ block.settings.title | escape }}</span>
-                {% render 'icon', name: 'chevron-down', class: 'icon--xs mega-nav__chevron' %}
-              </button>
-              <div class="mega-panel" id="{{ panel_id }}" hidden>
-                {%- if all_depts -%}
-                  {% render 'mega-all-panel', block: block %}
-                {%- elsif panel_links == blank and auto_c != blank -%}
-                  {% render 'mega-auto-panel', block: block, c: auto_c, all_blocks: section.blocks %}
-                {%- else -%}
-                <div class="mega-panel__inner container">
-                  <div class="mega-panel__links">
-                    <a href="{{ block.settings.link | default: panel_links.first.url }}" class="mega-panel__all">
-                      Shop all {{ block.settings.title | escape }}
-                    </a>
-                    {% render 'mega-columns', links: panel_links %}
-                  </div>
-                  {%- if block.settings.promo_image != blank or block.settings.promo_heading != blank -%}
-                    <a href="{{ block.settings.promo_link | default: block.settings.link }}" class="mega-promo">
-                      {%- if block.settings.promo_image != blank -%}
-                        {%- assign promo_alt = block.settings.promo_image.alt | default: block.settings.promo_heading -%}
-                        <span class="mega-promo__media">
-                          {{ block.settings.promo_image | image_url: width: 640 | image_tag:
-                            loading: 'lazy',
-                            widths: '320,480,640',
-                            sizes: '320px',
-                            alt: promo_alt,
-                            class: 'mega-promo__img'
-                          }}
-                        </span>
-                      {%- else -%}
-                        <span class="mega-promo__media mega-promo__media--art">{% render 'placeholder-art', type: 'product', uid: block.id, caption: block.settings.title %}</span>
-                      {%- endif -%}
-                      <span class="mega-promo__body">
-                        {%- if block.settings.promo_heading != blank -%}<span class="mega-promo__heading">{{ block.settings.promo_heading | escape }}</span>{%- endif -%}
-                        {%- if block.settings.promo_text != blank -%}<span class="mega-promo__text">{{ block.settings.promo_text | escape }}</span>{%- endif -%}
-                        <span class="mega-promo__cta">{{ block.settings.promo_link_label | default: 'Shop deals' | escape }}</span>
-                      </span>
-                    </a>
-                  {%- endif -%}
-                </div>
-                {%- endif -%}
-              </div>
-            {%- else -%}
-              <a href="{{ block.settings.link | default: routes.all_products_collection_url }}" class="mega-nav__top"{% if block.settings.color != blank %} style="--cat: {{ block.settings.color }};"{% endif %}>
-                {% render 'icon', name: block.settings.icon, class: 'mega-nav__icon' %}
-                <span>{{ block.settings.title | escape }}</span>
-              </a>
-            {%- endif -%}
-          </li>
-        {%- endfor -%}
-      {%- else -%}
-        {%- for link in fallback_menu.links -%}
-          {%- capture guessed_icon -%}{% render 'nav-icon-guess', title: link.title %}{%- endcapture -%}
-          {%- assign panel_id = 'MegaPanel-menu-' | append: forloop.index -%}
-          <li class="mega-nav__item">
-            {%- if link.links.size > 0 -%}
-              <button type="button" class="mega-nav__top" aria-expanded="false" aria-controls="{{ panel_id }}">
-                {% render 'icon', name: guessed_icon, class: 'mega-nav__icon' %}
-                <span>{{ link.title | escape }}</span>
-                {% render 'icon', name: 'chevron-down', class: 'icon--xs mega-nav__chevron' %}
-              </button>
-              <div class="mega-panel" id="{{ panel_id }}" hidden>
-                <div class="mega-panel__inner container">
-                  <div class="mega-panel__links">
-                    <a href="{{ link.url }}" class="mega-panel__all">Shop all {{ link.title | escape }}</a>
-                    {% render 'mega-columns', links: link.links %}
-                  </div>
-                </div>
-              </div>
-            {%- else -%}
-              <a href="{{ link.url }}" class="mega-nav__top"{% if link.current %} aria-current="page"{% endif %}>
-                {% render 'icon', name: guessed_icon, class: 'mega-nav__icon' %}
-                <span>{{ link.title | escape }}</span>
-              </a>
-            {%- endif -%}
-          </li>
-        {%- endfor -%}
-      {%- endif -%}
-    </ul>
-  </mega-menu>
-</header>
-
-<menu-drawer class="drawer drawer--left" id="MenuDrawer" hidden>
-  <div class="drawer__overlay" data-drawer-close></div>
-  <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu" tabindex="-1">
-    <div class="drawer__head">
-      <a href="{{ routes.root_url }}" class="drawer__logo" aria-label="{{ shop.name | escape }} home">
-        <img src="{{ 'logo-tech-luxedealers-purple.png' | asset_url }}" width="653" height="178" alt="" class="logo-dark" loading="lazy">
-        <img src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="653" height="178" alt="" class="logo-light" loading="lazy">
-      </a>
-      <button type="button" class="header__icon" data-drawer-close aria-label="Close menu">{% render 'icon', name: 'close' %}</button>
-    </div>
-    <div class="drawer__body">
-      <ul class="drawer-cats" role="list">
-        {%- if use_blocks -%}
-          {%- for block in section.blocks -%}
-            {%- liquid
-            assign panel_links = nil
-            if block.type == 'mega'
-              if block.settings.menu != blank and block.settings.menu.links.size > 0
-                assign panel_links = block.settings.menu.links
-              else
-                assign menu_handle = block.settings.title | handle
-                if linklists[menu_handle].links.size > 0
-                  assign panel_links = linklists[menu_handle].links
-                else
-                  for main_link in fallback_menu.links
-                    if main_link.title == block.settings.title and main_link.links.size > 0
-                      assign panel_links = main_link.links
-                      break
-                    endif
-                  endfor
-                endif
-              endif
-            endif
-            assign has_panel = false
-            if panel_links.size > 0
-              assign has_panel = true
-            endif
-            assign auto_c = nil
-            if block.type == 'mega' and has_panel == false and block.settings.link contains '/collections/'
-              assign auto_handle = block.settings.link | split: '/collections/' | last | split: '?' | first | split: '/' | first
-              assign auto_c = collections[auto_handle]
-              if auto_c.products_count > 0
-                assign has_panel = true
-              endif
-            endif
-            assign all_depts = false
-            if auto_c != blank and auto_handle == 'all'
-              assign all_depts = true
-            endif
-            -%}
-            <li>
-              {%- if has_panel -%}
-                <details class="drawer-cat">
-                  <summary class="drawer-cat__summary"{% if block.settings.color != blank %} style="--cat: {{ block.settings.color }};"{% endif %}>
-                    {% render 'icon', name: block.settings.icon, class: 'mega-nav__icon' %}
-                    <span>{{ block.settings.title | escape }}</span>
-                    {% render 'icon', name: 'chevron-down', class: 'icon--sm drawer-chevron' %}
-                  </summary>
-                  <div class="drawer-cat__panel">
-                    {%- if block.settings.link != blank -%}
-                      <a href="{{ block.settings.link }}" class="drawer-tree__link drawer-tree__link--all">{% if all_depts %}Shop everything{% else %}Shop all {{ block.settings.title | escape }}{% endif %}</a>
-                    {%- endif -%}
-                    {%- if panel_links.size > 0 -%}
-                      {% render 'menu-drawer-links', links: panel_links %}
-                    {%- elsif all_depts -%}
-                      <ul class="drawer-depts" role="list">
-                        {%- for c in collections -%}
-                          {%- if c.handle == 'all' or c.handle == 'frontpage' or c.handle contains 'performance' or c.handle == 'new-arrivals' or c.handle == 'best-sellers' or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
-                          <li><a href="{{ c.url }}" class="drawer-tree__link">{{ c.title | escape }}</a></li>
-                        {%- endfor -%}
-                      </ul>
-                    {%- elsif auto_c != blank -%}
-                      <ul class="drawer-products" role="list">
-                        {%- for p in auto_c.products limit: 6 -%}
-                          <li>
-                            <a href="{{ p.url }}" class="drawer-product">
-                              <span class="drawer-product__media">{%- if p.featured_media -%}{{ p.featured_media.preview_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 48, height: 48 }}{%- endif -%}</span>
-                              <span class="drawer-product__name">{% render 'product-short-title', product: p, words: 5 %}</span>
-                              <span class="drawer-product__price">{{ p.price_min | money_with_currency | replace: '.00 ', ' ' }}</span>
-                            </a>
-                          </li>
-                        {%- endfor -%}
-                      </ul>
-                    {%- endif -%}
-                  </div>
-                </details>
-              {%- else -%}
-                <a href="{{ block.settings.link | default: routes.all_products_collection_url }}" class="drawer-cat__summary{% if block.type == 'link' and block.settings.highlight %} is-highlight{% endif %}"{% if block.settings.color != blank %} style="--cat: {{ block.settings.color }};"{% endif %}>
-                  {% render 'icon', name: block.settings.icon, class: 'mega-nav__icon' %}
-                  <span>{{ block.settings.title | escape }}</span>
-                </a>
-              {%- endif -%}
-            </li>
-          {%- endfor -%}
-        {%- else -%}
-          {%- for link in fallback_menu.links -%}
-            {%- capture guessed_icon -%}{% render 'nav-icon-guess', title: link.title %}{%- endcapture -%}
-            <li>
-              {%- if link.links.size > 0 -%}
-                <details class="drawer-cat">
-                  <summary class="drawer-cat__summary">
-                    {% render 'icon', name: guessed_icon, class: 'mega-nav__icon' %}
-                    <span>{{ link.title | escape }}</span>
-                    {% render 'icon', name: 'chevron-down', class: 'icon--sm drawer-chevron' %}
-                  </summary>
-                  <div class="drawer-cat__panel">
-                    <a href="{{ link.url }}" class="drawer-tree__link drawer-tree__link--all">Shop all {{ link.title | escape }}</a>
-                    {% render 'menu-drawer-links', links: link.links %}
-                  </div>
-                </details>
-              {%- else -%}
-                <a href="{{ link.url }}" class="drawer-cat__summary">
-                  {% render 'icon', name: guessed_icon, class: 'mega-nav__icon' %}
-                  <span>{{ link.title | escape }}</span>
-                </a>
-              {%- endif -%}
-            </li>
-          {%- endfor -%}
-        {%- endif -%}
-      </ul>
-
-      {%- if section.settings.drawer_menu != blank -%}
-        <nav class="drawer__secondary" aria-label="More links">
-          {% render 'menu-drawer-links', links: section.settings.drawer_menu.links %}
-        </nav>
-      {%- endif -%}
-    </div>
-    <div class="drawer__foot">
-      <div class="drawer__prefs">
-        {% render 'currency-selector', id: 'drawer', variant: 'drawer' %}
-        {%- if settings.dark_mode != 'off' -%}
-          <button type="button" class="btn btn--outline btn--sm" data-theme-toggle aria-pressed="false">
-            {% render 'icon', name: 'moon', class: 'icon--sm icon-when-light' %}{% render 'icon', name: 'sun', class: 'icon--sm icon-when-dark' %}
-            <span class="icon-when-light">Dark mode</span><span class="icon-when-dark">Light mode</span>
-          </button>
-        {%- endif -%}
-        <a href="{{ routes.root_url }}pages/wishlist" class="btn btn--outline btn--sm">{% render 'icon', name: 'heart', class: 'icon--sm' %} Wishlist</a>
       </div>
-      {%- if shop.customer_accounts_enabled -%}
-        <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="btn btn--outline btn--block">
-          {% render 'icon', name: 'user', class: 'icon--sm' %}
-          <span>{% if customer %}My account{% else %}Sign in or create account{% endif %}</span>
+
+      <form action="{{ routes.search_url }}" method="get" role="search" class="header__search" data-header-search>
+        <label class="visually-hidden" for="HeaderSearch">{{ 'header.search' | t }}</label>
+        <input id="HeaderSearch" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'header.search_placeholder' | t }}" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="HeaderSearchPop" aria-autocomplete="list" data-search-input>
+        <input type="hidden" name="options[prefix]" value="last">
+        <input type="hidden" name="type" value="product">
+        <button type="submit" class="header__search-btn" aria-label="{{ 'header.search' | t }}">{% render 'icon', name: 'search' %}</button>
+        <div class="search-pop" id="HeaderSearchPop" data-search-pop hidden>
+          <div class="search-pop__idle" data-search-idle>
+            {%- assign pops = section.settings.popular_searches | split: ',' -%}
+            {%- if pops.size > 0 -%}
+              <p class="search-pop__label">{{ 'search.popular' | t }}</p>
+              <div class="search-pop__chips">{%- for q in pops -%}{%- assign qq = q | strip -%}<a class="search-chip" href="{{ routes.search_url }}?q={{ qq | url_encode }}&options%5Bprefix%5D=last">{% render 'icon', name: 'search', class: 'icon--sm' %}{{ qq }}</a>{%- endfor -%}</div>
+            {%- endif -%}
+            {%- assign sc = section.settings.search_collection -%}
+            {%- if sc != blank -%}
+              <p class="search-pop__label">{{ 'search.trending' | t: title: sc.title }}</p>
+              <ul class="search-pop__products" role="list">
+                {%- for p in sc.products limit: 4 -%}
+                  <li><a href="{{ p.url }}"><span class="search-pop__img">{{ p.featured_media.preview_image | image_url: width: 160 | image_tag: width: 64, height: 64, loading: 'lazy', alt: p.title }}</span><span class="search-pop__name">{{ p.title }}</span><strong>{{ p.price | money }}</strong></a></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+          <div class="search-pop__results" data-search-results hidden></div>
+        </div>
+      </form>
+
+      <div class="header__right">
+        <button type="button" class="icon-btn header__search-icon" data-drawer-open="SearchOverlay" aria-controls="SearchOverlay" aria-expanded="false" aria-label="{{ 'header.search' | t }}">{% render 'icon', name: 'search' %}</button>
+        <button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="{{ 'header.theme_toggle' | t }}" aria-pressed="false"><svg class="theme-toggle__moon" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="theme-toggle__sun" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg></button>
+        <button type="button" class="icon-btn header__wish" data-drawer-open="WishlistDrawer" aria-controls="WishlistDrawer" aria-expanded="false" aria-label="{{ 'header.wishlist' | t }}">{% render 'icon', name: 'heart' %}<span class="cart-count" data-wish-count hidden>0</span></button>
+        {%- if shop.customer_accounts_enabled -%}
+          <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="header__action header__account">
+            {% render 'icon', name: 'account' %}
+            <span class="header__action-text"><small>{% if customer and customer.first_name != blank %}{{ 'header.hello' | t: name: customer.first_name }}{% elsif customer %}{{ 'header.signed_in' | t }}{% else %}{{ 'header.sign_in' | t }}{% endif %}</small><strong>{{ 'header.account' | t }}</strong></span>
+          </a>
+        {%- endif -%}
+        <a href="{{ routes.cart_url }}" class="header__action header__cart" {% if settings.cart_type == 'drawer' %}data-drawer-open="CartDrawer" aria-controls="CartDrawer" aria-expanded="false" role="button"{% endif %} aria-label="{{ 'header.cart' | t }}">
+          <span class="header__cart-icon">{% render 'icon', name: 'cart' %}<span class="cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span></span>
+          <span class="header__action-text"><small data-cart-total>{{ cart.total_price | money }}</small><strong>{{ 'header.cart' | t }}</strong></span>
         </a>
+      </div>
+    </div>
+
+    {%- if menu != blank and section.settings.show_nav -%}
+      {%- liquid
+        assign hide_csv = section.settings.nav_hide | downcase | replace: ', ', ',' | replace: ' ,', ','
+        assign hide_csv = ',' | append: hide_csv | append: ','
+      -%}
+      <nav class="header__nav" aria-label="{{ 'header.main_menu' | t }}">
+        <div class="container header__nav-inner">
+        <ul class="header__nav-list" role="list">
+          {%- for link in menu.links -%}
+            {%- liquid
+              assign lt = link.title | downcase | strip
+              assign key = ',' | append: lt | append: ','
+              assign skip = false
+              if hide_csv contains key
+                assign skip = true
+              endif
+              assign has_mega = false
+              if link.links.size > 0
+                assign has_mega = true
+              endif
+              assign icon = 'sparkle'
+              if lt contains 'all'
+                assign icon = 'grid4'
+              elsif lt contains 'audio' or lt contains 'headphone' or lt contains 'speaker'
+                assign icon = 'headphones'
+              elsif lt contains 'charg' or lt contains 'power'
+                assign icon = 'bolt'
+              elsif lt contains 'kitchen' or lt contains 'smart home'
+                assign icon = 'home-device'
+              elsif lt contains 'wear' or lt contains 'watch'
+                assign icon = 'watch'
+              elsif lt contains 'phone' or lt contains 'computer'
+                assign icon = 'smartphone'
+              elsif lt contains 'entertain' or lt contains 'tv' or lt contains 'projector'
+                assign icon = 'tv'
+              elsif lt contains 'hair' or lt contains 'beauty'
+                assign icon = 'sparkle'
+              elsif lt contains 'car tech' or lt == 'car'
+                assign icon = 'plug'
+              elsif lt contains 'guide' or lt contains 'blog'
+                assign icon = 'help'
+              elsif lt contains 'new'
+                assign icon = 'sparkle'
+              elsif lt contains 'cloth'
+                assign icon = 'shirt'
+              elsif lt contains 'shoe' or lt contains 'sneaker'
+                assign icon = 'shoe'
+              elsif lt contains 'bag'
+                assign icon = 'bag'
+              elsif lt contains 'access' or lt contains 'watch'
+                assign icon = 'watch'
+              elsif lt contains 'jewel'
+                assign icon = 'diamond'
+              elsif lt contains 'brand'
+                assign icon = 'tag'
+              elsif lt contains 'women' or lt contains 'men'
+                assign icon = 'user'
+              elsif lt contains 'fragr'
+                assign icon = 'perfume'
+              elsif lt contains 'deal' or lt contains 'sale'
+                assign icon = 'percent'
+              elsif lt contains 'home'
+                assign icon = 'home'
+              endif
+              assign highlight = false
+              if section.settings.highlight_item != blank
+                assign hi = section.settings.highlight_item | downcase | strip
+                if lt == hi
+                  assign highlight = true
+                endif
+              endif
+            -%}
+            {%- unless skip -%}
+            <li class="nav-item"{% if has_mega %} data-has-mega{% endif %}>
+              <a href="{{ link.url }}" class="nav-link{% if highlight %} nav-link--highlight{% endif %}"{% if link.current %} aria-current="page"{% endif %}{% if has_mega %} aria-haspopup="true" aria-expanded="false"{% endif %}>{% render 'icon', name: icon, class: 'nav-link__icon' %}{{ link.title | escape }}{% if has_mega %}{% render 'icon', name: 'chevron-down', class: 'nav-link__chev' %}{% endif %}</a>
+              {%- if has_mega -%}
+                <div class="mega">
+                  <div class="container mega__inner">
+                    <div class="mega__cols">
+                      {%- assign has_grand = false -%}
+                      {%- for child in link.links -%}{%- if child.links.size > 0 -%}{%- assign has_grand = true -%}{%- endif -%}{%- endfor -%}
+                      {%- if has_grand -%}
+                        {%- for child in link.links -%}
+                          <div>
+                            <a class="mega__title" href="{{ child.url }}">{{ child.title | escape }}</a>
+                            <ul class="mega__links" role="list">{%- for g in child.links -%}<li><a href="{{ g.url }}">{{ g.title | escape }}</a></li>{%- endfor -%}</ul>
+                          </div>
+                        {%- endfor -%}
+                      {%- else -%}
+                        <div>
+                          <a class="mega__title" href="{{ link.url }}">{{ link.title | escape }}</a>
+                          <ul class="mega__links mega__links--cols" role="list">{%- for child in link.links -%}<li><a href="{{ child.url }}">{{ child.title | escape }}</a></li>{%- endfor -%}</ul>
+                        </div>
+                      {%- endif -%}
+                    </div>
+                    {%- liquid
+                      assign mc = nil
+                      if link.type == 'collection_link'
+                        assign mc = link.object
+                      else
+                        for child in link.links
+                          if child.type == 'collection_link'
+                            assign mc = child.object
+                            break
+                          endif
+                        endfor
+                      endif
+                    -%}
+                    {%- if mc != nil and mc.products_count > 0 -%}
+                      <div class="mega__shots">
+                        {%- for p in mc.products limit: 3 -%}
+                          {%- if p.featured_media -%}
+                            <a class="mega__shot" href="{{ p.url }}">
+                              <span class="mega__shot-img">{{ p.featured_media.preview_image | image_url: width: 300 | image_tag: width: 150, height: 150, loading: 'lazy', alt: p.title }}</span>
+                              <span class="mega__shot-name">{{ p.title }}</span>
+                              <span class="mega__shot-price">{{ p.price | money_with_currency | replace: '.00 ', ' ' | replace: ',00 ', ' ' }}</span>
+                            </a>
+                          {%- endif -%}
+                        {%- endfor -%}
+                        <a class="mega__shot-all" href="{{ mc.url }}">{{ 'header.shop_all' | t: title: mc.title }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>
+                      </div>
+                    {%- endif -%}
+                  </div>
+                </div>
+              {%- endif -%}
+            </li>
+            {%- endunless -%}
+          {%- endfor -%}
+          {%- if section.settings.help_menu != blank -%}
+            <li class="nav-item nav-item--help" data-has-mega>
+              <a href="{{ section.settings.help_menu.links.first.url | default: '#' }}" class="nav-link" aria-haspopup="true" aria-expanded="false">{% render 'icon', name: 'help', class: 'nav-link__icon' %}{{ section.settings.help_label }}{% render 'icon', name: 'chevron-down', class: 'nav-link__chev' %}</a>
+              <div class="dropdown"><ul role="list">{%- for l in section.settings.help_menu.links -%}<li><a href="{{ l.url }}">{{ l.title | escape }}</a></li>{%- endfor -%}</ul></div>
+            </li>
+          {%- endif -%}
+        </ul>
+        {%- if section.settings.pill_label != blank -%}
+          <a class="header__pill" href="{{ section.settings.pill_link | default: routes.all_products_collection_url }}">{% render 'icon', name: 'sparkle', class: 'icon--sm' %}{{ section.settings.pill_label }}</a>
+        {%- endif -%}
+        </div>
+      </nav>
+    {%- endif -%}
+    <span class="scroll-progress" aria-hidden="true"></span>
+  </header>
+</div>
+{%- unless overlay -%}<div class="header-spacer"></div>{%- endunless -%}
+
+{%- comment -%} Full-screen menu {%- endcomment -%}
+<div class="menu-overlay mnav" id="MenuOverlay" aria-hidden="true" data-menu-overlay>
+  <div class="mnav__backdrop" data-drawer-close></div>
+  <div class="menu-overlay__panel mnav__panel" role="dialog" aria-modal="true" aria-label="{{ 'header.menu' | t }}" tabindex="-1">
+    <div class="mnav__top">
+      <a href="{{ routes.root_url }}" class="mnav__logo" aria-label="{{ shop.name | escape }}">{% render 'logo' %}</a>
+      <div class="mnav__top-btns">
+        <button type="button" class="mnav__close theme-toggle" data-theme-toggle aria-label="{{ 'header.theme_toggle' | t }}" aria-pressed="false"><svg class="theme-toggle__moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="theme-toggle__sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg></button>
+      <button type="button" class="mnav__close" data-drawer-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button>
+      </div>
+    </div>
+    <div class="mnav__body">
+      <form action="{{ routes.search_url }}" method="get" role="search" class="mnav__search">
+        <label class="visually-hidden" for="MenuSearch">{{ 'header.search' | t }}</label>
+        <input id="MenuSearch" type="search" name="q" placeholder="{{ 'header.search_placeholder' | t }}" autocomplete="off" enterkeyhint="search">
+        <input type="hidden" name="type" value="product">
+        <input type="hidden" name="options[prefix]" value="last">
+        <button type="submit" class="mnav__search-btn" aria-label="{{ 'header.search' | t }}">{% render 'icon', name: 'search', class: 'icon--sm' %}</button>
+      </form>
+      {%- if menu != blank -%}
+        <p class="mnav__label">{{ 'header.shop' | t }}</p>
+        <ul class="mnav__list" role="list">
+          {%- for link in menu.links -%}
+            {%- liquid
+              assign lt = link.title | downcase | strip
+              assign is_page = false
+              if link.type == 'page_link' or link.type == 'frontpage_link' or link.type == 'blog_link' or link.type == 'http_link' or link.type == 'policy_link'
+                assign is_page = true
+              endif
+              if link.links.size > 0
+                assign is_page = false
+              endif
+              assign icon = 'sparkle'
+              if lt contains 'all'
+                assign icon = 'grid4'
+              elsif lt contains 'audio' or lt contains 'headphone' or lt contains 'speaker'
+                assign icon = 'headphones'
+              elsif lt contains 'charg' or lt contains 'power'
+                assign icon = 'bolt'
+              elsif lt contains 'kitchen' or lt contains 'smart home'
+                assign icon = 'home-device'
+              elsif lt contains 'wear' or lt contains 'watch'
+                assign icon = 'watch'
+              elsif lt contains 'phone' or lt contains 'computer'
+                assign icon = 'smartphone'
+              elsif lt contains 'entertain' or lt contains 'tv' or lt contains 'projector'
+                assign icon = 'tv'
+              elsif lt contains 'hair' or lt contains 'beauty'
+                assign icon = 'sparkle'
+              elsif lt contains 'car tech' or lt == 'car'
+                assign icon = 'plug'
+              elsif lt contains 'guide' or lt contains 'blog'
+                assign icon = 'help'
+              elsif lt contains 'new'
+                assign icon = 'sparkle'
+              elsif lt contains 'cloth'
+                assign icon = 'shirt'
+              elsif lt contains 'shoe' or lt contains 'sneaker'
+                assign icon = 'shoe'
+              elsif lt contains 'bag'
+                assign icon = 'bag'
+              elsif lt contains 'access' or lt contains 'watch'
+                assign icon = 'watch'
+              elsif lt contains 'jewel'
+                assign icon = 'diamond'
+              elsif lt contains 'brand'
+                assign icon = 'tag'
+              elsif lt contains 'women' or lt contains 'men'
+                assign icon = 'user'
+              elsif lt contains 'fragr'
+                assign icon = 'perfume'
+              elsif lt contains 'deal' or lt contains 'sale'
+                assign icon = 'percent'
+              endif
+            -%}
+            {%- unless is_page -%}
+              <li style="--i: {{ forloop.index0 }}">
+                {%- if link.links.size > 0 -%}
+                  <details class="mnav__group" name="mnav">
+                    <summary class="mnav__row"><span class="mnav__ico">{% render 'icon', name: icon %}</span><span class="mnav__txt">{{ link.title | escape }}</span>{% render 'icon', name: 'chevron-down', class: 'mnav__chev' %}</summary>
+                    <div class="mnav__sub">
+                      <a class="mnav__all" href="{{ link.url }}">{{ 'header.shop_all' | t: title: link.title }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>
+                      <div class="mnav__chips">
+                        {%- for child in link.links -%}
+                          {%- assign ct = child.title | downcase -%}
+                          {%- unless ct contains 'shop all' or child.url == link.url -%}
+                            <a class="mnav__chip" href="{{ child.url }}">{{ child.title | escape }}</a>
+                          {%- endunless -%}
+                          {%- for g in child.links -%}{%- assign gt = g.title | downcase -%}{%- unless gt contains 'shop all' -%}<a class="mnav__chip mnav__chip--sub" href="{{ g.url }}">{{ g.title | escape }}</a>{%- endunless -%}{%- endfor -%}
+                        {%- endfor -%}
+                      </div>
+                    </div>
+                  </details>
+                {%- else -%}
+                  <a class="mnav__row" href="{{ link.url }}"><span class="mnav__ico">{% render 'icon', name: icon %}</span><span class="mnav__txt">{{ link.title | escape }}</span>{% render 'icon', name: 'arrow-right', class: 'mnav__chev icon--sm' %}</a>
+                {%- endif -%}
+              </li>
+            {%- endunless -%}
+          {%- endfor -%}
+        </ul>
+        <p class="mnav__label">{{ 'header.departments' | t }}</p>
+        <div class="mnav__depts">
+          {%- for link in menu.links -%}
+            {%- if link.type == 'collection_link' and link.links.size > 0 -%}
+              {%- assign dimg = link.object.featured_image | default: link.object.products.first.featured_media.preview_image -%}
+              <a class="mnav__dept" href="{{ link.url }}">
+                <span class="mnav__dept-img">{%- if dimg -%}{{ dimg | image_url: width: 260 | image_tag: width: 130, height: 130, loading: 'lazy', alt: link.title }}{%- endif -%}</span>
+                <span class="mnav__dept-name">{{ link.title | escape }}</span>
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+        <div class="mnav__promo">
+          <span class="mnav__promo-ico">{% render 'icon', name: 'truck' %}</span>
+          <div><strong>{{ 'products.free_shipping' | t }}</strong><span>{{ 'products.refund_reship' | t }}</span></div>
+        </div>
+        <p class="mnav__label">{{ 'header.help' | t }}</p>
+        <div class="mnav__quick">
+          {%- for link in menu.links -%}
+            {%- liquid
+              assign lt = link.title | downcase | strip
+              assign is_page = false
+              if link.type == 'page_link' or link.type == 'blog_link' or link.type == 'http_link' or link.type == 'policy_link'
+                assign is_page = true
+              endif
+              if link.links.size > 0 or link.type == 'frontpage_link'
+                assign is_page = false
+              endif
+              assign qi = 'chat'
+              if lt contains 'track'
+                assign qi = 'truck'
+              elsif lt contains 'faq' or lt contains 'help'
+                assign qi = 'help'
+              elsif lt contains 'review'
+                assign qi = 'star'
+              elsif lt contains 'why' or lt contains 'about'
+                assign qi = 'diamond'
+              elsif lt contains 'size'
+                assign qi = 'ruler'
+              elsif lt contains 'news' or lt contains 'blog' or lt contains 'journal'
+                assign qi = 'sparkle'
+              endif
+            -%}
+            {%- if is_page -%}<a class="mnav__tile" href="{{ link.url }}">{% render 'icon', name: qi %}<span>{{ link.title | escape }}</span></a>{%- endif -%}
+          {%- endfor -%}
+          {%- if contact_url != blank -%}<a class="mnav__tile" href="{{ contact_url }}">{% render 'icon', name: 'chat' %}<span>{{ section.settings.contact_label }}</span></a>{%- endif -%}
+        </div>
       {%- endif -%}
-      {%- if settings.support_phone != blank or settings.support_email != blank -%}
-        <p class="drawer__support">
-          Need help?
-          {% if settings.support_phone != blank %}<a href="tel:{{ settings.support_phone | remove: ' ' }}">{{ settings.support_phone }}</a>{% endif %}
-          {% if settings.support_email != blank %}<a href="mailto:{{ settings.support_email }}">{{ settings.support_email }}</a>{% endif %}
-        </p>
+    </div>
+    <div class="mnav__foot">
+      {%- if shop.customer_accounts_enabled -%}
+        <a class="mnav__acct" href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}">{% render 'icon', name: 'account', class: 'icon--sm' %} {% if customer %}{{ 'header.account' | t }}{% else %}{{ 'header.login' | t }}{% endif %}</a>
       {%- endif -%}
-      {% render 'social-links', class: 'social--drawer' %}
+      <button type="button" class="mnav__acct" data-drawer-open="WishlistDrawer" aria-controls="WishlistDrawer">{% render 'icon', name: 'heart', class: 'icon--sm' %} {{ 'header.wishlist' | t }}</button>
+      <div class="mnav__loc">{% render 'localization', id: 'MenuLocalization' %}</div>
+      {% render 'social-links' %}
     </div>
   </div>
-</menu-drawer>
+</div>
 
 {% schema %}
 {
   "name": "Header",
   "class": "section-header",
-  "max_blocks": 10,
   "settings": [
-    { "type": "checkbox", "id": "sticky", "label": "Stick header to top on scroll", "default": true },
-    { "type": "link_list", "id": "menu", "label": "Fallback menu", "default": "main-menu", "info": "Used only when no category blocks are added. Nested menu items become mega menu columns." },
-    { "type": "link_list", "id": "drawer_menu", "label": "Extra mobile menu links", "info": "Optional. Shown under the categories in the mobile drawer, e.g. Help, Track order." },
-    { "type": "paragraph", "content": "Logo, search placeholder and live suggestions are set in Theme settings." }
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu", "info": "Second-level items become column titles, third level the links." },
+    { "type": "checkbox", "id": "show_nav", "label": "Show menu row under the logo", "default": true, "info": "On phones the menu is always in the Menu button." },
+    { "type": "text", "id": "highlight_item", "label": "Gold menu item", "info": "Exact title of a menu item to show in gold, e.g. New in." },
+    { "type": "text", "id": "nav_hide", "label": "Leave out of the menu row", "info": "Comma-separated titles, e.g. Home, FAQs. They stay in the phone menu." },
+    { "type": "link_list", "id": "help_menu", "label": "Help dropdown menu" },
+    { "type": "text", "id": "popular_searches", "label": "Popular searches", "default": "Handbags, Sneakers, Hoodies, Fragrances, Watches, Jewellery", "info": "Comma-separated. Shown when someone clicks the search bar." },
+    { "type": "collection", "id": "search_collection", "label": "Products shown before typing" },
+    { "type": "text", "id": "help_label", "label": "Help dropdown name", "default": "Help" },
+    { "type": "text", "id": "pill_label", "label": "Gold button text", "default": "New in" },
+    { "type": "url", "id": "pill_link", "label": "Gold button link" },
+    { "type": "checkbox", "id": "overlay_home", "label": "Transparent over homepage hero", "default": false },
+    { "type": "checkbox", "id": "hide_on_scroll", "label": "Hide when scrolling down", "default": false },
+    { "type": "checkbox", "id": "show_localization", "label": "Show country selector", "default": true, "info": "Countries come from Settings > Markets." },
+    { "type": "text", "id": "contact_label", "label": "Contact link text", "default": "Help" },
+    { "type": "page", "id": "contact_page", "label": "Contact page", "info": "Used when no advisor WhatsApp number is set in Theme settings > Client services." },
+    { "type": "page", "id": "wishlist_page", "label": "Wishlist page", "info": "Create a page with the wishlist template, then pick it to show the heart icon." }
   ],
   "blocks": [
     {
       "type": "mega",
-      "name": "Category with mega menu",
+      "name": "Menu images",
       "settings": [
-        { "type": "text", "id": "title", "label": "Label", "default": "Category" },
-        { "type": "select", "id": "icon", "label": "Icon", "options": [{"value": "headphones", "label": "Headphones"}, {"value": "earbuds", "label": "Earbuds"}, {"value": "speaker", "label": "Speaker"}, {"value": "plug", "label": "Charger"}, {"value": "battery", "label": "Battery"}, {"value": "cable", "label": "Cable"}, {"value": "bolt", "label": "Power"}, {"value": "home-device", "label": "Smart home"}, {"value": "camera", "label": "Camera"}, {"value": "bulb", "label": "Smart lighting"}, {"value": "watch", "label": "Watch"}, {"value": "smartphone", "label": "Smartphone"}, {"value": "tablet", "label": "Tablet"}, {"value": "laptop", "label": "Laptop"}, {"value": "monitor", "label": "Monitor"}, {"value": "tv", "label": "TV"}, {"value": "gamepad", "label": "Gamepad"}, {"value": "keyboard", "label": "Keyboard"}, {"value": "case", "label": "Phone case"}, {"value": "drone", "label": "Drone"}, {"value": "router", "label": "Networking"}, {"value": "tag", "label": "Deals tag"}, {"value": "percent", "label": "Percent"}, {"value": "gift", "label": "Gift"}, {"value": "sparkle", "label": "New arrivals"}, {"value": "box", "label": "Bundle"}, {"value": "grid", "label": "All categories"}], "default": "headphones" },
-        { "type": "color", "id": "color", "label": "Category color", "info": "Tints the icon. Use the same color as this category in Product type colors." },
-        { "type": "url", "id": "link", "label": "Category page", "info": "Used for the Shop all link." },
-        { "type": "link_list", "id": "menu", "label": "Subcategory menu", "info": "Create a menu in Online Store > Navigation. Top-level items become column headings, their nested items become the links. A flat menu flows into columns. If left empty, a menu with the same name as this label is used, or the matching item's sub-links in the main menu." },
-        { "type": "header", "content": "Promo tile" },
-        { "type": "image_picker", "id": "promo_image", "label": "Image" },
-        { "type": "text", "id": "promo_heading", "label": "Heading" },
-        { "type": "text", "id": "promo_text", "label": "Text" },
-        { "type": "text", "id": "promo_link_label", "label": "Link label", "default": "Shop deals" },
-        { "type": "url", "id": "promo_link", "label": "Link" }
-      ]
-    },
-    {
-      "type": "link",
-      "name": "Single link",
-      "settings": [
-        { "type": "text", "id": "title", "label": "Label", "default": "Deals" },
-        { "type": "select", "id": "icon", "label": "Icon", "options": [{"value": "headphones", "label": "Headphones"}, {"value": "earbuds", "label": "Earbuds"}, {"value": "speaker", "label": "Speaker"}, {"value": "plug", "label": "Charger"}, {"value": "battery", "label": "Battery"}, {"value": "cable", "label": "Cable"}, {"value": "bolt", "label": "Power"}, {"value": "home-device", "label": "Smart home"}, {"value": "camera", "label": "Camera"}, {"value": "bulb", "label": "Smart lighting"}, {"value": "watch", "label": "Watch"}, {"value": "smartphone", "label": "Smartphone"}, {"value": "tablet", "label": "Tablet"}, {"value": "laptop", "label": "Laptop"}, {"value": "monitor", "label": "Monitor"}, {"value": "tv", "label": "TV"}, {"value": "gamepad", "label": "Gamepad"}, {"value": "keyboard", "label": "Keyboard"}, {"value": "case", "label": "Phone case"}, {"value": "drone", "label": "Drone"}, {"value": "router", "label": "Networking"}, {"value": "tag", "label": "Deals tag"}, {"value": "percent", "label": "Percent"}, {"value": "gift", "label": "Gift"}, {"value": "sparkle", "label": "New arrivals"}, {"value": "box", "label": "Bundle"}, {"value": "grid", "label": "All categories"}], "default": "percent" },
-        { "type": "color", "id": "color", "label": "Icon color" },
-        { "type": "url", "id": "link", "label": "Link" },
-        { "type": "checkbox", "id": "highlight", "label": "Highlight (use for Deals)", "default": false }
+        { "type": "text", "id": "menu_item", "label": "Menu item title", "info": "Exact title of the top-level item, e.g. Watches." },
+        { "type": "image_picker", "id": "image_1", "label": "Image 1" },
+        { "type": "text", "id": "title_1", "label": "Title 1" },
+        { "type": "url", "id": "link_1", "label": "Link 1" },
+        { "type": "image_picker", "id": "image_2", "label": "Image 2" },
+        { "type": "text", "id": "title_2", "label": "Title 2" },
+        { "type": "url", "id": "link_2", "label": "Link 2" }
       ]
     }
   ]
 }
 {% endschema %}
+

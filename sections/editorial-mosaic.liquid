@@ -1,0 +1,72 @@
+{%- assign s = section.settings -%}
+<section class="section">
+  <div class="container">
+    {%- if s.heading != blank -%}
+      <div class="section-head">
+        <div class="section-head__text">
+          {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+          <h2 class="h2" data-split>{{ s.heading | newline_to_br }}</h2>
+        </div>
+      </div>
+    {%- endif -%}
+    <div class="mosaic">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign img = b.image
+          if img == blank and b.collection != blank
+            assign img = b.collection.featured_image
+          endif
+          assign url = b.link | default: b.collection.url | default: routes.collections_url
+          assign title = b.title | default: b.collection.title
+        -%}
+        <a class="mosaic__tile" href="{{ url }}" {{ block.shopify_attributes }}>
+          <div class="media mosaic__media zoom-hover" data-reveal="mask">
+            <div data-parallax style="position: absolute; inset: -6% 0; --parallax: 30px">{% render 'image', image: img, sizes: '(min-width: 750px) 55vw, 100vw', alt: title %}</div>
+          </div>
+          <div class="mosaic__caption" data-reveal>
+            <span class="mosaic__title">{{ title }}</span>
+            <span class="link">{{ b.cta | default: 'Discover' }}</span>
+          </div>
+          {%- if b.text != blank -%}<p class="muted" data-reveal style="max-width: 460px">{{ b.text }}</p>{%- endif -%}
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Editorial mosaic",
+  "class": "section-mosaic",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "The edit" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Dressed for\n<em>every</em> occasion" }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "text", "id": "text", "label": "Short text" },
+        { "type": "text", "id": "cta", "label": "Link text", "default": "Discover" },
+        { "type": "url", "id": "link", "label": "Link (optional)" }
+      ]
+    }
+  ],
+  "max_blocks": 9,
+  "presets": [
+    {
+      "name": "Editorial mosaic",
+      "blocks": [
+        { "type": "tile", "settings": { "title": "Ready-to-wear" } },
+        { "type": "tile", "settings": { "title": "Leather goods" } },
+        { "type": "tile", "settings": { "title": "Fine jewellery" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

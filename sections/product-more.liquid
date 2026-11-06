@@ -1,0 +1,52 @@
+{%- comment -%} More products from the same collection as the product being viewed. {%- endcomment -%}
+{%- liquid
+  assign c = nil
+  for col in product.collections
+    if col.handle != 'shop-all' and col.handle != 'all' and col.handle != 'new-arrivals' and col.products_count > 1
+      assign c = col
+      break
+    endif
+  endfor
+  if c == nil
+    assign c = product.collections.first
+  endif
+-%}
+{%- if c != nil and c.products_count > 1 -%}
+<section class="section section--tight section-products" data-product-more>
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">{{ section.settings.eyebrow }}</span>
+        <h2 class="h2">{{ 'products.more_from' | t: title: c.title }}</h2>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center">
+        <a class="pill-link" href="{{ c.url }}">{{ 'sections.view_all' | t: title: c.title }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>
+        <div class="rail__controls"><button type="button" class="rail__btn" data-rail-prev aria-label="{{ 'general.previous' | t }}">{% render 'icon', name: 'arrow-left', class: 'icon--sm' %}</button><button type="button" class="rail__btn" data-rail-next aria-label="{{ 'general.next' | t }}">{% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</button></div>
+      </div>
+    </div>
+    <div class="rail" data-rail>
+      <div class="rail__track">
+        {%- assign n = 0 -%}
+        {%- for p in c.products limit: 30 -%}
+          {%- if p.id == product.id or p.available == false -%}{%- continue -%}{%- endif -%}
+          {% render 'product-card', product: p, reveal: false %}
+          {%- assign n = n | plus: 1 -%}{%- if n >= section.settings.limit -%}{%- break -%}{%- endif -%}
+        {%- endfor -%}
+      </div>
+      <div class="rail__progress" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "More from collection",
+  "class": "section-more",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Keep browsing" },
+    { "type": "range", "id": "limit", "label": "Products", "min": 4, "max": 16, "step": 1, "default": 12 }
+  ],
+  "presets": [{ "name": "More from collection" }]
+}
+{% endschema %}

@@ -1,0 +1,91 @@
+{%- assign s = section.settings -%}
+<section class="section{% if s.subtle %} section--subtle{% endif %}">
+  <div class="container">
+    {%- if s.heading != blank -%}
+      <div class="section-head">
+        <div class="section-head__text">
+          {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+          <h2 class="h2" data-split>{{ s.heading | newline_to_br }}</h2>
+          {%- if s.text != blank -%}<p data-reveal>{{ s.text }}</p>{%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+    <div class="lookbook" data-lookbook>
+      <div class="lookbook__media" data-reveal="mask">
+        <div class="lookbook__img" data-parallax style="--parallax: 30px">
+          {% render 'image', image: s.image, sizes: '(min-width: 990px) 60vw, 100vw', label: 'Lookbook photo' %}
+        </div>
+        {%- for block in section.blocks -%}
+          {%- assign p = block.settings.product -%}
+          <div class="hotspot" style="--x: {{ block.settings.x }}%; --y: {{ block.settings.y }}%" {{ block.shopify_attributes }}>
+            <button type="button" class="hotspot__dot" aria-pressed="false" aria-label="{{ 'sections.hotspot' | t: n: forloop.index, title: p.title | escape }}"></button>
+          </div>
+        {%- endfor -%}
+      </div>
+      <div>
+        <ol class="lookbook__list" role="list" data-stagger>
+          {%- for block in section.blocks -%}
+            {%- assign p = block.settings.product -%}
+            <li class="look-item">
+              <a class="media look-item__media" href="{{ p.url | default: '#' }}" tabindex="-1" aria-hidden="true">
+                {%- if p.featured_media -%}{{ p.featured_media.preview_image | image_url: width: 240 | image_tag: loading: 'lazy', alt: p.title }}{%- else -%}{% render 'placeholder' %}{%- endif -%}
+              </a>
+              <div>
+                <span class="look-item__num">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+                {%- if p.vendor != blank -%}<span class="card__vendor" style="display: block">{{ p.vendor }}</span>{%- endif -%}
+                <a class="card__title" href="{{ p.url | default: '#' }}" style="display: block">{{ p.title | default: 'Pick a product' }}</a>
+                {%- if p != blank -%}{% render 'price', product: p, show_from: true %}{%- endif -%}
+              </div>
+              {%- if p != blank and p.available -%}
+                {%- if p.has_only_default_variant -%}
+                  <button type="button" class="rail__btn" data-add-variant="{{ p.selected_or_first_available_variant.id }}" aria-label="{{ 'products.add_title' | t: title: p.title | escape }}">{% render 'icon', name: 'plus', class: 'icon--sm' %}</button>
+                {%- else -%}
+                  <button type="button" class="rail__btn" data-quick-view="{{ p.url }}" aria-label="{{ 'products.quick_view' | t }}: {{ p.title | escape }}">{% render 'icon', name: 'plus', class: 'icon--sm' %}</button>
+                {%- endif -%}
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ol>
+        {%- if s.button != blank -%}<p style="margin-top: 32px"><a class="btn" href="{{ s.link | default: routes.all_products_collection_url }}">{{ s.button }}</a></p>{%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Shop the look",
+  "class": "section-lookbook",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Shop the look" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Styled together" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Tap a point on the photo to see the piece." },
+    { "type": "image_picker", "id": "image", "label": "Photo", "info": "Landscape works best, 2000 x 1500 px." },
+    { "type": "text", "id": "button", "label": "Button" },
+    { "type": "url", "id": "link", "label": "Button link" },
+    { "type": "checkbox", "id": "subtle", "label": "Soft background", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product point",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "range", "id": "x", "label": "Across", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 40 },
+        { "type": "range", "id": "y", "label": "Down", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Shop the look",
+      "blocks": [
+        { "type": "product", "settings": { "x": 30, "y": 40 } },
+        { "type": "product", "settings": { "x": 62, "y": 58 } },
+        { "type": "product", "settings": { "x": 78, "y": 30 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,84 @@
+{%- comment -%}
+  Current offers in one calm band. Every figure comes from Theme settings (Cart > Buy more, save more;
+  Welcome offer), so the band only ever shows offers that really apply at checkout.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign c1 = settings.qty_1_count | default: 0
+  assign c2 = settings.qty_2_count | default: 0
+  assign has_welcome = false
+  if settings.welcome_offer != blank and settings.welcome_code != blank or settings.welcome_personal
+    assign has_welcome = true
+  endif
+-%}
+<section class="section section--tight offers-band">
+  <div class="container">
+    <div class="offers tile--noir">
+      <div class="offers__head">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow offers__eyebrow">{{ s.eyebrow }}</span>{%- endif -%}
+        <h2 class="offers__title">{{ s.heading }}</h2>
+        {%- if s.text != blank -%}<p class="offers__text">{{ s.text }}</p>{%- endif -%}
+      </div>
+      <ul class="offers__list" role="list">
+        {%- if c1 > 1 -%}
+          <li class="offer-item">
+            <span class="offer-item__when">{{ 'sections.offers_qty' | t: count: c1 }}</span>
+            <span class="offer-item__fig">{{ settings.qty_1_percent }}% <small>{{ 'sections.offers_off' | t }}</small></span>
+            <span class="offer-item__note">{{ 'sections.offers_auto' | t: count: c1 }}</span>
+          </li>
+          {%- if c2 > c1 -%}
+            <li class="offer-item">
+              <span class="offer-item__when">{{ 'sections.offers_qty_plus' | t: count: c2 }}</span>
+              <span class="offer-item__fig">{{ settings.qty_2_percent }}% <small>{{ 'sections.offers_off' | t }}</small></span>
+              <span class="offer-item__note">{{ 'sections.offers_mix' | t }}</span>
+            </li>
+          {%- endif -%}
+        {%- endif -%}
+        {%- comment -%} Spend and save (Theme settings > Cart > Spend and save; match the automatic discounts). {%- endcomment -%}
+        {%- assign t1 = settings.tier_1_spend | default: 0 -%}{%- assign t2 = settings.tier_2_spend | default: 0 -%}
+        {%- if t1 > 0 -%}
+          <li class="offer-item">
+            <span class="offer-item__when">Spend {{ t1 | times: 100 | money_without_trailing_zeros }}+</span>
+            <span class="offer-item__fig">{{ settings.tier_1_percent }}% <small>{{ 'sections.offers_off' | t }}</small></span>
+            <span class="offer-item__note">Taken off at checkout</span>
+          </li>
+          {%- if t2 > t1 -%}
+            <li class="offer-item">
+              <span class="offer-item__when">Spend {{ t2 | times: 100 | money_without_trailing_zeros }}+</span>
+              <span class="offer-item__fig">{{ settings.tier_2_percent }}% <small>{{ 'sections.offers_off' | t }}</small></span>
+              <span class="offer-item__note">Taken off at checkout</span>
+            </li>
+          {%- endif -%}
+        {%- endif -%}
+        {%- if has_welcome -%}
+          <li class="offer-item">
+            <span class="offer-item__when">{{ 'sections.offers_first' | t }}</span>
+            <span class="offer-item__fig">10% <small>{{ 'sections.offers_off' | t }}</small></span>
+            <button type="button" class="offer-item__link" data-open-popup>{{ 'sections.offers_join' | t }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</button>
+          </li>
+        {%- endif -%}
+        <li class="offer-item">
+          <span class="offer-item__when">{{ 'sections.offers_ship' | t }}</span>
+          <span class="offer-item__fig">{{ 'sections.offers_free' | t }}</span>
+          <span class="offer-item__note">{{ 'sections.offers_ship_note' | t }}</span>
+        </li>
+      </ul>
+      {%- if s.button != blank -%}<a class="btn btn--gold btn--sm offers__cta" href="{{ s.link | default: routes.all_products_collection_url }}">{{ s.button }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Offers",
+  "settings": [
+    { "type": "paragraph", "content": "Figures come from Theme settings: Cart > Buy more, save more, and Welcome offer." },
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Offers" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Buy more, save more" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Bundle savings come off automatically at checkout. No code needed." },
+    { "type": "text", "id": "button", "label": "Button", "default": "Shop all" },
+    { "type": "url", "id": "link", "label": "Button link" }
+  ],
+  "presets": [{ "name": "Offers" }]
+}
+{% endschema %}
