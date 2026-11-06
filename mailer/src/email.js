@@ -4,7 +4,7 @@ import { esc, money, now, hmacHex, DAY, sendingReady } from './util.js';
 const GOLD = '#F4C430';
 const GOLD_TEXT = '#1E4FA8';
 const VIOLET = GOLD_TEXT;
-const INK = '#2E1460';
+const INK = '#0B1F4D';
 const BRAND = '#1E4FA8'; // luxury blue: header and footer
 const MUTED = '#5B6474';
 
@@ -24,7 +24,7 @@ export const TONES = {
   burgundy:  { a: '#C0263F', ai: '#FFFFFF', at: '#C0263F', soft: '#FDEDEF', line: '#F6D2D8', page: '#F4F6FA', deep: '#C0263F', deep2: '#FF6B7A', glow: '#FFFFFF', fg: '#FFFFFF', fgs: 'rgba(255,255,255,0.85)' },
   onyx:      { a: '#14306E', ai: '#FFD966', at: '#14306E', soft: '#EEF2FA', line: '#D3DCEE', page: '#F4F6FA', deep: '#14306E', deep2: '#2B63C9', glow: '#FFD966', fg: '#FFFFFF', fgs: 'rgba(255,255,255,0.82)' },
   champagne: { a: '#2F80ED', ai: '#FFFFFF', at: '#1F6AD1', soft: '#EDF5FF', line: '#CFE2FB', page: '#F4F6FA', deep: '#2F80ED', deep2: '#8EC5FF', glow: '#FFFFFF', fg: '#FFFFFF', fgs: 'rgba(255,255,255,0.88)' },
-  plum:      { a: '#6A3FD8', ai: '#FFFFFF', at: '#5B33C4', soft: '#F2EEFD', line: '#DED4FA', page: '#F4F6FA', deep: '#6A3FD8', deep2: '#A98BFF', glow: '#FFFFFF', fg: '#FFFFFF', fgs: 'rgba(255,255,255,0.85)' },
+  plum:      { a: '#3B86DC', ai: '#FFFFFF', at: '#2F77C8', soft: '#EEF5FD', line: '#D3E6FB', page: '#F4F6FA', deep: '#3B86DC', deep2: '#8BC2FF', glow: '#FFFFFF', fg: '#FFFFFF', fgs: 'rgba(255,255,255,0.85)' },
 };
 const FLOW_TONES = {
   welcome1: 'gold', welcome2: 'rose', welcome3: 'burgundy', checkout1: 'onyx', checkout2: 'sapphire', cart1: 'emerald', cart2: 'plum',
@@ -183,7 +183,7 @@ function letterLayout(env, { preheader, body, unsubUrl, reason }) {
 <body style="margin:0;padding:0;background:#FFFFFF;font-family:Arial,Helvetica,sans-serif;color:${INK};">
 <div style="display:none;max-height:0;overflow:hidden;">${esc(preheader || '')}</div>
 <div style="max-width:560px;margin:0 auto;padding:24px 20px;font-size:16px;line-height:1.6;">
-<a href="${env.STORE_URL}" style="display:block;margin:0 0 20px;text-decoration:none;border-bottom:1px solid #E3E8EF;"><img src="${env.PUBLIC_URL}/brand/header.png" width="300" height="50" alt="${esc(env.BRAND)}" style="display:block;width:300px;max-width:100%;height:auto;margin:0 auto;border:0;color:#8048F5;font-size:20px;font-weight:900;font-style:italic;"></a>${body}
+<a href="${env.STORE_URL}" style="display:block;margin:0 0 20px;text-decoration:none;border-bottom:1px solid #E3E8EF;"><img src="${env.PUBLIC_URL}/brand/header.png" width="300" height="50" alt="${esc(env.BRAND)}" style="display:block;width:300px;max-width:100%;height:auto;margin:0 auto;border:0;color:#0066FF;font-size:20px;font-weight:900;font-style:italic;"></a>${body}
 <p style="margin:32px 0 0;font-size:12px;line-height:1.5;color:${MUTED};">${esc(reason || `You're getting this because you signed up for ${env.BRAND} emails.`)} <a href="${esc(unsubUrl)}" style="color:${MUTED};">Unsubscribe</a></p>
 </div></body></html>`;
 }
@@ -200,7 +200,7 @@ export function letterStories(articles) {
 
 /** A plain underlined link on its own line, in place of a button. */
 export function letterLink(label, url) {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:4px 0 24px;"><tr><td style="border-radius:10px;background:#8048F5;"><a href="${esc(url)}" style="display:inline-block;padding:13px 26px;font-size:15px;font-weight:bold;color:#FFFFFF;text-decoration:none;border-radius:10px;">${esc(label)}</a></td></tr></table>`;
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:4px 0 24px;"><tr><td style="border-radius:10px;background:#0066FF;"><a href="${esc(url)}" style="display:inline-block;padding:13px 26px;font-size:15px;font-weight:bold;color:#FFFFFF;text-decoration:none;border-radius:10px;">${esc(label)}</a></td></tr></table>`;
 }
 
 
@@ -229,7 +229,7 @@ export function layout(env, { preheader, banner, bannerAlt, body, unsubUrl, reas
 .gap{width:8px!important}.pbody{padding:12px 10px 14px!important}.ptitle{font-size:13px!important;line-height:17px!important;height:34px!important}
 }</style></head>
 <body style="margin:0;padding:0;background:%%PAGE%%;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:${INK};">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${esc(preheader || '')}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${esc(preheader || '')}&#8199;&#42528A;&#8199;&#42528A;&#8199;&#42528A;&#8199;&#42528A;&#8199;&#42528A;&#8199;&#42528A;</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:%%PAGE%%;"><tr><td class="outer" align="center" style="padding:24px 12px;">
 <table role="presentation" class="wrap card" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;border-radius:22px;overflow:hidden;background:#FFFFFF;">
 <tr><td style="padding:0;background:#FFFFFF;border-bottom:1px solid #E3E8EF;"><a href="${env.STORE_URL}" style="display:block;text-decoration:none;"><img src="${env.PUBLIC_URL}/brand/header.png" width="600" height="100" alt="${esc(env.BRAND)}" style="display:block;width:100%;max-width:600px;height:auto;border:0;background:#FFFFFF;color:#B8892E;font-size:22px;font-weight:900;font-style:italic;text-align:center;"></a></td></tr>

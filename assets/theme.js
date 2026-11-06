@@ -1030,7 +1030,7 @@
       var swap = function () { if (dark) root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme'); };
       if (doc.startViewTransition && !reduceMotion) doc.startViewTransition(swap); else swap();
       storeSet('luxe:theme', dark ? 'dark' : 'light');
-      var m = doc.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', dark ? '#1A0A3A' : '#ffffff');
+      var m = doc.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', dark ? '#09203B' : '#ffffff');
       sync();
     });
     sync();

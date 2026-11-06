@@ -3,7 +3,22 @@
 {%- assign mins = words | divided_by: 200 | at_least: 1 -%}
 <article class="post-card{% if featured %} post-card--featured{% endif %}">
   <a class="post-card__media" href="{{ article.url }}" tabindex="-1" aria-hidden="true">
-    {%- if article.image -%}{{ article.image | image_url: width: 1200 | image_tag: widths: '400, 600, 800, 1000, 1200', sizes: '(min-width: 990px) 40vw, 100vw', loading: 'lazy', alt: article.title }}{%- else -%}<img src="{{ 'lx-diamond.svg' | asset_url }}" alt="" width="600" height="600" loading="lazy" class="post-card__ill">{%- endif -%}
+    {%- if article.image -%}{{ article.image | image_url: width: 1200 | image_tag: widths: '400, 600, 800, 1000, 1200', sizes: '(min-width: 990px) 40vw, 100vw', loading: 'lazy', alt: article.title }}{%- else -%}
+      {%- liquid
+        assign t = article.title | append: ' ' | append: article.tags | downcase
+        assign ill = 'ill-guides'
+        if t contains 'tracker' or t contains 'keys'
+          assign ill = 'ill-blog-tracker'
+        elsif t contains 'hair' or t contains 'straighten'
+          assign ill = 'ill-blog-haircare'
+        elsif t contains 'espresso' or t contains 'coffee'
+          assign ill = 'ill-blog-espresso'
+        elsif t contains 'charg' or t contains 'battery'
+          assign ill = 'ill-blog-charger'
+        elsif t contains 'earbud' or t contains 'audio' or t contains 'headphone'
+          assign ill = 'ill-blog-earbuds'
+        endif
+      -%}<img src="{{ ill | append: '.svg' | asset_url }}" alt="" width="600" height="600" loading="lazy" class="post-card__ill">{%- endif -%}
   </a>
   <div class="post-card__body">
     <div class="post-card__meta">

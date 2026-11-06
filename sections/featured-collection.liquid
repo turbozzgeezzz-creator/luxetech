@@ -2,7 +2,8 @@
   assign tabs = section.blocks
   assign limit = section.settings.limit
   assign uid = 'fc-' | append: section.id
-  assign fetch = limit | plus: 4
+  # Spare cards replace products already shown higher up the page (small catalogue: render plenty).
+  assign fetch = limit | plus: 16
   assign show = true
   if tabs.size > 0 and request.design_mode == false
     assign c0 = tabs.first.settings.collection

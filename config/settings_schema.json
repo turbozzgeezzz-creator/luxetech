@@ -48,46 +48,46 @@
         "id": "color_subtle",
         "label": "Soft panels",
         "info": "Image backgrounds and quiet bands.",
-        "default": "#F6F1FF"
+        "default": "#F2F7FF"
       },
       {
         "type": "color",
         "id": "color_ink",
         "label": "Text and dark buttons",
-        "default": "#2E1460"
+        "default": "#0B1F4D"
       },
       {
         "type": "color",
         "id": "color_muted",
         "label": "Secondary text",
-        "default": "#6B5E8C"
+        "default": "#5A6B8C"
       },
       {
         "type": "color",
         "id": "color_border",
         "label": "Lines and borders",
-        "default": "#ECE4FB"
+        "default": "#E3ECFA"
       },
       {
         "type": "color",
         "id": "color_gold",
         "label": "Gold",
         "info": "Taken from the logo. Used for accents, sale prices and highlights.",
-        "default": "#D9C4FF"
+        "default": "#CFE4FF"
       },
       {
         "type": "color",
         "id": "color_gold_text",
         "label": "Gold text",
         "info": "A deeper gold that stays readable on white.",
-        "default": "#8048F5"
+        "default": "#0066FF"
       },
       {
         "type": "color",
         "id": "color_sapphire",
         "label": "Sapphire",
         "info": "The diamond blue. Used sparingly: focus rings and New badges.",
-        "default": "#7A3FF0"
+        "default": "#3B8FF4"
       },
       {
         "type": "color",
