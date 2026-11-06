@@ -112,7 +112,7 @@
                       </span>
                     </div>
                   </div>
-                  <p class="price-range__note">Highest price is {{ filter.range_max | money }}</p>
+                  <p class="price-range__note">Highest price is {{ filter.range_max | money_with_currency | replace: '.00 ', ' ' }}</p>
                 {%- else -%}
                   {%- liquid
                     assign is_swatch = false

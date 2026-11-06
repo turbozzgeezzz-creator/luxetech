@@ -19,7 +19,7 @@
       <label class="qty-break">
         <input type="radio" name="qty-break" value="1" data-qty-break checked>
         <span class="qty-break__qty">1 item</span>
-        <span class="qty-break__price">{{ unit | money }}</span>
+        <span class="qty-break__price">{{ unit | money_with_currency | replace: '.00 ', ' ' }}</span>
         <span class="qty-break__save">Standard price</span>
       </label>
       {%- assign full1 = unit | times: t1q -%}
@@ -27,7 +27,7 @@
       <label class="qty-break">
         <input type="radio" name="qty-break" value="{{ t1q }}" data-qty-break>
         <span class="qty-break__qty">Buy {{ t1q }}</span>
-        <span class="qty-break__price">{{ full1 | minus: off1 | money }} <s>{{ full1 | money }}</s></span>
+        <span class="qty-break__price">{{ full1 | minus: off1 | money_with_currency | replace: '.00 ', ' ' }} <s>{{ full1 | money_with_currency | replace: '.00 ', ' ' }}</s></span>
         <span class="qty-break__save">Save {{ t1p }}%</span>
       </label>
       {%- if t2p > 0 and t2q > t1q -%}
@@ -37,7 +37,7 @@
           <input type="radio" name="qty-break" value="{{ t2q }}" data-qty-break>
           <span class="qty-break__badge">Best value</span>
           <span class="qty-break__qty">Buy {{ t2q }}+</span>
-          <span class="qty-break__price">{{ full2 | minus: off2 | money }} <s>{{ full2 | money }}</s></span>
+          <span class="qty-break__price">{{ full2 | minus: off2 | money_with_currency | replace: '.00 ', ' ' }} <s>{{ full2 | money_with_currency | replace: '.00 ', ' ' }}</s></span>
           <span class="qty-break__save">Save {{ t2p }}%</span>
         </label>
       {%- endif -%}

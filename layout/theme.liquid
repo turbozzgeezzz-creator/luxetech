@@ -2,6 +2,15 @@
 <html class="no-js" lang="{{ request.locale.iso_code }}">
   <head>
     <meta charset="utf-8">
+    {%- comment -%}
+      Security: browsers only run scripts from the sources below, so injected code can't load a script from anywhere
+      else (LuxeDealers had this happen through a compromised app). Off in the theme editor.
+      If a new app stops working, add its script domain here.
+    {%- endcomment -%}
+    {%- unless request.design_mode -%}
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.shopify.com https://*.shopify.com https://*.shopifycloud.com https://*.shopifycdn.com https://shop.app https://*.shop.app https://connect.facebook.net https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://*.hcaptcha.com https://hcaptcha.com https://*.judge.me https://luxemail-tech.turbozzgeezzz.workers.dev; object-src 'none'; base-uri 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    {%- endunless -%}
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="{{ settings.color_ink }}">
@@ -49,12 +58,28 @@
       {{ seo_title }}
       {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
       {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-      {%- unless seo_title contains seo_brand or seo_title contains shop.name %} &ndash; {{ seo_brand }}{% endunless -%}
+      {%- comment -%} Brand suffix only when the title still fits in search results (about 60 characters). {%- endcomment -%}
+      {%- unless seo_title contains seo_brand or seo_title contains shop.name or seo_title.size > 42 %} &ndash; {{ seo_brand }}{% endunless -%}
     </title>
     <meta name="description" content="{{ seo_desc | escape }}">
-    {%- if template.suffix == 'wishlist' or request.page_type == 'search' or request.page_type == 'cart' -%}
-      <meta name="robots" content="noindex, follow">
-    {%- endif -%}
+    {%- liquid
+      assign noindex = false
+      if template.suffix == 'wishlist' or request.page_type == 'search' or request.page_type == 'cart' or request.page_type == 'customers/account' or request.page_type == 'customers/order'
+        assign noindex = true
+      endif
+      # Filtered or re-sorted collection pages are near-duplicates of the main page: keep them out of Google.
+      if request.page_type == 'collection'
+        if collection.sort_by != blank and collection.sort_by != collection.default_sort_by
+          assign noindex = true
+        endif
+        for f in collection.filters
+          if f.active_values.size > 0 or f.min_value.value != nil or f.max_value.value != nil
+            assign noindex = true
+          endif
+        endfor
+      endif
+    -%}
+    {%- if noindex -%}<meta name="robots" content="noindex, follow">{%- endif -%}
 
     {% render 'meta-tags', seo_title: seo_title, seo_desc: seo_desc, seo_brand: seo_brand %}
     {% render 'structured-data' %}
@@ -89,7 +114,8 @@
         },
         cartType: {{ settings.cart_type | json }},
         mail: {{ settings.luxemail_endpoint | json }} ? { endpoint: {{ settings.luxemail_endpoint | json }}{% if customer and customer.accepts_marketing %}, email: {{ customer.email | json }}, firstName: {{ customer.first_name | json }}{% endif %} } : null,
-        moneyFormat: {{ shop.money_format | json }}
+        moneyFormat: {{ shop.money_format | json }},
+        currency: {{ cart.currency.iso_code | json }}
       };
     </script>
     <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>

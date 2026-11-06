@@ -9,7 +9,7 @@
   <div class="card__body">
     <p class="card__label">Brand</p>
     <h3 class="card__title">Your product title</h3>
-    <div class="price"><span class="price__current">{{ 19900 | money }}</span></div>
+    <div class="price"><span class="price__current">{{ 19900 | money_with_currency | replace: '.00 ', ' ' }}</span></div>
     <p class="card__sku">Pick a collection in the theme editor</p>
   </div>
 </article>

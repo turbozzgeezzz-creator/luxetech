@@ -31,15 +31,15 @@
   <span class="price__current">
     <span class="visually-hidden">{% if on_sale %}Sale price{% else %}Price{% endif %}</span>
     {%- if show_from -%}<span class="price__from">From </span>{%- endif -%}
-    {{- price | money -}}
+    {{- price | money_with_currency | replace: '.00 ', ' ' -}}
   </span>
   {%- if on_sale -%}
-    <s class="price__compare"><span class="visually-hidden">Regular price</span>{{ compare | money }}</s>
+    <s class="price__compare"><span class="visually-hidden">Regular price</span>{{ compare | money_with_currency | replace: '.00 ', ' ' }}</s>
     <span class="price__save">Save {{ save_pct }}%</span>
   {%- endif -%}
   {%- if target.unit_price_measurement -%}
     <span class="price__unit">
-      {{- target.unit_price | money }}/
+      {{- target.unit_price | money_with_currency | replace: '.00 ', ' ' }}/
       {%- if target.unit_price_measurement.reference_value != 1 -%}{{ target.unit_price_measurement.reference_value }}{%- endif -%}
       {{- target.unit_price_measurement.reference_unit -}}
     </span>

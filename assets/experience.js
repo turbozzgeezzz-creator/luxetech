@@ -45,7 +45,7 @@
         case 'amount_no_decimals_with_comma_separator': return withDelims(value, 0, '.', ',');
         default: return withDelims(value, 2, ',', '.');
       }
-    });
+    }).replace(/([.,])00(?!\d)/, '') + (config.currency && format.indexOf(config.currency) < 0 ? ' ' + config.currency : '');
   }
   function imageUrl(src, width) {
     if (!src) return '';
@@ -680,4 +680,37 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+})();
+
+/* Free shipping bar and cart shipping line for shoppers paying in another currency: the threshold and fee are set
+   in the store's currency, so convert them with the rate Shopify uses on this page. Runs again whenever the cart
+   drawer or cart page is re-rendered. */
+(function () {
+  function init(root) {
+    var rate = parseFloat((window.Shopify && Shopify.currency && Shopify.currency.rate) || 0);
+    if (!rate || !root.querySelectorAll) return;
+    var fmt = function (cur, cents) {
+      return new Intl.NumberFormat(document.documentElement.lang || undefined, { style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol' }).format(cents / 100).replace(/[.,]00$/, '');
+    };
+    root.querySelectorAll('[data-ship-bar]').forEach(function (bar) {
+      var limit = Math.round(parseInt(bar.dataset.threshold, 10) * rate), total = parseInt(bar.dataset.total, 10) || 0, left = limit - total;
+      if (left <= 0) { bar.hidden = true; return; } // qualifies: the shipping line says Free
+      bar.querySelector('[data-ship-left]').textContent = fmt(bar.dataset.currency, left);
+      bar.querySelector('.ship-bar__fill').style.width = Math.floor(total * 100 / limit) + '%';
+      bar.hidden = false;
+    });
+    root.querySelectorAll('[data-ship-cost]').forEach(function (el) {
+      var limit = Math.round(parseInt(el.dataset.threshold, 10) * rate), fee = Math.round(parseInt(el.dataset.fee, 10) * rate);
+      var free = (parseInt(el.dataset.total, 10) || 0) >= limit;
+      el.textContent = free ? 'Free' : fmt(el.dataset.currency, fee);
+      el.className = free ? 'cart-summary__free' : '';
+    });
+  }
+  init(document);
+  if (!window.MutationObserver) return;
+  new MutationObserver(function (list) {
+    list.forEach(function (m) {
+      m.addedNodes.forEach(function (n) { if (n.nodeType === 1 && (n.matches('[data-ship-bar],[data-ship-cost]') || n.querySelector('[data-ship-bar],[data-ship-cost]'))) init(n.parentNode || n); });
+    });
+  }).observe(document.body, { childList: true, subtree: true });
 })();

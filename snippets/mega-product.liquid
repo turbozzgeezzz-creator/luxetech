@@ -9,5 +9,5 @@
   </span>
   {%- if label != blank -%}<span class="mega-product__label">{{ label | escape }}</span>{%- endif -%}
   <span class="mega-product__name">{% render 'product-short-title', product: p, words: 6 %}</span>
-  <span class="mega-product__price">{% if p.price_varies %}<small>From </small>{% endif %}{{ p.price_min | money }}</span>
+  <span class="mega-product__price">{% if p.price_varies %}<small>From </small>{% endif %}{{ p.price_min | money_with_currency | replace: '.00 ', ' ' }}</span>
 </a>

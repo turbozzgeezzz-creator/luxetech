@@ -31,7 +31,7 @@
             <li>
               <a href="{{ filter.url_to_remove }}" class="chip chip--removable" data-facet-link>
                 <span>
-                  {{- filter.min_value.value | default: 0 | money }} to {{ filter.max_value.value | default: filter.range_max | money -}}
+                  {{- filter.min_value.value | default: 0 | money_with_currency | replace: '.00 ', ' ' }} to {{ filter.max_value.value | default: filter.range_max | money_with_currency | replace: '.00 ', ' ' -}}
                 </span>
                 {% render 'icon', name: 'close', class: 'icon--xs' %}
                 <span class="visually-hidden">Remove filter</span>

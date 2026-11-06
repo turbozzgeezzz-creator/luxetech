@@ -27,7 +27,7 @@
     {%- endif -%}
     {%- if item.sku != blank -%}<p class="card__sku">SKU {{ item.sku | escape }}</p>{%- endif -%}
     {%- for discount in item.line_level_discount_allocations -%}
-      <p class="cart-line__discount">{% render 'icon', name: 'tag', class: 'icon--xs' %} {{ discount.discount_application.title | escape }} (-{{ discount.amount | money }})</p>
+      <p class="cart-line__discount">{% render 'icon', name: 'tag', class: 'icon--xs' %} {{ discount.discount_application.title | escape }} (-{{ discount.amount | money_with_currency | replace: '.00 ', ' ' }})</p>
     {%- endfor -%}
 
     <div class="cart-line__controls">
@@ -54,9 +54,9 @@
   </div>
   <div class="cart-line__price">
     {%- if item.original_line_price > item.final_line_price -%}
-      <s class="price__compare"><span class="visually-hidden">Regular price</span>{{ item.original_line_price | money }}</s>
+      <s class="price__compare"><span class="visually-hidden">Regular price</span>{{ item.original_line_price | money_with_currency | replace: '.00 ', ' ' }}</s>
     {%- endif -%}
-    <span class="cart-line__total">{{ item.final_line_price | money }}</span>
-    {%- if item.quantity > 1 -%}<span class="cart-line__each">{{ item.final_price | money }} each</span>{%- endif -%}
+    <span class="cart-line__total">{{ item.final_line_price | money_with_currency | replace: '.00 ', ' ' }}</span>
+    {%- if item.quantity > 1 -%}<span class="cart-line__each">{{ item.final_price | money_with_currency | replace: '.00 ', ' ' }} each</span>{%- endif -%}
   </div>
 </li>

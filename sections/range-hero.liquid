@@ -100,7 +100,7 @@
               </span>
               <span class="range-sheet__price">
                 {%- if product.price_varies -%}<small>from </small>{%- endif -%}
-                {{- product.price_min | money -}}
+                {{- product.price_min | money_with_currency | replace: '.00 ', ' ' -}}
               </span>
               {%- capture stock_html -%}{% render 'stock-status', variant: v, compact: true %}{%- endcapture -%}
               <span class="range-sheet__stock">{{ stock_html }}</span>

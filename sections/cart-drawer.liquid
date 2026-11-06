@@ -21,13 +21,14 @@
         </div>
         <div class="drawer__foot cart-summary">
           {%- for discount in cart.cart_level_discount_applications -%}
-            <p class="cart-summary__row cart-summary__row--discount"><span>{{ discount.title | escape }}</span><span>-{{ discount.total_allocated_amount | money }}</span></p>
+            <p class="cart-summary__row cart-summary__row--discount"><span>{{ discount.title | escape }}</span><span>-{{ discount.total_allocated_amount | money_with_currency | replace: '.00 ', ' ' }}</span></p>
           {%- endfor -%}
-          <p class="cart-summary__row cart-summary__row--total"><span>Subtotal</span><span>{{ cart.total_price | money_with_currency }}</span></p>
+          {% render 'shipping-line' %}
+          <p class="cart-summary__row cart-summary__row--total"><span>Subtotal</span><span>{{ cart.total_price | money_with_currency | replace: '.00 ', ' ' }}</span></p>
           <p class="cart-summary__note">Shipping and any discount codes are added at checkout.</p>
           <form action="{{ routes.cart_url }}" method="post" class="cart-summary__actions">
             <button type="submit" name="checkout" class="btn btn--primary btn--lg btn--block cart-checkout">
-              {% render 'icon', name: 'lock', class: 'icon--sm' %}<span>Secure checkout</span><span class="cart-checkout__total">{{ cart.total_price | money }}</span>
+              {% render 'icon', name: 'lock', class: 'icon--sm' %}<span>Secure checkout</span><span class="cart-checkout__total">{{ cart.total_price | money_with_currency | replace: '.00 ', ' ' }}</span>
             </button>
             <a href="{{ routes.cart_url }}" class="btn btn--outline btn--block">View cart</a>
           </form>

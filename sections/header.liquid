@@ -73,7 +73,7 @@
       <a href="{{ routes.cart_url }}" class="header__icon header__cart" data-cart-toggle aria-label="Cart, {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}">
         {% render 'icon', name: 'cart' %}
         <span class="cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
-        <span class="header__icon-label"><small>{{ cart.total_price | money }}</small>Cart</span>
+        <span class="header__icon-label"><small>{{ cart.total_price | money_with_currency | replace: '.00 ', ' ' }}</small>Cart</span>
       </a>
     </div>
   </div>
@@ -283,7 +283,7 @@
                             <a href="{{ p.url }}" class="drawer-product">
                               <span class="drawer-product__media">{%- if p.featured_media -%}{{ p.featured_media.preview_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 48, height: 48 }}{%- endif -%}</span>
                               <span class="drawer-product__name">{% render 'product-short-title', product: p, words: 5 %}</span>
-                              <span class="drawer-product__price">{{ p.price_min | money }}</span>
+                              <span class="drawer-product__price">{{ p.price_min | money_with_currency | replace: '.00 ', ' ' }}</span>
                             </a>
                           </li>
                         {%- endfor -%}

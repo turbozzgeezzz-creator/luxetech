@@ -425,6 +425,13 @@
         "info": "Order subtotal, in your store's default currency, that unlocks free shipping. Must match the free shipping rate you set up in Settings > Shipping and delivery (the theme cannot create shipping rates). Set to 0 to hide the progress bar, the buy box line and the utility bar message."
       },
       {
+        "type": "number",
+        "id": "shipping_fee_below_threshold",
+        "label": "Shipping fee under the threshold",
+        "default": 0,
+        "info": "Shown as the cart's shipping line while the order is under the free shipping threshold, in your store's default currency. Must match your shipping rate."
+      },
+      {
         "type": "checkbox",
         "id": "cart_show_note",
         "label": "Show order note on cart page",

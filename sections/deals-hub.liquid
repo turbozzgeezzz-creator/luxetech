@@ -75,7 +75,7 @@
                   {%- if p.featured_media -%}{{ p.featured_media.preview_image | image_url: width: 300 | image_tag: loading: 'lazy', widths: '150,300', sizes: '110px', alt: '' }}{%- endif -%}
                 </a>
                 <a href="{{ p.url }}" class="deal-pair__name">{% render 'product-short-title', product: p, words: 6 %}</a>
-                <span class="deal-pair__price">{{ v.price | money }}</span>
+                <span class="deal-pair__price">{{ v.price | money_with_currency | replace: '.00 ', ' ' }}</span>
               </li>
               {%- if forloop.first -%}<li class="deal-pair__plus" aria-hidden="true">+</li>{%- endif -%}
             {%- endfor -%}
@@ -83,7 +83,7 @@
           <div class="deal-pair__foot">
             <div>
               <span class="deal-pair__label">Together</span>
-              <span class="deal-pair__total" data-bundle-total>{{ pair_a.selected_or_first_available_variant.price | plus: pair_b.selected_or_first_available_variant.price | money }}</span>
+              <span class="deal-pair__total" data-bundle-total>{{ pair_a.selected_or_first_available_variant.price | plus: pair_b.selected_or_first_available_variant.price | money_with_currency | replace: '.00 ', ' ' }}</span>
               {%- if settings.bundle_enabled -%}<span class="deal-pair__note">Save {{ settings.bundle_pct }}% as a bundle</span>{%- elsif section.settings.pair_note != blank -%}<span class="deal-pair__note">{{ section.settings.pair_note | escape }}</span>{%- endif -%}
             </div>
             <button type="button" class="btn btn--primary" data-bundle-add>{% render 'icon', name: 'cart', class: 'icon--sm' %} Add both</button>

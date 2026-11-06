@@ -84,7 +84,7 @@
         <dl class="glance">
           {%- if category != blank -%}<div><dt>Department</dt><dd><a href="{{ category.url }}">{{ category.title | escape }}</a></dd></div>{%- endif -%}
           {%- unless product.has_only_default_variant -%}<div><dt>Options</dt><dd>{{ product.variants.size }} {{ product.variants.size | pluralize: 'option', 'options' }}</dd></div>{%- endunless -%}
-          <div><dt>Price</dt><dd>{% if product.price_varies %}From {% endif %}{{ product.price_min | money }}</dd></div>
+          <div><dt>Price</dt><dd>{% if product.price_varies %}From {% endif %}{{ product.price_min | money_with_currency | replace: '.00 ', ' ' }}</dd></div>
           <div><dt>Availability</dt><dd>{% if product.available %}In stock{% else %}Sold out{% endif %}</dd></div>
           <div><dt>Dispatch</dt><dd>{{ section.settings.dispatch | escape }}</dd></div>
           <div><dt>Returns</dt><dd>{{ section.settings.returns | escape }}</dd></div>

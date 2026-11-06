@@ -19,24 +19,24 @@
               {%- endif -%}
             </td>
             <td>{{ line_item.sku }}</td>
-            <td>{{ line_item.final_price | money }}</td>
+            <td>{{ line_item.final_price | money_with_currency | replace: '.00 ', ' ' }}</td>
             <td>{{ line_item.quantity }}</td>
-            <td>{{ line_item.final_line_price | money }}</td>
+            <td>{{ line_item.final_line_price | money_with_currency | replace: '.00 ', ' ' }}</td>
           </tr>
         {%- endfor -%}
       </tbody>
       <tfoot>
-        <tr><th scope="row" colspan="4">Subtotal</th><td>{{ order.line_items_subtotal_price | money }}</td></tr>
+        <tr><th scope="row" colspan="4">Subtotal</th><td>{{ order.line_items_subtotal_price | money_with_currency | replace: '.00 ', ' ' }}</td></tr>
         {%- for discount in order.cart_level_discount_applications -%}
-          <tr><th scope="row" colspan="4">Discount ({{ discount.title }})</th><td>-{{ discount.total_allocated_amount | money }}</td></tr>
+          <tr><th scope="row" colspan="4">Discount ({{ discount.title }})</th><td>-{{ discount.total_allocated_amount | money_with_currency | replace: '.00 ', ' ' }}</td></tr>
         {%- endfor -%}
         {%- for shipping_method in order.shipping_methods -%}
-          <tr><th scope="row" colspan="4">Shipping ({{ shipping_method.title }})</th><td>{{ shipping_method.price | money }}</td></tr>
+          <tr><th scope="row" colspan="4">Shipping ({{ shipping_method.title }})</th><td>{{ shipping_method.price | money_with_currency | replace: '.00 ', ' ' }}</td></tr>
         {%- endfor -%}
         {%- for tax_line in order.tax_lines -%}
-          <tr><th scope="row" colspan="4">Tax ({{ tax_line.title }} {{ tax_line.rate | times: 100 }}%)</th><td>{{ tax_line.price | money }}</td></tr>
+          <tr><th scope="row" colspan="4">Tax ({{ tax_line.title }} {{ tax_line.rate | times: 100 }}%)</th><td>{{ tax_line.price | money_with_currency | replace: '.00 ', ' ' }}</td></tr>
         {%- endfor -%}
-        <tr><th scope="row" colspan="4">Total</th><td><strong>{{ order.total_net_amount | money_with_currency }}</strong></td></tr>
+        <tr><th scope="row" colspan="4">Total</th><td><strong>{{ order.total_net_amount | money_with_currency | replace: '.00 ', ' ' }}</strong></td></tr>
       </tfoot>
     </table>
   </div>

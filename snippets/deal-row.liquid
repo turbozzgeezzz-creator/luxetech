@@ -10,8 +10,8 @@
     </span>
     <span class="deal-row__name">{% render 'product-short-title', product: product, words: 6 %}</span>
     <span class="deal-row__price">
-      {%- if product.compare_at_price_max > product.price_min -%}<s>{{ product.compare_at_price_max | money }}</s>{%- endif -%}
-      {{ product.price_min | money }}
+      {%- if product.compare_at_price_max > product.price_min -%}<s>{{ product.compare_at_price_max | money_with_currency | replace: '.00 ', ' ' }}</s>{%- endif -%}
+      {{ product.price_min | money_with_currency | replace: '.00 ', ' ' }}
     </span>
   </a>
 </li>

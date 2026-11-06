@@ -18,11 +18,12 @@
 
       <aside class="cart-page__summary cart-summary" aria-label="Order summary">
         <h2 class="cart-summary__title">Order summary</h2>
-        <p class="cart-summary__row"><span>Items ({{ cart.item_count }})</span><span>{{ cart.items_subtotal_price | money }}</span></p>
+        <p class="cart-summary__row"><span>Items ({{ cart.item_count }})</span><span>{{ cart.items_subtotal_price | money_with_currency | replace: '.00 ', ' ' }}</span></p>
         {%- for discount in cart.cart_level_discount_applications -%}
-          <p class="cart-summary__row cart-summary__row--discount"><span>{{ discount.title | escape }}</span><span>-{{ discount.total_allocated_amount | money }}</span></p>
+          <p class="cart-summary__row cart-summary__row--discount"><span>{{ discount.title | escape }}</span><span>-{{ discount.total_allocated_amount | money_with_currency | replace: '.00 ', ' ' }}</span></p>
         {%- endfor -%}
-        <p class="cart-summary__row cart-summary__row--total"><span>Subtotal</span><span>{{ cart.total_price | money_with_currency }}</span></p>
+        {% render 'shipping-line' %}
+        <p class="cart-summary__row cart-summary__row--total"><span>Subtotal</span><span>{{ cart.total_price | money_with_currency | replace: '.00 ', ' ' }}</span></p>
         <p class="cart-summary__note">Taxes, discount codes and shipping are calculated at checkout.</p>
 
         {%- if settings.cart_show_note -%}
