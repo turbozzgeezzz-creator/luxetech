@@ -17,6 +17,7 @@ function send(type, checkout) {
     t: type,
     token: checkout.token,
     e: checkout.email || null,
+    am: checkout.buyerAcceptsEmailMarketing === true,
     fn: addr.firstName || null,
     total: checkout.subtotalPrice ? String(checkout.subtotalPrice.amount) : null,
     order: checkout.order ? String(checkout.order.id) : null,

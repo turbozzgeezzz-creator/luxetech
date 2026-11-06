@@ -38,6 +38,8 @@ fi
 [ -n "$DB_ID" ] || { echo "Could not create the D1 database" >&2; exit 1; }
 sed -i "s/^database_id = \".*\"/database_id = \"$DB_ID\"/" wrangler.toml
 $WRANGLER d1 execute luxemail-tech --remote --file schema.sql --yes >/dev/null
+# Columns added after the first deploy (fails harmlessly once they exist).
+$WRANGLER d1 execute luxemail-tech --remote --command "ALTER TABLE checkouts ADD COLUMN recover_url TEXT" --yes >/dev/null 2>&1 || true
 echo "   database ready"
 
 echo "== 3. Deploy"
@@ -52,10 +54,10 @@ echo "   live at $WORKER_URL"
 
 echo "== 4. Secrets"
 SECRETS_FILE="$(mktemp)"; chmod 600 "$SECRETS_FILE"; trap 'rm -f "$SECRETS_FILE"' EXIT
-node -e 'const e=process.env;require("fs").writeFileSync(process.argv[1],JSON.stringify({SHOPIFY_CLIENT_ID:e.SHOPIFY_CLIENT_ID,SHOPIFY_CLIENT_SECRET:e.SHOPIFY_CLIENT_SECRET,RESEND_API_KEY:e.RESEND_API_KEY,UNSUB_SECRET:e.UNSUB_SECRET}))' "$SECRETS_FILE"
+node -e 'const e=process.env;require("fs").writeFileSync(process.argv[1],JSON.stringify({SHOPIFY_CLIENT_ID:e.SHOPIFY_CLIENT_ID,SHOPIFY_CLIENT_SECRET:e.SHOPIFY_CLIENT_SECRET,RESEND_API_KEY:e.RESEND_API_KEY,UNSUB_SECRET:e.UNSUB_SECRET,...(e.TRACK17_KEY?{TRACK17_KEY:e.TRACK17_KEY}:{})}))' "$SECRETS_FILE"
 $WRANGLER secret bulk "$SECRETS_FILE" >/dev/null
 rm -f "$SECRETS_FILE"
-echo "   4 secrets stored in Cloudflare"
+echo "   secrets stored in Cloudflare (plus TRACK17_KEY when set)"
 
 echo "== 5. Old Shopify webhooks (no longer used)"
 node lib/shopify-webhooks.mjs
@@ -73,7 +75,7 @@ curl -fsS "$WORKER_URL/health"; echo
 echo "== 8. Every email builds (set SEND_TESTS=1 to also email them to ADMIN_EMAIL)"
 FAILED=0
 for flow in welcome1 welcome2 welcome3 checkout1 checkout2 cart1 cart2 browse wishlist postpurchase nextreminder vip winback \
-            "fortnight&theme=new" "fortnight&theme=picks" "fortnight&theme=best" "fortnight&theme=blog"; do
+            "fortnight&theme=new" "fortnight&theme=picks" "fortnight&theme=best" journal; do
   SEND=""; [ "${SEND_TESTS:-}" = "1" ] && [ "$DOMAIN_STATUS" = "verified" ] && SEND="&send=1"
   CODE="$(curl -s -o /dev/null -w '%{http_code}' "$WORKER_URL/preview?flow=$flow&key=$UNSUB_SECRET$SEND")"
   printf '   %-22s %s\n' "$flow" "$([ "$CODE" = 200 ] && echo ok${SEND:+, emailed} || echo "FAILED ($CODE)")"

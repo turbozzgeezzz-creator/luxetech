@@ -14,7 +14,7 @@ database_id = "6acb20bf-df20-403d-991d-e7ae0512c8b0"
 
 [triggers]
 # Every 30 minutes: process reminders and drain the outbox. Daily and fortnightly jobs gate themselves on time.
-crons = ["*/30 * * * *"]
+crons = ["*/10 * * * *"]
 
 [vars]
 SHOP_DOMAIN = "vyc3tw-gf.myshopify.com"
@@ -22,7 +22,7 @@ STORE_URL = "https://tech.luxedealers.com"
 # Set after the first deploy to the Worker's address, e.g. https://luxemail-tech.<account>.workers.dev
 PUBLIC_URL = "https://luxemail-tech.turbozzgeezzz.workers.dev"
 BRAND = "Tech.LuxeDealers"
-FROM_EMAIL = "Tech.LuxeDealers <noreply@tech.luxedealers.com>"
+FROM_EMAIL = "Tech.LuxeDealers <support@tech.luxedealers.com>"
 REPLY_TO = "support@luxedealers.com"
 ADMIN_EMAIL = "support@luxedealers.com"
 TIMEZONE_OFFSET_HOURS = "10"
@@ -31,6 +31,21 @@ SHOPIFY_API_VERSION = "2025-10"
 # VIP and win-back come from LuxeMail's own order history (verified orders from the custom pixel).
 VIP_SPEND_CENTS = "25000"
 LAPSED_DAYS = "60"
+# Emails per 10-minute run; keeps each run under Cloudflare's free-plan limit of 50 outbound requests.
+BATCH_SIZE = "6"
+# Sending domain id in Resend (tech.luxedealers.com). Empty: no domain check before sending.
+RESEND_DOMAIN_ID = ""
+# Master switch: "1" sends, anything else only queues.
+SENDING_ENABLED = "1"
+# Spend-and-save tiers in cents (Shopify automatic discounts on the site: spend $100 save 5%, $150 save 10%).
+TIER1_SPEND_CENTS = "10000"
+TIER1_PERCENT = "5"
+TIER2_SPEND_CENTS = "15000"
+TIER2_PERCENT = "10"
+# Collection used for "best sellers" picks in emails.
+BEST_COLLECTION = "best-sellers"
+# Shipping line in the welcome email, e.g. "Shipping is free on orders over A$80". Empty: only "Every order is tracked".
+SHIPPING_NOTE = ""
 
 # Secrets (set with `wrangler secret put NAME`):
 # SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET, RESEND_API_KEY, UNSUB_SECRET

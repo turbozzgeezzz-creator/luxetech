@@ -518,6 +518,16 @@
     try { if (sessionStorage.getItem('luxetech:identified')) return; sessionStorage.setItem('luxetech:identified', '1'); } catch (e) {}
     mailTrack({ e: mail.email, fn: mail.firstName || null, c: 1, src: 'account', pg: location.pathname });
   })();
+  /* Arrived from one of our emails (?lx= is that subscriber's link code): report it once, so the */
+  /* visit counts as engagement for newsletters, then tidy it out of the address bar.            */
+  (function () {
+    try {
+      var u = new URL(window.location.href), lx = u.searchParams.get('lx');
+      if (!lx) return;
+      mailTrack({ lx: lx, pg: location.pathname });
+      u.searchParams.delete('lx'); window.history.replaceState(window.history.state, '', u.pathname + u.search + u.hash);
+    } catch (e) {}
+  })();
   /* Newsletter sign-ups: submitting the form joins the email list. */
   document.addEventListener('submit', function (e) {
     var form = e.target;

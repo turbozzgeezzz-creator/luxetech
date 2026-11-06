@@ -2,13 +2,12 @@
 // LuxeMail keeps its own mailing list and doesn't rely on Shopify showing customer emails. Marketing email
 // only goes to addresses that ticked the consent box (or opted in on their Shopify account), checked again
 // right before every send.
-import { now, HOUR, DAY, cleanEmail, localParts, getKV, setKV, money, esc, hmacHex } from './util.js';
+import { now, HOUR, DAY, cleanEmail, localParts, getKV, setKV, money, esc, hmacHex, sendingReady } from './util.js';
 import {
-  verifyOrder, createPersonalCode, createSharedCode, gql, productByHandle, recommendations, collectionProducts, latestArticles,
+  verifyOrder, createPersonalCode, createSharedCode, gql, productByHandle, recommendations, collectionProducts, latestArticles, shopifyHasOrders, abandonedCheckouts, shopifyOrderedSince, recentOrdersFor, ordersSince, boughtProductIds,
 } from './shopify.js';
 import {
-  enqueue, layout, heading, para, button, offerCard, tierCard, tierNudge, productGrid, articleList, sendViaResend,
-  unsubscribeUrl, sentTodayCount,
+  enqueue, layout, letterItems, letterLink, letterStories, sendViaResend, unsubscribeUrl, sentTodayCount,
 } from './email.js';
 
 export const CONSENT_TEXT = 'Signed up to the email list (form says: By signing up you agree to get our emails)';
@@ -51,7 +50,7 @@ export async function subscribe(env, { email, firstName, source, page, ip }) {
       ON CONFLICT(email) DO UPDATE SET status = 'subscribed', first_name = COALESCE(excluded.first_name, subscribers.first_name),
         source = excluded.source, consent_text = excluded.consent_text, consent_page = excluded.consent_page,
         requested_at = excluded.requested_at, confirmed_at = excluded.confirmed_at, unsubscribed_at = NULL`)
-    .bind(email, firstName, source, source === 'account' ? 'Accepts marketing on their store account' : CONSENT_TEXT, page, now(), now()).run();
+    .bind(email, firstName, source, source === 'account' ? 'Accepts marketing on their store account' : source === 'checkout' ? 'Ticked "Email me with news and offers" at checkout' : CONSENT_TEXT, page, now(), now()).run();
   await env.DB.prepare('DELETE FROM suppressions WHERE email = ?').bind(email).run();
   // A returning subscriber gets a fresh welcome series (the dedupe keys include the sign-up day).
   const day = new Date(now() * 1000).toISOString().slice(0, 10);
@@ -68,11 +67,159 @@ export async function subscribe(env, { email, firstName, source, page, ip }) {
  * The site's sign-up message and the welcome emails both use it. If two requests arrive together,
  * only the one that claims the row creates the code; the other waits for it.
  */
+/**
+ * People who subscribe outside the website (Facebook and Instagram sign-ups, the Shop app, checkout on another
+ * channel, or added in Shopify admin) only exist as Shopify customers marked "subscribed". Every 30 minutes this
+ * copies them onto LuxeMail's list. Needs the app's read_customers permission; until then it records why and stops.
+ * The first run welcomes people who subscribed in the last 30 days and adds older subscribers quietly; later runs
+ * welcome every new sign-up, just like the website forms.
+ * Anyone who unsubscribed through LuxeMail is never re-added from here.
+ */
+export async function syncShopifySubscribers(env) {
+  if (!(await sendingReady(env))) return;
+  const since = await getKV(env, 'cust_sync_at');
+  const first = !since;
+  let cursor = null, last = since, added = 0;
+  for (let page = 0; page < 3; page++) {
+    let data;
+    try {
+      data = await gql(env, `query($q: String!, $after: String){ customers(first: 100, after: $after, sortKey: UPDATED_AT, query: $q){
+          nodes { email firstName updatedAt emailMarketingConsent { marketingState consentUpdatedAt } }
+          pageInfo { hasNextPage endCursor } } }`,
+        { q: `email_marketing_state:SUBSCRIBED${since ? ` updated_at:>'${since}'` : ''}`, after: cursor });
+    } catch (e) {
+      const msg = String(e && e.message || e);
+      await setKV(env, 'customer_sync', /access|read_customers|denied/i.test(msg) ? 'needs read_customers permission' : 'error: ' + msg.slice(0, 120));
+      return;
+    }
+    const conn = data.customers;
+    for (const c of conn.nodes) {
+      last = c.updatedAt;
+      const email = cleanEmail(c.email);
+      if (!email || !c.emailMarketingConsent || c.emailMarketingConsent.marketingState !== 'SUBSCRIBED') continue;
+      if (await env.DB.prepare('SELECT 1 FROM suppressions WHERE email = ?').bind(email).first()) continue;
+      if (await subscriber(env, email)) continue;
+      await env.DB.prepare(`INSERT OR IGNORE INTO subscribers (email, first_name, status, source, consent_text, consent_page, requested_at, confirmed_at)
+          VALUES (?, ?, 'subscribed', 'shopify', ?, NULL, ?, ?)`)
+        .bind(email, c.firstName || null, 'Subscribed to email marketing in Shopify (e.g. Facebook, Instagram or Shop sign-up)', now(), now()).run();
+      added++;
+      // Welcome everyone new; on the first run only those who subscribed in the last 30 days (older subscribers join quietly).
+      const optedAt = Date.parse(c.emailMarketingConsent.consentUpdatedAt || c.updatedAt || 0) / 1000;
+      if (!first || optedAt > now() - 30 * DAY) {
+        const day = new Date(now() * 1000).toISOString().slice(0, 10);
+        const d = { firstName: c.firstName || null };
+        await enqueue(env, { email, flow: 'welcome1', dedupe: `welcome1:${email}:${day}`, priority: 1, data: d });
+        await enqueue(env, { email, flow: 'welcome2', dedupe: `welcome2:${email}:${day}`, priority: 4, data: d, sendAfter: now() + 3 * DAY });
+        await enqueue(env, { email, flow: 'welcome3', dedupe: `welcome3:${email}`, priority: 4, data: d, sendAfter: now() + 7 * DAY });
+      }
+    }
+    cursor = conn.pageInfo.endCursor;
+    if (!conn.pageInfo.hasNextPage) { cursor = null; break; }
+  }
+  // Only move the start point forward once a full pass has finished, so a long first import resumes where it left off.
+  if (!cursor) await setKV(env, 'cust_sync_at', last || new Date().toISOString());
+  else if (last) await setKV(env, 'cust_sync_at', last);
+  await setKV(env, 'customer_sync', `ok, ${added} added ${new Date().toISOString().slice(0, 16)}`);
+}
+
+/**
+ * Abandoned checkouts straight from Shopify (website, Facebook, Instagram, Shop), so reminders don't depend on the
+ * pixel. Only subscribers' checkouts are kept; a checkout that later became an order is marked completed.
+ * Shopify's own "return to checkout" link is stored so the email button reopens their exact checkout.
+ */
+export async function syncShopifyCheckouts(env) {
+  if (!(await sendingReady(env))) return;
+  let list;
+  try { list = await abandonedCheckouts(env, new Date((now() - 6 * DAY) * 1000).toISOString()); } catch (e) { console.error('abandoned checkouts', e); return; }
+  for (const c of list) {
+    const email = cleanEmail(c.customer && c.customer.email);
+    if (!email) continue;
+    const member = await subscriber(env, email);
+    if (!member || member.status !== 'subscribed') continue;
+    const token = 'shop:' + String(c.id).replace(/\D/g, '');
+    const started = Math.floor(Date.parse(c.createdAt) / 1000);
+    const known = await env.DB.prepare('SELECT completed FROM checkouts WHERE token = ?').bind(token).first();
+    let completed = c.completedAt ? 1 : 0;
+    if (!completed && !(known && known.completed) && (await shopifyOrderedSince(env, email, c.createdAt))) completed = 1;
+    const items = c.lineItems.nodes.filter((l) => l.variant).map((l) => ({
+      variantId: String(l.variant.id).replace(/\D/g, ''), qty: l.quantity, handle: l.variant.product ? l.variant.product.handle : null, title: l.title,
+    }));
+    await env.DB.prepare(`INSERT INTO checkouts (token, email, first_name, total, items, started_at, updated_at, completed, recover_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(token) DO UPDATE SET completed = MAX(checkouts.completed, excluded.completed), items = excluded.items,
+          total = excluded.total, updated_at = excluded.updated_at, recover_url = excluded.recover_url`)
+      .bind(token, email, (c.customer && c.customer.firstName) || member.first_name || null,
+        c.subtotalPriceSet ? String(c.subtotalPriceSet.shopMoney.amount) : null, JSON.stringify(items),
+        started, Math.floor(Date.parse(c.updatedAt) / 1000), completed, c.abandonedCheckoutUrl || null).run();
+  }
+}
+
+/**
+ * New orders from Shopify (every channel): recorded for subscribers (stops reminders, builds VIP and win-back
+ * history) and their thank-you email is queued. The quiet period below holds it until the order has arrived.
+ */
+export async function syncShopifyOrders(env) {
+  if (!(await sendingReady(env))) return;
+  let list;
+  try { list = await ordersSince(env, new Date((now() - 2 * DAY) * 1000).toISOString()); } catch (e) { console.error('orders sync', e); return; }
+  for (const o of list) {
+    const email = cleanEmail(o.email);
+    if (!email || o.cancelledAt) continue;
+    const member = await subscriber(env, email);
+    if (!member || member.status !== 'subscribed') continue;
+    const orderId = String(o.id).replace(/\D/g, '');
+    const handles = o.lineItems.nodes.map((l) => l.product && l.product.handle).filter(Boolean);
+    const firstName = (o.customer && o.customer.firstName) || member.first_name || null;
+    const totalCents = o.totalPriceSet ? Math.round(parseFloat(o.totalPriceSet.shopMoney.amount) * 100) : null;
+    await env.DB.prepare(`INSERT INTO orders (id, email, first_name, total_cents, handles, verified, created_at) VALUES (?, ?, ?, ?, ?, 1, ?)
+        ON CONFLICT(id) DO UPDATE SET verified = 1, total_cents = COALESCE(excluded.total_cents, orders.total_cents)`)
+      .bind(orderId, email, firstName, totalCents, JSON.stringify(handles), Math.floor(Date.parse(o.createdAt) / 1000)).run();
+    await env.DB.prepare('UPDATE checkouts SET completed = 1 WHERE email = ? AND started_at <= ?').bind(email, Math.floor(Date.parse(o.createdAt) / 1000)).run();
+    // They bought: drop any cart, checkout or browse reminder still waiting to go out.
+    await env.DB.prepare(`UPDATE sends SET status = 'skipped', error = 'ordered', sent_at = ? WHERE email = ? AND status = 'queued'
+        AND flow IN ('checkout1', 'checkout2', 'cart1', 'cart2', 'browse')`).bind(now(), email).run();
+    await enqueue(env, { email, flow: 'postpurchase', dedupe: `postpurchase:${orderId}`, priority: 3, data: { firstName, handles }, sendAfter: now() + 7 * DAY });
+  }
+}
+
+/**
+ * After someone orders, we leave them alone until the order has arrived: until Shopify shows it delivered (plus a
+ * day), or, without a delivery update, 3 weeks after it shipped (4 weeks after ordering if it hasn't shipped yet),
+ * and never longer than 5 weeks. Returns the time the quiet period ends (0 when there's none).
+ */
+export async function quietUntil(env, email) {
+  let orders;
+  try { orders = await recentOrdersFor(env, email); } catch (e) { console.error('quiet check', e); return 0; }
+  let until = 0;
+  for (const o of orders) {
+    if (o.cancelledAt) continue;
+    const placed = Date.parse(o.createdAt) / 1000;
+    const fs = o.fulfillments || [];
+    const delivered = fs.map((f) => f.deliveredAt && Date.parse(f.deliveredAt) / 1000).filter(Boolean);
+    const shipped = fs.map((f) => Date.parse(f.createdAt) / 1000).filter(Boolean);
+    let end;
+    if (delivered.length && delivered.length === fs.length) end = Math.max(...delivered) + DAY;
+    else if (shipped.length) end = Math.min(...shipped) + 21 * DAY;
+    else end = placed + 28 * DAY;
+    until = Math.max(until, Math.min(end, placed + 35 * DAY));
+  }
+  return until > now() ? until : 0;
+}
+
+/** Someone who has bought before: the first-order welcome code isn't for them. */
+export async function isReturningCustomer(env, email) {
+  const row = await env.DB.prepare('SELECT id FROM orders WHERE email = ? LIMIT 1').bind(email).first();
+  return !!row || (await shopifyHasOrders(env, email));
+}
+
 export async function welcomeCodeFor(env, email) {
   if (env.PREVIEW) return createPersonalCode(env, { prefix: 'WELCOME10', percent: 10, days: 30, title: 'Welcome 10%' });
   const read = () => env.DB.prepare('SELECT code, ends_at FROM welcome_codes WHERE email = ?').bind(email).first();
   let row = await read();
   if (row && row.code) return { code: row.code, endsAt: row.ends_at };
+  if (!row && (await isReturningCustomer(env, email))) {
+    const e = new Error('Returning customer: no first-order code'); e.returning = true; throw e;
+  }
   const claim = await env.DB.prepare('INSERT OR IGNORE INTO welcome_codes (email, code, ends_at, created_at) VALUES (?, NULL, NULL, ?)').bind(email, now()).run();
   if (claim.meta && claim.meta.changes) {
     try {
@@ -128,6 +275,11 @@ export async function recordEvent(env, body, ip = null) {
       .bind(cid, email, firstName, now()).run();
     await env.DB.prepare('UPDATE events SET email = ? WHERE client_id = ? AND email IS NULL').bind(email, cid).run();
   }
+  // Arrived from an email link (lx = that subscriber's link code): counts as engagement for newsletters.
+  if (typeof body.lx === 'string' && /^[0-9a-f]{16}$/.test(body.lx)) {
+    const row = await env.DB.prepare('SELECT email FROM email_tokens WHERE token = ?').bind(body.lx).first();
+    if (row) await env.DB.prepare(`INSERT INTO events (client_id, email, type, handle, at) VALUES (?, ?, 'emailclick', ?, ?)`).bind(cid, row.email, str(body.pg, 200) || '', now()).run();
+  }
   const type = ['view', 'cart', 'wishlist', 'unwishlist'].includes(body.t) ? body.t : null;
   if (!type || !body.h) return job;
   const known = (await env.DB.prepare('SELECT email FROM clients WHERE client_id = ?').bind(cid).first())?.email || null;
@@ -154,7 +306,13 @@ export async function recordPixel(env, body) {
   const email = cleanEmail(body.e);
   if (!token) return;
   const items = pixelItems(body.items);
-  const member = email ? await subscriber(env, email) : null;
+  let member = email ? await subscriber(env, email) : null;
+  // Ticked "Email me with news and offers" at checkout: that's consent, so they join the list
+  // (and get checkout reminders) even if they never used a sign-up form.
+  if (email && body.am === true && body.t === 'checkout' && !(member && member.status === 'subscribed')) {
+    await subscribe(env, { email, firstName: str(body.fn, 60), source: 'checkout', page: '/checkout', ip: null });
+    member = await subscriber(env, email);
+  }
   const isMember = member && member.status === 'subscribed';
 
   if (body.t === 'checkout') {
@@ -202,11 +360,18 @@ export async function scanAbandonment(env) {
   // Abandoned checkout (from the pixel): a reminder after 4 hours, then a 5% code after 2 days.
   const { results: checkouts } = await env.DB.prepare(
     `SELECT * FROM checkouts WHERE completed = 0 AND updated_at < ? AND updated_at > ?`).bind(t - 4 * HOUR, t - 6 * DAY).all();
-  for (const ck of checkouts) {
+  // One reminder chain per person: only their newest abandoned checkout, and nothing if a different checkout
+  // already got a reminder in the last 3 days.
+  const newest = new Map();
+  for (const ck of checkouts) if (!newest.has(ck.email) || ck.updated_at > newest.get(ck.email).updated_at) newest.set(ck.email, ck);
+  for (const ck of newest.values()) {
     if (await orderedSince(env, ck.email, ck.started_at - HOUR)) continue;
+    const other = await env.DB.prepare(`SELECT id FROM sends WHERE email = ? AND flow IN ('checkout1', 'checkout2') AND dedupe NOT LIKE ?
+        AND status IN ('queued', 'sent') AND created_at > ? LIMIT 1`).bind(ck.email, `%:${ck.token}`, t - 3 * DAY).first();
+    if (other) continue;
     const items = JSON.parse(ck.items || '[]');
     if (!items.length) continue;
-    const data = { token: ck.token, items, firstName: ck.first_name, subtotal: ck.total };
+    const data = { token: ck.token, items, firstName: ck.first_name, subtotal: ck.total, url: ck.recover_url || null };
     if (t - ck.updated_at < 2 * DAY) {
       await enqueue(env, { email: ck.email, flow: 'checkout1', dedupe: `checkout1:${ck.token}`, priority: 1, data });
     } else {
@@ -241,11 +406,11 @@ export async function scanAbandonment(env) {
     if (await orderedSince(env, v.email, v.first_at)) continue;
     const carted = await env.DB.prepare(`SELECT id FROM events WHERE email = ? AND type = 'cart' AND at >= ? LIMIT 1`).bind(v.email, v.first_at).first();
     if (carted || await sentRecently(env, v.email, 'browse', 7 * DAY)) continue;
-    const top = await env.DB.prepare(`SELECT handle, COUNT(*) AS n, MAX(at) AS last FROM events WHERE email = ? AND type = 'view' AND at >= ?
-        GROUP BY handle ORDER BY n DESC, last DESC LIMIT 1`).bind(v.email, v.first_at).first();
-    if (!top) continue;
+    const { results: top } = await env.DB.prepare(`SELECT handle, COUNT(*) AS n, MAX(at) AS last FROM events WHERE email = ? AND type = 'view' AND at >= ?
+        GROUP BY handle ORDER BY n DESC, last DESC LIMIT 4`).bind(v.email, v.first_at).all();
+    if (!top.length) continue;
     const week = Math.floor(t / (7 * DAY));
-    await enqueue(env, { email: v.email, flow: 'browse', dedupe: `browse:${v.email}:${week}`, priority: 3, data: { handle: top.handle } });
+    await enqueue(env, { email: v.email, flow: 'browse', dedupe: `browse:${v.email}:${week}`, priority: 3, data: { handle: top[0].handle, alts: top.slice(1).map((x) => x.handle) } });
   }
 
   // Wishlist: items saved 3+ days ago and still not bought; at most every 14 days.
@@ -290,9 +455,23 @@ export async function scanDaily(env) {
   }
 }
 
-const THEMES = ['new', 'picks', 'best', 'blog'];
+const THEMES = ['new', 'deals', 'picks', 'best'];
 
 /** Every second Tuesday from 6:30 pm Sydney time: the fortnightly email to the whole list, rotating 4 themes. */
+/**
+ * Newsletters (fortnightly, monthly journal) only go to engaged subscribers: joined in the last 90 days, visited
+ * the store or clicked an email link in the last 90 days, or ordered in the last 180 days. Mailing people who never
+ * engage wastes the send quota and teaches Gmail to file us under Promotions or spam.
+ */
+async function engagedSubscribers(env) {
+  const t = now();
+  const { results } = await env.DB.prepare(`SELECT email, first_name FROM subscribers s WHERE status = 'subscribed' AND (
+      COALESCE(confirmed_at, requested_at, 0) > ?
+      OR EXISTS (SELECT 1 FROM events e WHERE e.email = s.email AND e.at > ?)
+      OR EXISTS (SELECT 1 FROM orders o WHERE o.email = s.email AND o.created_at > ?))`).bind(t - 90 * DAY, t - 90 * DAY, t - 180 * DAY).all();
+  return results;
+}
+
 export async function scanFortnightly(env) {
   const { day, hour, minute, ymd } = localParts(env);
   if (day !== 2 || hour < 18 || (hour === 18 && minute < 30)) return;
@@ -302,7 +481,7 @@ export async function scanFortnightly(env) {
   const index = Number((await getKV(env, 'fortnight_index')) || 0);
   await setKV(env, 'fortnight_index', (index + 1) % THEMES.length);
   const theme = THEMES[index % THEMES.length];
-  const { results } = await env.DB.prepare(`SELECT email, first_name FROM subscribers WHERE status = 'subscribed'`).all();
+  const results = await engagedSubscribers(env);
   if (!results.length) return;
   // New arrivals and blog fortnights carry a subscriber code (one shared code, 7 days, once per customer).
   let offer = null;
@@ -319,13 +498,47 @@ export async function scanFortnightly(env) {
   }
 }
 
+/**
+ * Weekly journal: every Sunday from 10 am, one email with the week's new blog posts (we post daily, so this
+ * replaces seven emails with one). Skipped if nothing new was published. Same consent rules as everything else.
+ */
+export async function scanWeeklyJournal(env) {
+  // Monthly now: the first Sunday of each month from 10 am, with the month's newest stories.
+  const { day, hour, ymd } = localParts(env);
+  if (day !== 0 || hour < 10 || Number(ymd.slice(8, 10)) > 7) return;
+  if ((await getKV(env, 'journal_last')) === ymd) return;
+  await setKV(env, 'journal_last', ymd);
+  const since = new Date(Date.now() - 31 * DAY * 1000).toISOString();
+  const articles = await latestArticles(env, 6, since);
+  if (!articles.length) return;
+  const results = await engagedSubscribers(env);
+  for (const m of results) {
+    await enqueue(env, { email: m.email, flow: 'journal', dedupe: `journal:${ymd}:${m.email}`, priority: 6, data: { firstName: m.first_name, since } });
+  }
+}
+
+/** Adds the subscriber's link code to every store link (links still go straight to the store, nothing is rewritten). */
+async function tagLinks(env, email, html) {
+  const token = (await hmacHex(env.UNSUB_SECRET, `lx:${email}`)).slice(0, 16);
+  await env.DB.prepare('INSERT OR IGNORE INTO email_tokens (token, email) VALUES (?, ?)').bind(token, email).run();
+  const store = env.STORE_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return html.replace(new RegExp(`href="(${store}[^"#]*)(#[^"]*)?"`, 'g'), (m, url, hash) => {
+    // Discount links redirect onwards, so the code goes inside the redirect target.
+    if (/\/discount\/[^?]+\?redirect=/.test(url)) return `href="${url.replace(/(redirect=)([^&]*)/, (x, k, v) => `${k}${v}${decodeURIComponent(v).includes('?') ? '%26' : '%3F'}lx%3D${token}`)}${hash || ''}"`;
+    return `href="${url}${url.includes('?') ? '&amp;' : '?'}lx=${token}${hash || ''}"`;
+  });
+}
+
 /* ======================= Building each email ======================= */
+
+const P = (html) => `<p style="margin:0 0 16px;">${html}</p>`;
+const SIGN = (env) => `<p style="margin:0 0 16px;">Any questions, just reply to this email.</p><p style="margin:0;">Thanks,<br>The ${esc(env.BRAND)} team</p>`;
 
 const hi = (name) => (name ? `Hi ${esc(name)},` : 'Hi there,');
 
-async function productsForHandles(env, handles) {
+async function productsForHandles(env, handles, skip = new Set()) {
   const out = [];
-  for (const h of handles || []) { const p = await productByHandle(env, h); if (p && p.available) out.push(p); }
+  for (const h of handles || []) { const p = await productByHandle(env, h); if (p && p.available && !skip.has(String(p.id))) out.push(p); }
   return out;
 }
 
@@ -345,27 +558,7 @@ async function personalPicks(env, email, limit = 4) {
     const recs = await recommendations(env, seed, limit);
     if (recs.length >= 2) return recs;
   }
-  return collectionProducts(env, 'best-sellers', limit);
-}
-
-// Department banners for the "Picked for you" email, matched to what the subscriber has been looking at.
-const INTEREST_BANNERS = {
-  audio: ['banner-picks-audio.jpg', 'Audio picks for you'],
-  charging: ['banner-picks-charging.jpg', 'Charging picks you\'ll love'],
-  'smart-home': ['banner-picks-home.jpg', 'Kitchen picks for you'],
-  accessories: ['banner-picks-accessories.jpg', 'Accessories for you'],
-};
-
-async function interestBanner(env, email) {
-  const seed = await seedProductId(env, email);
-  if (seed) {
-    const data = await gql(env, `query($id: ID!){ product(id: $id){ collections(first: 10){ nodes{ handle } } } }`,
-      { id: `gid://shopify/Product/${String(seed).replace(/\D/g, '')}` });
-    const handles = data.product ? data.product.collections.nodes.map((c) => c.handle) : [];
-    const match = handles.find((h) => INTEREST_BANNERS[h]);
-    if (match) return INTEREST_BANNERS[match];
-  }
-  return ['banner-picks-everyone.jpg', 'Picked for you this fortnight'];
+  return collectionProducts(env, env.BEST_COLLECTION || 'best-sellers', limit);
 }
 
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', timeZone: 'Australia/Sydney' });
@@ -378,49 +571,57 @@ function cartLink(env, items, code) {
 }
 
 export const builders = {
+  // Every email is a short personal letter (best chance of Gmail's Primary tab): service-style subject with no
+  // "%", "off" or "code", a few lines of text, at most 2-3 small product rows, one button. Codes sit in the text.
   async welcome1(env, email, d) {
-    const { code, endsAt } = await welcomeCodeFor(env, email);
-    const picks = await collectionProducts(env, 'best-sellers', 4);
+    const wc = await welcomeCodeFor(env, email).catch((e) => { if (e.returning) return null; throw e; });
+    const picks = (await collectionProducts(env, env.BEST_COLLECTION || 'best-sellers', 4)).slice(0, 2);
+    if (!wc) {
+      return {
+        letter: true,
+        subject: `You're on the ${env.BRAND} list`,
+        preheader: 'Thanks for joining, and for shopping with us before.',
+        body: P(hi(d.firstName)) + P(`Thanks for joining the list, and for shopping with us before. You'll be first to hear about new arrivals and restocks.`)
+          + letterItems(picks) + letterLink('See new arrivals', `${env.STORE_URL}/collections/new-arrivals`) + SIGN(env),
+      };
+    }
+    const { code, endsAt } = wc;
     return {
-      subject: `Welcome to ${env.BRAND}: here's 10% off`,
-      preheader: `Your code ${code} is inside, plus a few of our most-loved picks.`,
-      banner: 'banner-welcome.jpg', bannerAlt: 'Welcome, here is 10% off your first order',
-      body: heading('Welcome to the crew!') + para(`${hi(d.firstName)} thanks for joining. We hand-pick everyday tech, home and lifestyle gear, and every order is dispatched within 3-4 business days with tracking.`)
-        + offerCard(env, { theme: 'welcome', big: '10%', unit: 'off', title: 'Your welcome gift: 10% off your order', code,
-          fine: `Your own code: single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
-        + button('Start shopping', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`)
-        + productGrid(picks, { heading: 'Most loved right now' }),
+      letter: true,
+      subject: `Welcome to ${env.BRAND}${d.firstName ? `, ${d.firstName}` : ''}`,
+      preheader: 'Thanks for joining. A quick hello from our team.',
+      body: P(hi(d.firstName)) + P(`Thanks for joining. We hand-pick smart gadgets and everyday tech for home, audio, beauty and the car. ${env.SHIPPING_NOTE ? esc(env.SHIPPING_NOTE) + ', every' : 'Every'} order is tracked, and if anything isn't right we'll refund or reship it.`)
+        + P(`As a welcome, here's 10% off your first order: <strong>${esc(code)}</strong> (single use, until ${fmtDate(endsAt)}). The button applies it for you.`)
+        + letterItems(picks) + letterLink('Start shopping', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`) + SIGN(env),
     };
   },
   async welcome2(env, email, d) {
     if (await orderedSince(env, email, 0)) return null;
-    const { code, endsAt } = await welcomeCodeFor(env, email);
+    const wc = await welcomeCodeFor(env, email).catch((e) => { if (e.returning) return null; throw e; });
+    if (!wc) return null;
+    const { code, endsAt } = wc;
     if (Date.parse(endsAt) < Date.now() + DAY * 1000) return null;
-    const picks = await collectionProducts(env, 'new-arrivals', 4);
+    const picks = (await collectionProducts(env, 'new-arrivals', 4)).slice(0, 2);
     return {
-      subject: 'Still deciding? Your 10% is waiting',
-      preheader: `${code} still takes 10% off, until ${fmtDate(endsAt)}.`,
-      banner: 'banner-picks-everyone.jpg', bannerAlt: 'Fresh picks for you',
-      body: heading('Your 10% is still here') + para(`${hi(d.firstName)} in case you missed it, your welcome code is ready whenever you are.`)
-        + offerCard(env, { theme: 'reminder', big: '10%', unit: 'still yours', title: 'Your welcome code hasn\'t been used yet', code,
-          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts.` })
-        + productGrid(picks, { heading: 'Just landed' })
-        + button('Use my 10%', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`),
+      letter: true,
+      subject: 'Did you find what you were looking for?',
+      preheader: `A quick note from the ${env.BRAND} team.`,
+      body: P(hi(d.firstName)) + P(`Just checking in. If you couldn't find something, or have a question about a product or delivery, reply to this email and we'll help.`)
+        + P(`Your welcome code <strong>${esc(code)}</strong> still takes 10% off your first order, until ${fmtDate(endsAt)}. A couple of new arrivals:`)
+        + letterItems(picks) + letterLink('Have a look', `${env.STORE_URL}/discount/${code}?redirect=/collections/new-arrivals`) + SIGN(env),
     };
   },
   async welcome3(env, email, d) {
     if (await orderedSince(env, email, 0)) return null;
+    if (!env.PREVIEW && (await isReturningCustomer(env, email))) return null;
     const { code, endsAt } = await createPersonalCode(env, { prefix: 'WELCOME15', percent: 15, days: 3, title: 'Welcome last call 15%' });
-    const picks = await collectionProducts(env, 'best-sellers', 4);
+    const picks = (await collectionProducts(env, env.BEST_COLLECTION || 'best-sellers', 4)).slice(0, 2);
     return {
-      subject: 'Last call: 15% off, for 3 days',
-      preheader: `${code} takes 15% off until ${fmtDate(endsAt)}.`,
-      banner: 'banner-last-call.jpg', bannerAlt: 'Last call: 15% off, ends in 3 days',
-      body: heading('Last call: 15% off') + para(`${hi(d.firstName)} you've been with us a week, so here's our best new-member offer: 15% off your order, for the next 3 days.`)
-        + offerCard(env, { theme: 'lastcall', big: '15%', unit: '3 days only', title: 'Your new-member offer', code,
-          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
-        + button('Use my 15%', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`)
-        + productGrid(picks, { heading: 'Most loved right now' }),
+      letter: true,
+      subject: `One more thing${d.firstName ? `, ${d.firstName}` : ''}`,
+      preheader: 'Something for your first order, for the next 3 days.',
+      body: P(hi(d.firstName)) + P(`You've been with us a week, so for your first order we've made you a personal code: <strong>${esc(code)}</strong>. It takes 15% off and works for the next 3 days, until ${fmtDate(endsAt)}.`)
+        + P('Our best sellers right now:') + letterItems(picks) + letterLink('Start shopping', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`) + SIGN(env),
     };
   },
   async checkout1(env, email, d) {
@@ -428,14 +629,13 @@ export const builders = {
     if (ck && ck.completed) return null;
     const products = await productsForHandles(env, (d.items || []).map((i) => i.handle));
     if (!products.length) return null;
+    // Reminders are short personal-style letters: they read as service emails, not adverts (better inbox placement).
     return {
-      subject: 'You left something at checkout',
+      letter: true,
+      subject: 'Did something go wrong at checkout?',
       preheader: 'Your items are still available.',
-      banner: 'banner-checkout.jpg', bannerAlt: 'Your checkout is waiting',
-      body: heading('Ready when you are') + para(`${hi(d.firstName)} you started a checkout but didn't quite finish. Your items are below, and the button puts them straight back in your cart.`)
-        + productGrid(products, { heading: 'Still in your checkout' })
-        + tierNudge(env, d.subtotal != null ? Math.round(parseFloat(d.subtotal) * 100) : null)
-        + button('Complete my order', cartLink(env, d.items)),
+      body: `<p style="margin:0 0 16px;">${hi(d.firstName)}</p><p style="margin:0 0 16px;">You started a checkout with us but didn't finish. If something went wrong, or you have a question about compatibility or shipping, just reply and we'll help.</p><p style="margin:0 0 8px;">Your items are still available:</p>`
+        + letterItems(products) + letterLink('Finish my order', d.url || cartLink(env, d.items)) + SIGN(env),
     };
   },
   async checkout2(env, email, d) {
@@ -445,79 +645,72 @@ export const builders = {
     if (!products.length) return null;
     const { code, endsAt } = await createPersonalCode(env, { prefix: 'BACK5', percent: 5, days: 7, title: 'Abandoned checkout 5%' });
     return {
-      subject: 'Here\'s 5% off to finish your order',
-      preheader: `Your items are still available, and ${code} takes 5% off.`,
-      banner: 'banner-reminder.jpg', bannerAlt: 'Here is 5% off to finish up',
-      body: heading('A little nudge, with 5% off') + para(`${hi(d.firstName)} your items are still available. Here's 5% off to help you decide.`)
-        + offerCard(env, { theme: 'personal', big: '5%', unit: 'off', title: 'A code just for you, to finish your order', code,
-          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
-        + button('Complete my order', cartLink(env, d.items, code)) + productGrid(products, { heading: 'Still in your checkout' }),
+      letter: true,
+      subject: 'Your items are still saved',
+      preheader: 'Everything you picked is still available.',
+      body: `<p style="margin:0 0 16px;">${hi(d.firstName)}</p><p style="margin:0 0 16px;">Your items are still waiting at checkout. To help you decide, here's a code for 5% off: <strong>${esc(code)}</strong> (single use, until ${fmtDate(endsAt)}). The link below applies it for you.</p>`
+        + letterItems(products) + letterLink('Finish my order with 5% off', d.url ? `${d.url}${d.url.includes('?') ? '&' : '?'}discount=${encodeURIComponent(code)}` : cartLink(env, d.items, code)) + SIGN(env),
     };
   },
   async cart1(env, email, d) {
-    const products = await productsForHandles(env, d.handles);
+    const products = await productsForHandles(env, d.handles, await boughtProductIds(env, email));
     if (!products.length) return null;
     return {
-      subject: 'Your cart is waiting',
+      letter: true,
+      subject: 'Still deciding on these?',
       preheader: 'The things you added are still available.',
-      banner: 'banner-checkout.jpg', bannerAlt: 'Your cart is waiting',
-      body: heading('Forgot something?') + para('You added these to your cart. They\'re still in stock, and your cart is saved on the device you used.')
-        + productGrid(products) + button('Back to my cart', `${env.STORE_URL}/cart`),
+      body: `<p style="margin:0 0 16px;">Hi there,</p><p style="margin:0 0 8px;">You added these to your cart and they're still in stock. Your cart is saved on the device you used.</p>`
+        + letterItems(products) + letterLink('Back to my cart', `${env.STORE_URL}/cart`) + SIGN(env),
     };
   },
   async cart2(env, email, d) {
-    const products = await productsForHandles(env, d.handles);
+    const products = await productsForHandles(env, d.handles, await boughtProductIds(env, email));
     if (!products.length) return null;
     const { code, endsAt } = await createPersonalCode(env, { prefix: 'BACK5', percent: 5, days: 7, title: 'Abandoned cart 5%' });
     return {
-      subject: '5% off to finish up',
-      preheader: `${code} takes 5% off your cart.`,
-      banner: 'banner-reminder.jpg', bannerAlt: 'Here is 5% off to finish up',
-      body: heading('Here\'s 5% off your cart') + para('Still thinking it over? Here\'s a little something to help.')
-        + offerCard(env, { theme: 'personal', big: '5%', unit: 'off', title: 'A code just for you, for what\'s in your cart', code,
-          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
-        + productGrid(products)
-        + button('Use my 5%', `${env.STORE_URL}/discount/${code}?redirect=/cart`),
+      letter: true,
+      subject: 'Quick question about your cart',
+      preheader: 'Is anything holding you back? We can help.',
+      body: `<p style="margin:0 0 16px;">Hi there,</p><p style="margin:0 0 16px;">Is anything holding you back, like compatibility, shipping or delivery time? Just reply and we'll help. And if it helps you decide, here's 5% off what's in your cart: <strong>${esc(code)}</strong> (single use, until ${fmtDate(endsAt)}). The link below applies it for you.</p>`
+        + letterItems(products) + letterLink('Use my 5% code', `${env.STORE_URL}/discount/${code}?redirect=/cart`) + SIGN(env),
     };
   },
   async browse(env, email, d) {
-    const product = await productByHandle(env, d.handle);
-    if (!product || !product.available) return null;
-    const recs = (await recommendations(env, product.id, 4)).filter((p) => p.handle !== product.handle).slice(0, 2);
+    // Most-viewed first; never a product they already own.
+    const bought = await boughtProductIds(env, email);
+    const [product] = await productsForHandles(env, [d.handle, ...(d.alts || [])], bought);
+    if (!product) return null;
+    const recs = (await recommendations(env, product.id, 6)).filter((p) => p.handle !== product.handle && !bought.has(String(p.id))).slice(0, 2);
     return {
+      letter: true,
       subject: `Still thinking about the ${product.title.split(/[,|(]/)[0].trim()}?`,
       preheader: 'The one you were looking at is still in stock.',
-      banner: 'banner-browse.jpg', bannerAlt: 'You looked, we noticed',
-      body: heading('Still thinking it over?') + para('You were checking this out. Here it is again, in case you want another look.')
-        + productGrid([product]) + productGrid(recs, { heading: 'You might also like' }),
+      body: `<p style="margin:0 0 16px;">Hi there,</p><p style="margin:0 0 8px;">You were looking at this recently, and it's still in stock:</p>`
+        + letterItems([product]) + letterLink('Take another look', product.url) + (recs.length ? `<p style="margin:0 0 8px;">You might also like:</p>` + letterItems(recs) : '') + SIGN(env),
     };
   },
   async wishlist(env, email, d) {
-    const products = await productsForHandles(env, d.handles);
+    const products = (await productsForHandles(env, d.handles, await boughtProductIds(env, email))).slice(0, 3);
     if (!products.length) return null;
     return {
-      subject: 'Your wishlist misses you',
-      preheader: 'The things you saved are still in stock.',
-      banner: 'banner-wishlist.jpg', bannerAlt: 'Your saved picks',
-      body: heading('Your saved picks') + para('You saved these to your wishlist. Good news: they\'re still in stock.')
-        + productGrid(products) + button('View my wishlist', `${env.STORE_URL}/pages/wishlist`),
+      letter: true,
+      subject: 'Still have your eye on these?',
+      preheader: 'The items you saved are still in stock.',
+      body: P('Hi there,') + P(`The items you saved to your wishlist are still in stock:`) + letterItems(products) + letterLink('View my wishlist', `${env.STORE_URL}/pages/wishlist`) + SIGN(env),
     };
   },
   async postpurchase(env, email, d) {
     const bought = (d.handles || [])[0] ? await productByHandle(env, d.handles[0]) : null;
-    const recs = bought ? (await recommendations(env, bought.id, 5)).filter((p) => !(d.handles || []).includes(p.handle)).slice(0, 4) : [];
-    const picks = recs.length ? recs : await collectionProducts(env, 'best-sellers', 4);
+    const recs = bought ? (await recommendations(env, bought.id, 5)).filter((p) => !(d.handles || []).includes(p.handle)).slice(0, 2) : [];
+    const picks = recs.length ? recs : (await collectionProducts(env, env.BEST_COLLECTION || 'best-sellers', 4)).slice(0, 2);
     const { code, endsAt } = await createPersonalCode(env, { prefix: 'NEXT10', percent: 10, days: 30, title: 'Thank-you 10% next order' });
     return {
-      subject: 'A thank-you: 10% off your next order',
-      preheader: `${code} takes 10% off your next order, until ${fmtDate(endsAt)}.`,
-      banner: 'banner-next-order.jpg', bannerAlt: 'A thank-you gift: 10% off your next order',
-      body: heading('Thanks for shopping with us!') + para(`${hi(d.firstName)} we hope you're enjoying your order. As a thank-you, here's 10% off your next one.`)
-        + offerCard(env, { theme: 'thanks', big: '10%', unit: 'next order', title: 'A thank-you gift for your next order', code,
-          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
-        + button('Use my 10%', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`)
-        + productGrid(picks, { heading: recs.length ? 'Goes great with your order' : 'Most loved right now' })
-        + para('Anything not right with your order? Just reply to this email and we\'ll sort it out.'),
+      letter: true,
+      subject: `How's your order going${d.firstName ? `, ${d.firstName}` : ''}?`,
+      preheader: `A quick check-in from the ${env.BRAND} team.`,
+      body: P(hi(d.firstName)) + P(`Thanks again for your order. If anything isn't right, or you have a question about delivery, just reply and we'll sort it out.`)
+        + P(`As a thank-you, <strong>${esc(code)}</strong> takes 10% off your next order, until ${fmtDate(endsAt)}. ${recs.length ? 'These go well with what you bought:' : 'A couple of our favourites:'}`)
+        + letterItems(picks) + letterLink('Have a look', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`) + SIGN(env),
       // A week before the code ends, remind them (skipped if they've ordered again by then).
       afterSend: () => enqueue(env, { email, flow: 'nextreminder', dedupe: `nextreminder:${code}`, priority: 4,
         data: { firstName: d.firstName, code, endsAt, since: now() }, sendAfter: Math.floor(Date.parse(endsAt) / 1000) - 7 * DAY }),
@@ -526,79 +719,77 @@ export const builders = {
   async nextreminder(env, email, d) {
     if (await orderedSince(env, email, d.since)) return null;
     if (Date.parse(d.endsAt) < Date.now() + DAY * 1000) return null;
-    const picks = await personalPicks(env, email, 4);
+    const picks = (await personalPicks(env, email, 4)).slice(0, 2);
     return {
-      subject: `Your 10% ends ${fmtDate(d.endsAt)}`,
-      preheader: `${d.code} still takes 10% off your next order.`,
-      banner: 'banner-next-reminder.jpg', bannerAlt: 'Your 10% is still waiting',
-      body: heading('Your 10% is still waiting') + para(`${hi(d.firstName)} a quick reminder: your thank-you code still takes 10% off your next order, until ${fmtDate(d.endsAt)}.`)
-        + offerCard(env, { theme: 'thanks', big: '10%', unit: 'next order', title: 'Your thank-you code', code: d.code,
-          fine: `Single use, valid until ${fmtDate(d.endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
-        + button('Use my 10%', `${env.STORE_URL}/discount/${d.code}?redirect=/collections/all`)
-        + productGrid(picks, { heading: 'Picked for you' }),
+      letter: true,
+      subject: `Just checking in${d.firstName ? `, ${d.firstName}` : ''}`,
+      preheader: `A quick reminder from the ${env.BRAND} team.`,
+      body: P(hi(d.firstName)) + P(`A quick reminder: your thank-you code <strong>${esc(d.code)}</strong> still takes 10% off your next order, until ${fmtDate(d.endsAt)}. Picked for you:`)
+        + letterItems(picks) + letterLink('Have a look', `${env.STORE_URL}/discount/${d.code}?redirect=/collections/all`) + SIGN(env),
     };
   },
-
   async vip(env, email, d) {
-    const picks = await collectionProducts(env, 'new-arrivals', 4);
+    const { code, endsAt } = await createPersonalCode(env, { prefix: 'VIP15', percent: 15, days: 30, title: 'VIP thank-you 15%' });
+    const picks = (await collectionProducts(env, 'new-arrivals', 4)).slice(0, 2);
     return {
-      subject: 'You\'re a VIP. Here\'s 10% off every order',
-      preheader: 'Thanks for being one of our best customers.',
-      banner: 'banner-vip.jpg', bannerAlt: 'You are a VIP, 10% off every order',
-      body: heading('Welcome to VIP') + para(`${hi(d.firstName)} you've spent $250 or more with us. Thank you! As a VIP, this code takes 10% off every order, any time.`)
-        + offerCard(env, { theme: 'vip', big: '10%', unit: 'every order', title: 'VIP pricing, on every order, any time', code: 'VIP10',
-          fine: 'For customers who\'ve spent $250+ with us. Use it as often as you like. Can\'t be combined with other discounts.' })
-        + productGrid(picks, { heading: 'New this fortnight' })
-        + button('Shop with VIP10', `${env.STORE_URL}/discount/VIP10?redirect=/collections/all`),
+      letter: true,
+      subject: `Thank you${d.firstName ? `, ${d.firstName}` : ''}`,
+      preheader: `A note from the ${env.BRAND} team.`,
+      body: P(hi(d.firstName)) + P(`You're one of our best customers, and we wanted to say thank you. Here's 15% off your next order, just for you: <strong>${esc(code)}</strong> (single use, until ${fmtDate(endsAt)}).`)
+        + P('New this fortnight:') + letterItems(picks) + letterLink('Have a look', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`) + SIGN(env),
     };
   },
   async winback(env, email, d) {
     const { code, endsAt } = await createPersonalCode(env, { prefix: 'COMEBACK15', percent: 15, days: 14, title: 'Win-back 15%' });
-    const picks = await collectionProducts(env, 'new-arrivals', 4);
+    const picks = (await collectionProducts(env, 'new-arrivals', 4)).slice(0, 2);
     return {
-      subject: 'We miss you. Here\'s 15% off',
-      preheader: 'See what\'s new since your last visit.',
-      banner: 'banner-winback.jpg', bannerAlt: 'We miss you',
-      body: heading('It\'s been a while!') + para(`${hi(d.firstName)} here's what's new since your last visit, plus 15% off your next order.`)
-        + offerCard(env, { theme: 'winback', big: '15%', unit: 'off', title: 'Welcome back: 15% off your next order', code,
-          fine: `Single use, valid until ${fmtDate(endsAt)}. Can't be combined with other discounts. The button applies it for you.` })
-        + productGrid(picks, { heading: 'New since your last visit' })
-        + button('Use my 15%', `${env.STORE_URL}/discount/${code}?redirect=/collections/all`),
+      letter: true,
+      subject: `It's been a while${d.firstName ? `, ${d.firstName}` : ''}`,
+      preheader: "Here's what's new since you last visited.",
+      body: P(hi(d.firstName)) + P(`It's been a while since your last visit, so here's what's new. If you'd like to come back, <strong>${esc(code)}</strong> takes 15% off your next order, until ${fmtDate(endsAt)}.`)
+        + letterItems(picks) + letterLink("See what's new", `${env.STORE_URL}/discount/${code}?redirect=/collections/new-arrivals`) + SIGN(env),
+    };
+  },
+  async journal(env, email, d) {
+    const articles = await latestArticles(env, 3, d.since || new Date(Date.now() - 7 * DAY * 1000).toISOString());
+    if (!articles.length) return null;
+    return {
+      letter: true,
+      subject: articles[0].title,
+      preheader: `${articles.length} new ${articles.length === 1 ? 'story' : 'stories'} from our team this week.`,
+      body: P(hi(d.firstName)) + P(`Here's what's new on the ${esc(env.BRAND)} journal this week:`) + letterStories(articles)
+        + letterLink('Read the journal', `${env.STORE_URL}/blogs/news`) + `<p style="margin:0;">Happy reading,<br>The ${esc(env.BRAND)} team</p>`,
     };
   },
   async fortnight(env, email, d) {
-    const intro = `${hi(d.firstName)} here's what's worth a look this fortnight, picked by our team.`;
-    // Each theme carries a different offer: a New arrivals code, spend-and-save, or a sitewide subscriber code.
-    const insider = (unit, title, where, redirect) => d.offer
-      ? offerCard(env, { theme: 'insider', big: '10%', unit, title, code: d.offer.code,
-          fine: `${where} until ${fmtDate(d.offer.endsAt)}. Once per customer. Can't be combined with other discounts.` })
-        + button('Use my 10%', `${env.STORE_URL}/discount/${d.offer.code}?redirect=${redirect}`)
-      : tierCard(env);
+    // Each theme still carries its offer (a New arrivals or subscriber code), mentioned in the text.
+    const offer = (what) => d.offer ? P(`For subscribers: <strong>${esc(d.offer.code)}</strong> takes 10% off ${what}, until ${fmtDate(d.offer.endsAt)} (once per customer).`) : '';
+    const link = (label, path) => letterLink(label, d.offer ? `${env.STORE_URL}/discount/${d.offer.code}?redirect=${path}` : `${env.STORE_URL}${path}`);
+    const letter = (subject, preheader, intro, items, extra, button) => ({ letter: true, subject, preheader, body: P(hi(d.firstName)) + P(intro) + extra + letterItems(items) + button + SIGN(env) });
     if (d.theme === 'new') {
-      const p = await collectionProducts(env, 'new-arrivals', 4);
-      return { subject: d.offer ? 'Just landed, and 10% off for subscribers' : 'Just landed: new this fortnight', preheader: 'Fresh arrivals, picked by our team.', banner: 'banner-new-arrivals.jpg', bannerAlt: 'New arrivals this fortnight',
-        body: heading('New arrivals') + para(intro) + insider('new arrivals', 'Subscriber code: 10% off New arrivals', 'Valid on the New arrivals collection', '/collections/new-arrivals')
-          + productGrid(p) + (d.offer ? '' : button('See what\'s new', `${env.STORE_URL}/collections/new-arrivals`)) };
+      const p = (await collectionProducts(env, 'new-arrivals', 4)).slice(0, 3);
+      return letter('New this fortnight', 'A few new arrivals, picked by our team.', "A few new arrivals our team picked this fortnight:", p, offer('New arrivals'), link("See what's new", '/collections/new-arrivals'));
+    }
+    if (d.theme === 'deals') {
+      // Genuine price drops (compare-at prices); the reduced prices are the offer.
+      const p = await collectionProducts(env, 'deals', 6);
+      if (p.length >= 2) {
+        return { _theme: 'deals', ...letter('A few gadgets just came down in price', 'Selected tech, reduced.', "We've reduced selected gadgets. A few worth a look:", p.slice(0, 3), '', letterLink('See them all', `${env.STORE_URL}/collections/deals`)) };
+      }
+      d = { ...d, theme: 'best' };
     }
     if (d.theme === 'best') {
-      const p = await collectionProducts(env, 'best-sellers', 4);
-      return { subject: 'What everyone\'s buying right now', preheader: 'This fortnight\'s best sellers.', banner: 'banner-best-sellers.jpg', bannerAlt: 'Best sellers this fortnight',
-        body: heading('Most loved right now') + para(intro) + productGrid(p) + tierCard(env) + button('Shop best sellers', `${env.STORE_URL}/collections/best-sellers`) };
+      const p = (await collectionProducts(env, env.BEST_COLLECTION || 'best-sellers', 4)).slice(0, 3);
+      return { _theme: 'best', ...letter("What everyone's buying right now", 'Our best sellers this fortnight.', "Here's what customers are loving this fortnight:", p, '', letterLink('Shop all', `${env.STORE_URL}/collections/${env.BEST_COLLECTION || 'best-sellers'}`)) };
     }
     if (d.theme === 'blog') {
       const articles = await latestArticles(env, 3);
-      const p = await personalPicks(env, email, 2);
-      return { subject: d.offer ? 'New guides, plus 10% off for subscribers' : 'From the tech desk: new guides worth a read', preheader: 'Buying tips and how-tos from our team.', banner: 'banner-blog.jpg', bannerAlt: 'New guides worth a read',
-        body: heading('From the tech desk') + para(`${hi(d.firstName)} a few guides from our team, plus a couple of picks for you.`)
-          + articleList(articles) + insider('subscribers only', 'A subscriber code, on everything', 'Valid on everything', '/collections/all')
-          + productGrid(p, { heading: 'Picked for you' }) + (d.offer ? '' : button('Read all guides', `${env.STORE_URL}/blogs/news`)) };
+      return { letter: true, subject: 'New on the blog', preheader: 'Buying guides and tech tips from our team.',
+        body: P(hi(d.firstName)) + P('A few new stories from our team:') + letterStories(articles) + offer('everything') + link('Read the journal', '/blogs/news') + SIGN(env) };
     }
-    const p = await personalPicks(env, email, 4);
-    const [banner, bannerAlt] = await interestBanner(env, email);
-    return { subject: 'Picked for you this fortnight', preheader: 'Chosen from what you\'ve looked at and bought.', banner, bannerAlt,
-      body: heading('Picked for you') + para(intro) + productGrid(p) + tierCard(env) + button('Shop your picks', `${env.STORE_URL}/collections/all`) };
+    const p = (await personalPicks(env, email, 4)).slice(0, 3);
+    return letter('Picked for you this fortnight', "Chosen from what you've looked at and bought.", 'A few things we think you will like, based on what you have looked at:', p, '', letterLink('Have a look', `${env.STORE_URL}/collections/all`));
   },
-
 };
 
 /* ======================= Outbox ======================= */
@@ -607,37 +798,85 @@ export const builders = {
  * Sends queued emails, at most DAILY_SEND_LIMIT per 24 hours, after a fresh consent check.
  * With `id`, sends just that one job now (the welcome email, right after sign-up).
  */
+const REMINDERS = ['checkout1', 'checkout2', 'cart1', 'cart2', 'browse'];
+const DROP_WHEN_QUIET = ['fortnight', 'journal', 'browse', 'wishlist', 'cart1', 'cart2', 'welcome2', 'welcome3', 'winback'];
+
 export async function drainOutbox(env, { id } = {}) {
+  // Master switch: until the sending domain is approved, jobs stay queued and nothing is sent.
+  if (!(await sendingReady(env))) return { sent: 0, reason: 'sending not live (switch off or domain not verified)' };
   const budget = Number(env.DAILY_SEND_LIMIT || 95) - (await sentTodayCount(env));
   if (budget <= 0) return { sent: 0, reason: 'daily limit reached' };
   const { results } = id
     ? await env.DB.prepare(`SELECT * FROM sends WHERE status = 'queued' AND id = ?`).bind(id).all()
     : await env.DB.prepare(`SELECT * FROM sends WHERE status = 'queued' AND created_at <= ? ORDER BY priority ASC, created_at ASC LIMIT ?`)
-      .bind(now(), Math.min(budget, 40)).all();
+      .bind(now(), Math.min(budget, Number(env.BATCH_SIZE || 6))).all();
   let sent = 0;
+  const quiet = new Map(); // email -> end of their post-order quiet period (looked up once per run)
   for (const job of results) {
     const mark = (status, error = null) => env.DB.prepare('UPDATE sends SET status = ?, error = ?, sent_at = ? WHERE id = ?')
       .bind(status, error, now(), job.id).run();
     try {
       if (!(await mayEmail(env, job.email, job.flow))) { await mark('skipped', 'not subscribed'); continue; }
-      // One marketing email per person per 20 hours; anything else waits its turn.
+      // One newsletter-style email per person per 20 hours. Time-sensitive emails (checkout and cart reminders,
+      // the first welcome, thank-you) only need a 2-hour gap, so a welcome never holds back a checkout reminder.
+      const urgent = ['checkout1', 'checkout2', 'cart1', 'cart2', 'welcome1', 'postpurchase'].includes(job.flow);
       const recent = await env.DB.prepare(`SELECT id FROM sends WHERE email = ? AND status = 'sent' AND sent_at > ? LIMIT 1`)
-        .bind(job.email, now() - 20 * HOUR).first();
+        .bind(job.email, now() - (urgent ? 2 : 20) * HOUR).first();
       if (recent) {
-        await env.DB.prepare('UPDATE sends SET created_at = ? WHERE id = ?').bind(now() + 6 * HOUR, job.id).run();
+        await env.DB.prepare('UPDATE sends SET created_at = ? WHERE id = ?').bind(now() + (urgent ? 1 : 6) * HOUR, job.id).run();
         continue;
       }
+      // Just ordered: dated emails are dropped, the rest (thank-you, next-order reminder, VIP...) wait until the
+      // order has arrived. A reminder for a new checkout they started still goes.
+      if (!['checkout1', 'checkout2'].includes(job.flow)) {
+        if (!quiet.has(job.email)) quiet.set(job.email, await quietUntil(env, job.email));
+        const q = quiet.get(job.email);
+        if (q) {
+          if (DROP_WHEN_QUIET.includes(job.flow)) await mark('skipped', 'recent order');
+          else await env.DB.prepare('UPDATE sends SET created_at = ? WHERE id = ?').bind(q, job.id).run();
+          continue;
+        }
+      }
+      // Cart, checkout and browse reminders: one last check that they haven't ordered since (our own records,
+      // then Shopify itself in case this run's order sync hasn't caught up).
+      if (REMINDERS.includes(job.flow)) {
+        const payload = JSON.parse(job.payload || '{}');
+        const ck = payload.token ? await env.DB.prepare('SELECT started_at FROM checkouts WHERE token = ?').bind(payload.token).first() : null;
+        const since = (ck && ck.started_at ? ck.started_at : job.created_at - 3 * DAY) - HOUR;
+        if (await orderedSince(env, job.email, since)
+          || await shopifyOrderedSince(env, job.email, new Date(since * 1000).toISOString())) {
+          await mark('skipped', 'ordered');
+          continue;
+        }
+      }
       const builder = builders[job.flow];
-      const email = builder ? await builder(env, job.email, JSON.parse(job.payload || '{}')) : null;
+      const { results: seenRows } = await env.DB.prepare('SELECT DISTINCT handle FROM shown WHERE email = ? AND at > ?').bind(job.email, now() - 60 * DAY).all();
+      const jobEnv = { ...env, _who: job.email, _seen: new Set(seenRows.map((r) => r.handle)), _shown: [] };
+      const email = builder ? await builder(jobEnv, job.email, JSON.parse(job.payload || '{}')) : null;
       if (!email) { await mark('skipped', 'nothing to send'); continue; }
       const unsubUrl = await unsubscribeUrl(env, job.email);
-      await sendViaResend(env, { to: job.email, subject: email.subject, unsubUrl,
-        html: layout(env, { ...email, unsubUrl }) });
+      let res;
+      try {
+        res = await sendViaResend(env, { to: job.email, subject: email.subject, unsubUrl, html: await tagLinks(env, job.email, layout(env, { ...email, unsubUrl })) });
+      } catch (e) {
+        // Resend rejects addresses that can't receive mail (422): never try them again.
+        if (/Resend 422/.test(String(e && e.message)) && /to|email|address|recipient/i.test(String(e.message))) {
+          await unsubscribe(env, job.email, 'invalid address');
+          await mark('skipped', 'invalid address');
+          continue;
+        }
+        throw e;
+      }
       await mark('sent');
+      if (res && res.id) await env.DB.prepare('INSERT OR IGNORE INTO deliveries (resend_id, email, flow, sent_at) VALUES (?, ?, ?, ?)').bind(res.id, job.email, job.flow, now()).run();
+      for (const h of jobEnv._shown.slice(0, 12)) await env.DB.prepare('INSERT INTO shown (email, handle, at) VALUES (?, ?, ?)').bind(job.email, h, now()).run();
       sent++;
       if (email.afterSend) await email.afterSend().catch((e) => console.error('afterSend', job.flow, e));
     } catch (err) {
-      await mark('error', String(err && err.message || err).slice(0, 500));
+      const msg = String(err && err.message || err);
+      // Cloudflare caps outbound requests per run: leave the job queued for the next run instead of failing it.
+      if (/too many subrequests/i.test(msg)) break;
+      await mark('error', msg.slice(0, 500));
     }
   }
   return { sent };
@@ -646,6 +885,7 @@ export async function drainOutbox(env, { id } = {}) {
 /* ======================= Weekly report ======================= */
 
 export async function weeklyReport(env) {
+  if (!(await sendingReady(env))) return;
   const { day, hour, ymd } = localParts(env);
   if (day !== 1 || hour < 9 || (await getKV(env, 'report_ran')) === ymd) return;
   await setKV(env, 'report_ran', ymd);
@@ -656,8 +896,74 @@ export async function weeklyReport(env) {
     `SELECT flow, error, COUNT(*) AS n FROM sends WHERE status = 'error' AND created_at > ? GROUP BY flow, error LIMIT 10`).bind(since).all();
   const rows = results.map((r) => `<tr><td style="padding:4px 10px;">${esc(r.flow)}</td><td style="padding:4px 10px;">${esc(r.status)}</td><td style="padding:4px 10px;text-align:right;">${r.n}</td></tr>`).join('');
   const errs = errors.map((e) => `<li>${esc(e.flow)}: ${esc(e.error)} (${e.n})</li>`).join('');
+  const { results: blocked } = await env.DB.prepare(`SELECT reason, COUNT(*) AS n FROM suppressions WHERE at > ? AND reason IN ('bounced', 'marked as spam', 'invalid address') GROUP BY reason`).bind(since).all();
+  const blockedLine = blocked.length ? `<p>Addresses stopped this week (never emailed again): ${blocked.map((b) => `${esc(b.reason)} ${b.n}`).join(', ')}.</p>` : '';
   const html = `<div style="font-family:Arial,sans-serif;color:#0B1220;"><h2>LuxeMail weekly report</h2>
 <p>Emails in the last 7 days:</p><table style="border-collapse:collapse;border:1px solid #ddd;">${rows || '<tr><td style="padding:6px;">No emails this week.</td></tr>'}</table>
-${errs ? `<p><strong>Errors to look at:</strong></p><ul>${errs}</ul>` : '<p>No errors. Everything is running.</p>'}</div>`;
+${blockedLine}${errs ? `<p><strong>Errors to look at:</strong></p><ul>${errs}</ul>` : '<p>No errors. Everything is running.</p>'}</div>`;
   await sendViaResend(env, { to: env.ADMIN_EMAIL, subject: `LuxeMail weekly report (${ymd})`, html, unsubUrl: env.STORE_URL });
+}
+
+/* ======================= Bounces and spam complaints ======================= */
+
+/**
+ * A few times an hour, ask Resend what happened to recent emails. A hard bounce (the address doesn't exist or the
+ * mailbox refuses mail) or a spam complaint puts that address on the suppression list, so it's never emailed again:
+ * no wasted sends, and our sending reputation stays clean. Temporary problems (mailbox full, server busy) are
+ * Resend's "delivery_delayed" and are left alone; Resend retries those itself.
+ */
+export async function checkDeliveries(env) {
+  const readKey = env.RESEND_READ_KEY || env.RESEND_API_KEY; // a Full access key, kept separate from the sending key
+  if (!readKey) return;
+  const t = now();
+  // One-off catch-up for emails sent before tracking started: page through Resend's recent sends (a few pages a run).
+  if ((await getKV(env, 'bounce_backfill')) !== 'done') {
+    let after = await getKV(env, 'bounce_backfill_after');
+    for (let page = 0; page < 4; page++) {
+      let body;
+      try {
+        const res = await fetch(`https://api.resend.com/emails?limit=100${after ? `&after=${encodeURIComponent(after)}` : ''}`, { headers: { Authorization: `Bearer ${readKey}` } });
+        if (!res.ok) {
+          await setKV(env, 'bounce_check', `Resend refused (${res.status})${res.status === 401 || res.status === 403 ? ': the API key can only send; add a Full access key as RESEND_READ_KEY in Cloudflare' : ''}`);
+          if (res.status !== 401 && res.status !== 403) await setKV(env, 'bounce_backfill', 'done');
+          break;
+        }
+        body = await res.json();
+        await setKV(env, 'bounce_check', 'ok');
+      } catch (e) { break; }
+      const list = body.data || [];
+      for (const m of list) {
+        const to = cleanEmail(Array.isArray(m.to) ? m.to[0] : m.to);
+        if (!to) continue;
+        if (m.last_event === 'bounced') await unsubscribe(env, to, 'bounced');
+        else if (m.last_event === 'complained') await unsubscribe(env, to, 'marked as spam');
+      }
+      if (!body.has_more || !list.length) { await setKV(env, 'bounce_backfill', 'done'); break; }
+      after = list[list.length - 1].id;
+      await setKV(env, 'bounce_backfill_after', after);
+    }
+  }
+  const { results } = await env.DB.prepare(`SELECT resend_id, email FROM deliveries
+      WHERE (last_event IS NULL OR last_event IN ('sent', 'queued', 'scheduled', 'delivery_delayed'))
+        AND sent_at < ? AND sent_at > ? AND (checked_at IS NULL OR checked_at < ?)
+      ORDER BY checked_at IS NOT NULL, checked_at ASC LIMIT 8`).bind(t - 10 * 60, t - 3 * DAY, t - HOUR).all();
+  for (const d of results) {
+    let event = null;
+    try {
+      const res = await fetch(`https://api.resend.com/emails/${encodeURIComponent(d.resend_id)}`, { headers: { Authorization: `Bearer ${readKey}` } });
+      if (!res.ok) {
+        await setKV(env, 'bounce_check', `Resend refused (${res.status})${res.status === 401 || res.status === 403 ? ': the API key can only send; add a Full access key as RESEND_READ_KEY in Cloudflare' : ''}`);
+        await env.DB.prepare('UPDATE deliveries SET checked_at = ? WHERE resend_id = ?').bind(t, d.resend_id).run();
+        continue;
+      }
+      await setKV(env, 'bounce_check', 'ok');
+      event = (await res.json()).last_event || null;
+    } catch (e) {
+      if (/too many subrequests/i.test(String(e && e.message))) break;
+      continue;
+    }
+    await env.DB.prepare('UPDATE deliveries SET checked_at = ?, last_event = ? WHERE resend_id = ?').bind(t, event, d.resend_id).run();
+    if (event === 'bounced') await unsubscribe(env, d.email, 'bounced');
+    else if (event === 'complained') await unsubscribe(env, d.email, 'marked as spam');
+  }
 }
