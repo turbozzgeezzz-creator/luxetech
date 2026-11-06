@@ -2413,4 +2413,4 @@ html.atc-on shopify-chat, html.atc-on #shopify-chat { transform: translateY(-96p
 .tile__art img, .tile__img { transform: scale(1.12); transform-origin: 70% 70%; }
 
 /* Footer sign-up fine print: readable white on the blue footer (it was grey on blue) */
-.footer .newsletter__notice, .footer .recaptcha-note, .footer .newsletter__notice a, .footer .recaptcha-note a { color: rgba(255, 255, 255, .85) !important; }
+.site-footer .newsletter__notice, .site-footer .recaptcha-note, .site-footer .newsletter__notice a, .site-footer .recaptcha-note a { color: rgba(255, 255, 255, .85) !important; }
