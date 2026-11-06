@@ -183,7 +183,7 @@ function letterLayout(env, { preheader, body, unsubUrl, reason }) {
 <body style="margin:0;padding:0;background:#FFFFFF;font-family:Arial,Helvetica,sans-serif;color:${INK};">
 <div style="display:none;max-height:0;overflow:hidden;">${esc(preheader || '')}</div>
 <div style="max-width:560px;margin:0 auto;padding:24px 20px;font-size:16px;line-height:1.6;">
-<a href="${env.STORE_URL}" style="display:block;margin:0 0 20px;text-decoration:none;border-bottom:1px solid #E3E8EF;"><img src="${env.PUBLIC_URL}/brand/header.png" width="300" height="50" alt="${esc(env.BRAND)}" style="display:block;width:300px;max-width:100%;height:auto;margin:0 auto;border:0;color:#0066FF;font-size:20px;font-weight:900;font-style:italic;"></a>${body}
+<a href="${env.STORE_URL}" style="display:block;margin:0 0 20px;text-decoration:none;border-bottom:1px solid #E3E8EF;"><img src="${env.PUBLIC_URL}/brand/header.png" width="300" height="50" alt="${esc(env.BRAND)}" style="display:block;width:300px;height:50px;max-width:100%;margin:0 auto;border:0;color:#0052D6;font-family:Arial,sans-serif;font-size:22px;font-weight:900;font-style:italic;line-height:50px;text-align:center;"></a>${body}
 <p style="margin:32px 0 0;font-size:12px;line-height:1.5;color:${MUTED};">${esc(reason || `You're getting this because you signed up for ${env.BRAND} emails.`)} <a href="${esc(unsubUrl)}" style="color:${MUTED};">Unsubscribe</a></p>
 </div></body></html>`;
 }
