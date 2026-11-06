@@ -1,5 +1,15 @@
 # LuxeTech theme (tech.luxedealers.com)
 
+> **Branch `luxe-design`:** the luxedealers.com theme rebuilt for Tech.LuxeDealers: same layout, sections and features,
+> with the Tech.LuxeDealers logo, light purple and white colours, tech departments and copy.
+> - Colours: LuxeDealers' blue, yellow and navy become purple (#8048F5), light lilac (#D9C4FF) and deep purple text (#2E1460).
+> - Logo: `assets/logo-tech-luxedealers-purple.png` (white version in dark mode and the footer).
+> - Illustrations: the `lx-*.svg` files hold Tech.LuxeDealers artwork under the same names, so every illustration picker keeps
+>   working; page banners use the `ill-*.svg` set.
+> - Menus: `main-menu-2` (nav row), `support-menu`, `main-menu-1` (Shop) and `legal-menu`, created in the Tech store.
+> - Offers: spend-and-save tiers only (Theme settings > Cart), no free-shipping claims until a threshold is set, Shopify's own
+>   cookie banner. Preview it by connecting this branch in Shopify (Add theme > Connect from GitHub), then publish when ready.
+
 A custom Shopify Online Store 2.0 theme for a consumer electronics store. It replaces the
 v1 theme: same LuxeTech name and category set, with a new design and most of the code rewritten.
 
