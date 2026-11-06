@@ -18,7 +18,7 @@
           "type": "step",
           "settings": {
             "title": "Check your shipping email",
-            "text": "<p>When your order ships, we email you a tracking number and a link to the carrier's tracking page.</p>"
+            "text": "<p>When your order ships, we email you a tracking number and a link to follow your parcel on this page.</p>"
           }
         },
         "s2": {
@@ -56,7 +56,7 @@
         "tone": "violet",
         "art": "ill-track",
         "kicker": "Orders",
-        "text": "<p>Paste your tracking number for live updates, or send us your order number and we'll check on it for you.</p>",
+        "text": "<p>Enter your order number to see where your parcel is, or send it to us and we'll check on it for you.</p>",
         "heading": "Track my order"
       }
     },

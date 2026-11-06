@@ -22,7 +22,7 @@
           class: 'header__logo-img'
         }}
       {%- else -%}
-        <img src="{{ 'logo-tech-luxedealers.png' | asset_url }}" width="653" height="178" alt="{{ shop.name | escape }}" class="header__logo-img logo-dark" loading="eager">
+        <img src="{{ 'logo-tech-luxedealers-purple.png' | asset_url }}" width="653" height="178" alt="{{ shop.name | escape }}" class="header__logo-img logo-dark" loading="eager">
         <img src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="653" height="178" alt="" aria-hidden="true" class="header__logo-img logo-light" loading="lazy">
       {%- endif -%}
     </a>
@@ -210,7 +210,7 @@
   <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu" tabindex="-1">
     <div class="drawer__head">
       <a href="{{ routes.root_url }}" class="drawer__logo" aria-label="{{ shop.name | escape }} home">
-        <img src="{{ 'logo-tech-luxedealers.png' | asset_url }}" width="653" height="178" alt="" class="logo-dark" loading="lazy">
+        <img src="{{ 'logo-tech-luxedealers-purple.png' | asset_url }}" width="653" height="178" alt="" class="logo-dark" loading="lazy">
         <img src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="653" height="178" alt="" class="logo-light" loading="lazy">
       </a>
       <button type="button" class="header__icon" data-drawer-close aria-label="Close menu">{% render 'icon', name: 'close' %}</button>

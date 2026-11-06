@@ -1,0 +1,136 @@
+/* ==========================================================================
+   Lilac: the LuxeDealers look in Tech.LuxeDealers colours.
+   Loaded after theme.css. White pages, light purple panels and gradient tiles,
+   a purple top bar and footer, deep purple text, Poppins type (upright, like
+   luxedealers.com). No black anywhere.
+   ========================================================================== */
+@font-face { font-family: 'Poppins'; font-style: normal; font-weight: 400; font-display: swap; src: url('poppins-400.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-style: normal; font-weight: 500; font-display: swap; src: url('poppins-500.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-style: normal; font-weight: 600; font-display: swap; src: url('poppins-600.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-style: normal; font-weight: 700; font-display: swap; src: url('poppins-700.woff2') format('woff2'); }
+
+:root {
+  /* Palette */
+  --lilac-50: #FAF7FF;
+  --lilac-100: #F4EEFF;
+  --lilac-200: #E9DDFF;
+  --lilac-300: #D6C2FF;
+  --lilac-400: #B794FF;
+  --lilac-500: #9B6BFF;
+  --lilac-600: #8048F5;
+  --lilac-700: #6A33DB;
+  --plum: #2E1460;          /* text: deep purple instead of black */
+  --plum-rgb: 46, 20, 96;
+
+  --c-bg: #FFFFFF;
+  --c-subtle: var(--lilac-50);
+  --c-surface: #FFFFFF;
+  --c-ink: var(--plum);
+  --c-ink-rgb: var(--plum-rgb);
+  --c-muted: #6B5E8C;
+  --c-border: #ECE4FB;
+  --c-primary: var(--lilac-600);
+  --c-primary-rgb: 128, 72, 245;
+  --c-primary-dark: var(--lilac-700);
+  --c-accent: var(--lilac-100);
+  --c-accent-text: var(--lilac-700);
+  --c-night: var(--lilac-600);   /* everything that used to be black is purple now */
+  --c-photo: #F6F2FF;
+  --c-on-ink: #FFFFFF;
+  --c-on-ink-muted: rgba(255, 255, 255, .86);
+  --c-primary-on-ink: #FFFFFF;
+
+  --grad-purple: linear-gradient(135deg, #A57BFF 0%, #8048F5 55%, #6E3AE6 100%);
+  --grad-lilac: linear-gradient(135deg, #FFFFFF 0%, #F1E9FF 45%, #DCCBFF 100%);
+  --grad-bar: linear-gradient(90deg, #7C45F2 0%, #9B6BFF 100%);
+
+  --font-display: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Poppins', system-ui, sans-serif;
+  --stretch-display: 100%;
+  --stretch-heading: 100%;
+}
+
+/* ---------- Type: upright Poppins like luxedealers.com ---------- */
+body { font-family: var(--font-body); color: var(--c-ink); background: var(--c-bg); }
+h1, h2, h3, h4, [class*="heading"], [class*="__title"], [class*="-title"], .footer__deal-title {
+  font-family: var(--font-display); font-style: normal !important; font-stretch: 100% !important; letter-spacing: -.01em;
+}
+h1, h2 { font-weight: 700; }
+h3, h4 { font-weight: 600; }
+.price, .price__current, [class*="price"] strong, [class*="__price"] { font-style: normal !important; font-stretch: 100% !important; }
+.tone-kicker, [class*="kicker"], [class*="eyebrow"] { font-family: var(--font-body); font-weight: 600; letter-spacing: .14em; }
+
+/* No slanted text anywhere (the old style was italic); real emphasis in text keeps its italics. */
+body *:not(em):not(i):not(cite):not(blockquote) { font-style: normal !important; }
+.footer__wordmark { font-stretch: 100% !important; }
+
+/* ---------- Top bar and header ---------- */
+.utility-bar { background: var(--grad-bar); color: #fff; }
+.utility-bar a, .utility-bar button, .utility-bar .icon { color: #fff; }
+
+/* ---------- Buttons ---------- */
+.btn--primary { background: var(--c-primary); color: #fff; }
+.btn--primary:hover { background: var(--lilac-700); }
+.btn--ink, .newsletter-band .btn--primary { background: var(--c-primary); color: #fff; }
+.btn--white:hover, .tone--light .tone-btn:hover { background: var(--lilac-700); color: #fff; }
+
+/* ---------- Tiles: purple gradients and light lilac, never dark ---------- */
+.tone--violet, .tone--grape { background: var(--grad-purple); }
+.tone { --tone-accent: #F1E7FF; }
+/* The old black tiles become light lilac, so purple and lilac tiles alternate (like LuxeDealers' blue and yellow). */
+.tone--light, .tone--ink { background: var(--grad-lilac); color: var(--plum); --tone-muted: #5C4F80; --tone-accent: var(--lilac-700); }
+.tone--ink::after { background-image: radial-gradient(rgba(128, 72, 245, .12) 1.3px, transparent 1.5px); }
+.tone--ink .tone-btn, .tone--light .tone-btn { background: var(--c-primary); color: #fff; }
+.tone--ink .tone-btn-2 { border-color: rgba(var(--plum-rgb), .3); color: var(--plum); }
+.tone--ink .tone-pill { background: var(--c-primary); color: #fff; }
+.tone--ink .dept-chip { border-color: rgba(var(--plum-rgb), .2); color: var(--plum); }
+.tone::after { background-image: radial-gradient(rgba(255, 255, 255, .14) 1.3px, transparent 1.5px); }
+.tone--light::after { background-image: radial-gradient(rgba(128, 72, 245, .12) 1.3px, transparent 1.5px); }
+.tone-btn { background: #fff; color: var(--lilac-700); }
+.tone-pill { color: var(--lilac-700); }
+@media (min-width: 750px) { .bento__main { background: var(--lilac-600); } }
+.bento__controls { background: rgba(255, 255, 255, .22); backdrop-filter: blur(6px); }
+.bento__arrow { background: #fff; color: var(--lilac-700); }
+.slideshow__arrow:hover, .slideshow__dot[aria-current="true"] { background: var(--c-primary); }
+
+/* ---------- Bands ---------- */
+.marquee--ink { background: var(--lilac-100); color: var(--plum); }
+.marquee--ink .marquee__item::after { background: var(--c-primary); }
+.range-hero--ink { background: var(--grad-purple); }
+.help-card--contact { background: var(--grad-purple); border-color: transparent; }
+.overview__glance, .card--feature .card__index { background: var(--grad-purple); }
+.pagination__item.is-current { background: var(--c-primary); border-color: var(--c-primary); }
+.shopify-payment-button__button--unbranded { background: var(--lilac-700) !important; }
+.gallery__counter { background: rgba(var(--plum-rgb), .7); }
+
+/* ---------- Footer: purple gradient like the LuxeDealers blue one ---------- */
+html { background: var(--lilac-700); }
+body { background: var(--c-bg); }
+.footer { background: linear-gradient(160deg, #8A55FA 0%, #7440EE 55%, #6533DE 100%); color: rgba(255, 255, 255, .86); }
+.footer__links a, .footer__policies a { color: rgba(255, 255, 255, .86); }
+.footer__links a:hover, .footer__policies a:hover { color: #fff; }
+.footer__fine, .footer__legal { color: rgba(255, 255, 255, .72); }
+.footer__legal a { color: rgba(255, 255, 255, .86); }
+.footer .newsletter-form__row { border-color: rgba(255, 255, 255, .4); background: #fff; }
+.footer .newsletter-form__row .input { color: var(--plum); }
+.footer .newsletter-form__row .input::placeholder { color: #8B7FB0; }
+.footer .newsletter-form__row .btn { background: var(--lilac-700); color: #fff; }
+.footer .social a { border-color: rgba(255, 255, 255, .45); }
+.footer .social a:hover { background: #fff; color: var(--lilac-700); border-color: #fff; }
+.footer__contact .icon { color: #fff; }
+.footer__wordmark { color: rgba(255, 255, 255, .14); background: none; -webkit-text-fill-color: rgba(255, 255, 255, .14); }
+.footer .currency-form--footer select, .footer .currency-form--footer button { color: #fff; border-color: rgba(255, 255, 255, .4); background: transparent; }
+
+/* ---------- Dark mode: deep purple, not black ---------- */
+html[data-theme="dark"] {
+  --c-bg: #1B0F38;
+  --c-subtle: #24164A;
+  --c-surface: #221446;
+  --c-ink: #F3EEFF;
+  --c-muted: #BDB2DA;
+  --c-border: #3A2A66;
+  --c-night: var(--lilac-600);
+}
+html[data-theme="dark"] .tone--light { background: linear-gradient(135deg, #2D1B5C 0%, #3A2475 100%); color: #fff; --tone-muted: #D4C8F2; --tone-accent: #D6C2FF; }
+html[data-theme="dark"] .marquee--ink { background: #2D1B5C; color: #fff; }

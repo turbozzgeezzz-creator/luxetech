@@ -20,9 +20,9 @@ function cors(env, request) {
 }
 
 const page = (title, message) => new Response(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
-<style>body{margin:0;background:#F2F3F5;font-family:Arial,sans-serif;color:#0B1220;display:grid;place-items:center;min-height:100vh}
+<style>body{margin:0;background:#FAF7FF;font-family:Arial,sans-serif;color:#2E1460;display:grid;place-items:center;min-height:100vh}
 .c{max-width:440px;margin:16px;padding:32px;border-radius:20px;background:#fff;text-align:center}h1{font-weight:800}
-button,a.b{display:inline-block;margin-top:14px;padding:14px 26px;border:0;border-radius:999px;background:#7D03FC;color:#fff;font-weight:700;font-size:15px;text-decoration:none;cursor:pointer}</style></head>
+button,a.b{display:inline-block;margin-top:14px;padding:14px 26px;border:0;border-radius:999px;background:#8048F5;color:#fff;font-weight:700;font-size:15px;text-decoration:none;cursor:pointer}</style></head>
 <body><div class="c">${message}</div></body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
 
 async function validUnsub(env, email, sig) {
