@@ -164,6 +164,9 @@
                       assign mc = nil
                       if link.type == 'collection_link'
                         assign mc = link.object
+                      elsif link.type == 'catalog_link' or link.url == '/collections/all'
+                        # Shop all: best sellers from the whole store, not the first department in the list
+                        assign mc = collections['best-sellers'] | default: collections.all
                       else
                         for child in link.links
                           if child.type == 'collection_link'
@@ -184,7 +187,7 @@
                             </a>
                           {%- endif -%}
                         {%- endfor -%}
-                        <a class="mega__shot-all" href="{{ mc.url }}">{{ 'header.shop_all' | t: title: mc.title }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>
+                        <a class="mega__shot-all" href="{% if link.type == 'catalog_link' or link.url == '/collections/all' %}{{ routes.all_products_collection_url }}{% else %}{{ mc.url }}{% endif %}">{% if link.type == 'catalog_link' or link.url == '/collections/all' %}Shop everything{% else %}{{ 'header.shop_all' | t: title: mc.title }}{% endif %} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>
                       </div>
                     {%- endif -%}
                   </div>
