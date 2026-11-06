@@ -57,11 +57,6 @@
             <button type="button" class="offer-item__link" data-open-popup>{{ 'sections.offers_join' | t }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</button>
           </li>
         {%- endif -%}
-        <li class="offer-item">
-          <span class="offer-item__when">{{ 'sections.offers_ship' | t }}</span>
-          <span class="offer-item__fig">{{ 'sections.offers_free' | t }}</span>
-          <span class="offer-item__note">{{ 'sections.offers_ship_note' | t }}</span>
-        </li>
       </ul>
       {%- if s.button != blank -%}<a class="btn btn--gold btn--sm offers__cta" href="{{ s.link | default: routes.all_products_collection_url }}">{{ s.button }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
     </div>

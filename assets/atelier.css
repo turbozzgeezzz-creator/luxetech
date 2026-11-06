@@ -2385,8 +2385,8 @@ html[data-theme="dark"] .trk__stages li.is-done, html[data-theme="dark"] .trk__l
 /* ---------- Tech.LuxeDealers logo (image instead of the LUXEDEALERS wordmark) ---------- */
 .logo-img, .header__logo img.logo-img { display: block; height: 44px; width: auto; max-width: 200px; object-fit: contain; }
 .header-wrapper.is-scrolled .header__logo img.logo-img { height: 38px; }
-.logo-img--dark { display: none; }
-html[data-theme="dark"] .logo-img--light { display: none; }
-html[data-theme="dark"] .logo-img--dark { display: block; }
+.header__logo img.logo-img--dark, img.logo-img--dark { display: none; }
+html[data-theme="dark"] .header__logo img.logo-img--light, html[data-theme="dark"] img.logo-img--light { display: none; }
+html[data-theme="dark"] .header__logo img.logo-img--dark, html[data-theme="dark"] img.logo-img--dark { display: block; }
 .footer__logo-img { display: block; width: 190px; height: auto; margin-bottom: 4px; }
 @media (max-width: 749px) { .logo-img, .header__logo img.logo-img { height: 34px; } }
