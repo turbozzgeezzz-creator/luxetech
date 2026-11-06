@@ -1,0 +1,20 @@
+{%- comment -%}
+  Plug for a country (ISO code). Outputs AU, UK, US or EU. The same rule is printed on the packing slip
+  (mailer/PACKING-SLIP.md), so what the site promises is what the packer sends. Param: country (e.g. 'GB')
+{%- endcomment -%}
+{%- liquid
+  assign c = country | upcase
+  assign au = ',AU,NZ,FJ,PG,TO,WS,VU,SB,AR,UY,CN,'
+  assign uk = ',GB,IE,HK,SG,MY,AE,SA,QA,KW,BH,OM,CY,MT,MU,KE,NG,GH,ZW,ZM,UG,TZ,JE,GG,IM,GI,MO,BN,LK,'
+  assign us = ',US,CA,MX,JP,TW,PH,TH,CO,EC,PE,VE,PR,GT,CR,PA,DO,HN,SV,NI,JM,BS,BM,KY,BR,'
+  assign key = ',' | append: c | append: ','
+  if au contains key
+    echo 'AU'
+  elsif uk contains key
+    echo 'UK'
+  elsif us contains key
+    echo 'US'
+  else
+    echo 'EU'
+  endif
+-%}

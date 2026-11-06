@@ -187,7 +187,7 @@
           "type": "question",
           "settings": {
             "question": "Will it work in my country?",
-            "answer": "<p>Mains-powered products let you choose a US, UK or AU plug. If you are unsure about compatibility, ask us before you order.</p>"
+            "answer": "<p>Mains-powered products ship with the right plug for your delivery country (AU, UK, US or EU). Unsure about compatibility? Ask us before you order.</p>"
           }
         }
       },

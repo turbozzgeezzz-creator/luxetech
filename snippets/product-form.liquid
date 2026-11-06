@@ -95,6 +95,11 @@
   <p class="dispatch" data-dispatch data-days="{{ settings.dispatch_days }}" data-cutoff="{{ settings.dispatch_cutoff }}" data-offset="{{ 'now' | date: '%z' }}" data-label="{{ 'products.dispatch' | t | escape }}" hidden>{% render 'icon', name: 'truck', class: 'icon--sm' %} <span></span></p>
 {%- endif -%}
 <p class="{{ stock_class }}" data-stock data-threshold="{{ threshold }}" data-in="{{ 'products.in_stock' | t | escape }}" data-out="{{ 'products.sold_out' | t | escape }}" data-low="{{ low | escape }}" data-backorder="{{ 'products.backorder' | t | escape }}">{{ stock_text }}</p>
+{%- if product.tags contains 'mains-plug' -%}
+  {%- capture plug -%}{% render 'plug-type', country: localization.country.iso_code %}{%- endcapture -%}
+  {%- assign plug = plug | strip -%}
+  <p class="plug-note">{% render 'icon', name: 'plug', class: 'icon--sm' %}<span>Comes with {% if plug == 'EU' or plug == 'AU' %}an{% else %}a{% endif %} <strong>{{ plug }} plug</strong> for {{ localization.country.name }}. We match the plug to your delivery address, so there's nothing to choose.</span></p>
+{%- endif -%}
 
 {%- form 'product', product, id: form_id, class: 'buy-buttons', data-product-form: '', novalidate: 'novalidate' -%}
   <input type="hidden" name="id" value="{{ current.id }}">

@@ -2414,3 +2414,8 @@ html.atc-on shopify-chat, html.atc-on #shopify-chat { transform: translateY(-96p
 
 /* Footer sign-up fine print: readable white on the blue footer (it was grey on blue) */
 .site-footer .newsletter__notice, .site-footer .recaptcha-note, .site-footer .newsletter__notice a, .site-footer .recaptcha-note a { color: rgba(255, 255, 255, .85) !important; }
+
+/* Plug matched to the delivery country (mains-powered products) */
+.plug-note { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0 0; padding: 10px 14px; border-radius: 12px; background: #F2F7FF; border: 1px solid #D7E6FA; font-size: 13.5px; line-height: 1.45; color: var(--c-ink); }
+.plug-note .icon { flex: none; margin-top: 2px; color: #0066FF; }
+html[data-theme="dark"] .plug-note { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }

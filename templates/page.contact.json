@@ -30,7 +30,7 @@
           "type": "question",
           "settings": {
             "question": "Do you ship internationally?",
-            "answer": "<p>Yes. Every order is tracked. Choose your country at the top of the page to see prices in your currency, and pick the right plug (US, UK or AU) on mains-powered products. Any customs duties or taxes charged by your country are paid by the customer.</p>"
+            "answer": "<p>Yes. Every order is tracked. Choose your country at the top of the page to see prices in your currency, and mains-powered products ship with the right plug for your delivery country. Any customs duties or taxes charged by your country are paid by the customer.</p>"
           }
         },
         "q3": {

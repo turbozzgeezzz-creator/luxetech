@@ -106,7 +106,7 @@
           "settings": {
             "topic": "products",
             "question": "Which plug will I get?",
-            "answer": "<p>Mains-powered products let you choose a US, UK or AU plug on the product page. Pick the one for the country you will use it in.</p>"
+            "answer": "<p>Mains-powered products ship with the right plug for your delivery country (AU, UK, US or EU), so there is nothing to choose.</p>"
           }
         }
       },

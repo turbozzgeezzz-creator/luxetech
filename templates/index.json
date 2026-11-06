@@ -402,7 +402,7 @@
           "type": "q",
           "settings": {
             "question": "Will it work in my country?",
-            "answer": "<p>Choose your plug type on the product page (US, UK or AU). If you're unsure, ask us before you order.</p>",
+            "answer": "<p>Mains-powered products ship with the right plug for your delivery country (AU, UK, US or EU), so there is nothing to choose. Unsure about compatibility? Ask us before you order.</p>",
             "link": "/pages/contact",
             "link_label": "Ask us"
           }
