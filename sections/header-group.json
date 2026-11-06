@@ -27,11 +27,12 @@
         "m1": {
           "type": "message",
           "settings": {
-            "icon": "chat",
-            "text": "Real people, real answers",
-            "link": "/pages/contact",
+            "icon": "tag",
+            "text": "Buy 2, save 10% · Buy 3+, save 15%",
+            "link": "/collections/all",
             "opens_popup": false,
-            "needs_code": false
+            "needs_code": false,
+            "needs_qty": true
           }
         },
         "m2": {

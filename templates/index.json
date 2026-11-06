@@ -368,44 +368,6 @@
         "collection": "all"
       }
     },
-    "why": {
-      "type": "why-us",
-      "blocks": {
-        "a": {
-          "type": "point",
-          "settings": {
-            "title": "Checked before it ships",
-            "text": "Every order is checked before it's packed, so what arrives matches what you ordered."
-          }
-        },
-        "b": {
-          "type": "point",
-          "settings": {
-            "title": "Real people, real answers",
-            "text": "Questions about compatibility, an order or tracking go to a person on our team, not a bot."
-          }
-        },
-        "c": {
-          "type": "point",
-          "settings": {
-            "title": "Tracked, no surprises",
-            "text": "Every order is tracked from our warehouse to your door. If anything arrives faulty, we make it right."
-          }
-        }
-      },
-      "block_order": [
-        "a",
-        "b",
-        "c"
-      ],
-      "settings": {
-        "eyebrow": "Why Tech.LuxeDealers",
-        "heading": "Tech, chosen by\npeople who use it",
-        "text": "<p>Smart gadgets for audio, charging, the kitchen, home and the car, picked by our team and sent with tracking. Ask us anything before you buy and you'll get a straight answer from a real person.</p>",
-        "button": "Why choose us",
-        "link": "/pages/about-us"
-      }
-    },
     "journal": {
       "type": "blog-posts",
       "settings": {
@@ -552,7 +514,6 @@
     "offers",
     "deals",
     "budget",
-    "why",
     "journal",
     "help",
     "signup",
