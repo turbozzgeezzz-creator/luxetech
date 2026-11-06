@@ -58,9 +58,9 @@
         "m5": {
           "type": "message",
           "settings": {
-            "icon": "sparkle",
-            "text": "New arrivals every week",
-            "link": "/collections/new-arrivals",
+            "icon": "tag",
+            "text": "Price drops on selected tech",
+            "link": "/collections/deals",
             "opens_popup": false,
             "needs_code": false
           }
@@ -69,7 +69,7 @@
           "type": "message",
           "settings": {
             "icon": "truck",
-            "text": "Dispatched in 3-4 business days, tracked",
+            "text": "FREE tracked shipping on orders over A$50",
             "link": "/pages/shipping-delivery",
             "opens_popup": false,
             "needs_code": false
@@ -77,12 +77,12 @@
         }
       },
       "block_order": [
+        "m5",
         "m4",
         "m0",
         "m6",
         "m2",
-        "m1",
-        "m5"
+        "m1"
       ],
       "settings": {
         "speed": 4,
@@ -99,7 +99,7 @@
         "hide_on_scroll": false,
         "highlight_item": "Best sellers",
         "menu": "main-menu-2",
-        "nav_hide": "Help",
+        "nav_hide": "Track your order, FAQs, Reviews, Why choose us, Guides, Contact",
         "overlay_home": false,
         "pill_label": "New in",
         "pill_link": "/collections/new-arrivals",

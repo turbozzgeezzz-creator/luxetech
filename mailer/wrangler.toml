@@ -45,7 +45,7 @@ TIER2_PERCENT = "10"
 # Collection used for "best sellers" picks in emails.
 BEST_COLLECTION = "best-sellers"
 # Shipping line in the welcome email, e.g. "Shipping is free on orders over A$80". Empty: only "Every order is tracked".
-SHIPPING_NOTE = ""
+SHIPPING_NOTE = "Shipping is free on orders over A$50"
 
 # Secrets (set with `wrangler secret put NAME`):
 # SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET, RESEND_API_KEY, UNSUB_SECRET

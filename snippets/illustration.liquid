@@ -2,7 +2,43 @@
   A gold illustration from assets (lx-*.svg), or the uploaded image when one
   is set. Params: name, image, sizes, class, eager
 {%- endcomment -%}
-{%- assign ill_alt = name | remove: 'lx-' | replace: '-', ' ' | capitalize | append: ' illustration' -%}
+{%- liquid
+  # Plain-English alt text for the Tech.LuxeDealers artwork behind each illustration name.
+  case name
+    when 'lx-watch' or 'ill-watch'
+      assign ill_alt = 'Smart watch illustration'
+    when 'lx-bag' or 'ill-about'
+      assign ill_alt = 'Shopping bag illustration'
+    when 'lx-tote' or 'ill-dept-audio'
+      assign ill_alt = 'Wireless earbuds and charging case illustration'
+    when 'lx-sneaker' or 'ill-buds'
+      assign ill_alt = 'Wireless earbuds illustration'
+    when 'lx-heel' or 'ill-haircare'
+      assign ill_alt = 'Hair dryer illustration'
+    when 'lx-diamond' or 'ill-devices'
+      assign ill_alt = 'Phone, smart watch and earbuds illustration'
+    when 'lx-ring' or 'ill-charge'
+      assign ill_alt = 'Wireless charging pad illustration'
+    when 'lx-necklace' or 'ill-dept-home'
+      assign ill_alt = 'Blender and kitchen gadget illustration'
+    when 'lx-perfume' or 'ill-espresso'
+      assign ill_alt = 'Espresso machine illustration'
+    when 'lx-sunglasses' or 'ill-dept-accessories'
+      assign ill_alt = 'Hair dryer and tracker illustration'
+    when 'lx-hoodie' or 'ill-dept-charging'
+      assign ill_alt = 'Wireless charger illustration'
+    when 'lx-gift' or 'ill-offer'
+      assign ill_alt = 'Gift illustration'
+    when 'lx-parcel' or 'ill-shipping'
+      assign ill_alt = 'Parcel illustration'
+    when 'lx-coupon' or 'ill-coupon'
+      assign ill_alt = 'Discount coupon illustration'
+    when 'lx-envelope' or 'ill-newsletter'
+      assign ill_alt = 'Email envelope illustration'
+    else
+      assign ill_alt = name | remove: 'lx-' | remove: 'ill-' | replace: '-', ' ' | capitalize | append: ' illustration'
+  endcase
+-%}
 {%- if image != blank -%}
   {%- if eager -%}
     {{ image | image_url: width: 1400 | image_tag: widths: '360, 540, 720, 960, 1200, 1400', sizes: sizes, fetchpriority: 'high', alt: ill_alt, class: class }}

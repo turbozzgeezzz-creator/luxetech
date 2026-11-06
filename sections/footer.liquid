@@ -22,7 +22,7 @@
       {%- case block.type -%}
         {%- when 'brand' -%}
           <div class="footer__col footer__brand" {{ block.shopify_attributes }}>
-            <img class="footer__logo-img" src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="440" height="120" alt="{{ block.settings.title | default: shop.name | escape }}" loading="lazy">
+            <img class="footer__logo-img" src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="1008" height="200" alt="{{ block.settings.title | default: shop.name | escape }}" loading="lazy">
             {%- if block.settings.text != blank -%}<div class="footer__about rte">{{ block.settings.text }}</div>{%- endif -%}
             {%- if block.settings.service_title != blank -%}<span class="footer__title">{{ block.settings.service_title }}</span>{%- endif -%}
             {%- if block.settings.service_text != blank -%}<p class="footer__about">{{ block.settings.service_text }}</p>{%- endif -%}

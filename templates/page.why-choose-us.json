@@ -1,0 +1,215 @@
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "eyebrow": "Why Tech.LuxeDealers",
+        "heading": "Tech, chosen by people who use it",
+        "text": "Hand-picked gadgets for audio, charging, wearables, home and the car, sent with tracking, with real people to help before and after you buy.",
+        "show_meta": true,
+        "art": "auto"
+      }
+    },
+    "promises": {
+      "type": "promises",
+      "blocks": {
+        "a": {
+          "type": "promise",
+          "settings": {
+            "icon": "truck",
+            "title": "Free shipping",
+            "text": "<p>On orders over A$50, with tracking. Dispatched within 3-4 business days.</p>",
+            "link": "/pages/shipping-delivery",
+            "link_label": "Shipping and delivery"
+          }
+        },
+        "b": {
+          "type": "promise",
+          "settings": {
+            "icon": "return",
+            "title": "Refund or replacement",
+            "text": "<p>Damaged, faulty or the wrong item? Send us a photo and we'll make it right.</p>",
+            "link": "/pages/returns-warranty",
+            "link_label": "Refund policy"
+          }
+        },
+        "c": {
+          "type": "promise",
+          "settings": {
+            "icon": "shield",
+            "title": "Checked before it ships",
+            "text": "<p>Every order is checked before it's packed.</p>",
+            "link": "",
+            "link_label": ""
+          }
+        },
+        "d": {
+          "type": "promise",
+          "settings": {
+            "icon": "chat",
+            "title": "Real support",
+            "text": "<p>Real people answer every email at support@luxedealers.com.</p>",
+            "link": "/pages/contact",
+            "link_label": "Contact us"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "settings": {
+        "eyebrow": "",
+        "heading": "",
+        "subtle": false,
+        "cards": true
+      }
+    },
+    "why": {
+      "type": "why-us",
+      "blocks": {
+        "a": {
+          "type": "point",
+          "settings": {
+            "title": "Checked, every order",
+            "text": "Each order is checked before it's packed, so what arrives matches what you picked."
+          }
+        },
+        "b": {
+          "type": "point",
+          "settings": {
+            "title": "Real people, real answers",
+            "text": "Questions about compatibility, plugs, an order or tracking go to a person on our team at support@luxedealers.com."
+          }
+        },
+        "c": {
+          "type": "point",
+          "settings": {
+            "title": "Clear prices, no surprises",
+            "text": "Prices are shown in your currency, discounts come off automatically, and every order is tracked."
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c"
+      ],
+      "settings": {
+        "eyebrow": "Our standards",
+        "heading": "What we promise,\nevery time.",
+        "text": "<p>No fake reviews and no countdown timers. Just clear prices, honest product details and people who answer your emails.</p>",
+        "button": "Contact us",
+        "link": "/pages/contact"
+      }
+    },
+    "reviews": {
+      "type": "reviews-strip",
+      "settings": {
+        "eyebrow": "Reviews",
+        "heading": "Real reviews from real customers",
+        "collection": "best-sellers",
+        "limit": 10,
+        "min_rating": 1,
+        "link_label": "All reviews",
+        "link": "/pages/reviews"
+      }
+    },
+    "steps": {
+      "type": "steps",
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "icon": "sparkle",
+            "title": "Pick your tech",
+            "text": "Browse, check the plug and compatibility details, and choose your style. Questions? Ask us before you order."
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "icon": "shield",
+            "title": "We check it",
+            "text": "Every order is checked before it's packed, so what arrives matches what you picked."
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "icon": "truck",
+            "title": "Free tracked shipping",
+            "text": "Free on orders over A$50, dispatched within 3-4 business days with tracking."
+          }
+        },
+        "s4": {
+          "type": "step",
+          "settings": {
+            "icon": "return",
+            "title": "Love it, or we fix it",
+            "text": "Damaged, faulty or wrong? We'll refund or replace it."
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ],
+      "settings": {
+        "eyebrow": "From order to door",
+        "heading": "How it works",
+        "text": "Every order follows the same four steps.",
+        "dark": false
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Orders are dispatched within 3-4 business days, and you'll get a tracking number by email when yours ships.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "What if something isn't right?",
+            "answer": "<p>Email support@luxedealers.com with your order number and a photo or video. We'll refund or replace it.</p>"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Will it work in my country?",
+            "answer": "<p>Mains-powered products let you choose a US, UK or AU plug. If you are unsure about compatibility, ask us before you order.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3"
+      ],
+      "settings": {
+        "eyebrow": "Questions",
+        "heading": "Good to know",
+        "more_link": "/pages/faq",
+        "schema": false
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "promises",
+    "steps",
+    "why",
+    "reviews",
+    "faq"
+  ]
+}

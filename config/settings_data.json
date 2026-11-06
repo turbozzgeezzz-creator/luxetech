@@ -18,8 +18,8 @@
     "tier_2_spend": 150,
     "tier_2_percent": 10,
     "seo_home_title": "Tech.LuxeDealers | Smart Gadgets, Audio, Charging & Home Tech",
-    "free_shipping_threshold": 0,
-    "shipping_fee_below_threshold": 0,
+    "free_shipping_threshold": 50,
+    "shipping_fee_below_threshold": 5.95,
     "seo_home_description": "Shop hand-picked smart gadgets: earbuds, chargers, smart watches, home and kitchen tech. Tracked shipping on every order and real people to help.",
     "sections": {
       "cart-drawer": {

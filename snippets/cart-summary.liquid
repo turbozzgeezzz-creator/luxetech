@@ -35,8 +35,8 @@
     <div class="ship-bar__track" aria-hidden="true"><div class="ship-bar__fill" style="--pct: 0%"></div></div>
   </div>
 {%- endif -%}
-{% render 'tier-bar' %}
-{% render 'qty-bar' %}
+{%- comment -%} One discount bar: only one automatic discount applies at checkout, so with buy-more-save-more on, the spend-and-save bar stays hidden. {%- endcomment -%}
+{%- if settings.qty_1_count > 1 -%}{% render 'qty-bar' %}{%- else -%}{% render 'tier-bar' %}{%- endif -%}
 {%- if settings.cart_gift_note -%}
   <details class="cart-gift"{% if cart.note != blank %} open{% endif %}>
     <summary>{{ 'cart.gift_message' | t }} {% render 'icon', name: 'gift', class: 'icon--sm' %}</summary>

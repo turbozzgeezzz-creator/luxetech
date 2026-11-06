@@ -267,7 +267,7 @@
       "settings": {
         "eyebrow": "Departments",
         "heading": "Shop by department",
-        "text": "Every department, hand-picked and shipped with tracking.",
+        "text": "Every department, hand-picked, with free tracked shipping over A$50.",
         "link_label": "Shop all",
         "link": "/collections/all"
       }
@@ -384,7 +384,7 @@
           "type": "q",
           "settings": {
             "question": "When will my order ship?",
-            "answer": "<p>Orders are dispatched within 3–4 business days, and your tracking number is emailed as soon as it leaves.</p>",
+            "answer": "<p>Orders are dispatched within 3–4 business days with tracking. Shipping is free on orders over A$50 (A$5.95 below that).</p>",
             "link": "/policies/shipping-policy",
             "link_label": "Shipping policy"
           }
@@ -424,22 +424,6 @@
         "cta_link": "/pages/contact"
       }
     },
-    "signup": {
-      "type": "signup-offer",
-      "settings": {
-        "illustration": "lx-envelope",
-        "illustration_offer": "lx-envelope",
-        "eyebrow": "The list",
-        "offer_eyebrow": "Welcome offer",
-        "heading": "First look at new tech",
-        "text": "Join the list for new arrivals, restocks and subscriber-only deals.",
-        "tick_1": "Early access to new arrivals",
-        "tick_2": "Subscriber-only deals",
-        "tick_3": "No spam, unsubscribe any time",
-        "card_title": "Join the list",
-        "card_text": "Enter your email and tick the box to subscribe."
-      }
-    },
     "recent": {
       "type": "recently-viewed",
       "settings": {
@@ -463,8 +447,8 @@
       "type": "offers",
       "settings": {
         "eyebrow": "Offers",
-        "heading": "Spend more, save more",
-        "text": "Spend-and-save discounts come off automatically at checkout. No code needed.",
+        "heading": "Buy more, save more",
+        "text": "Automatic discounts, no code needed. The best one for your cart is applied at checkout.",
         "button": "Shop all",
         "link": "/collections/all"
       }
@@ -485,8 +469,8 @@
         "d": {
           "type": "collection",
           "settings": {
-            "collection": "best-sellers",
-            "title": "Best sellers"
+            "collection": "deals",
+            "title": "Price drops"
           }
         }
       },
@@ -494,8 +478,8 @@
         "d"
       ],
       "settings": {
-        "eyebrow": "Most loved",
-        "heading": "Best sellers",
+        "eyebrow": "Selected tech reduced",
+        "heading": "Price drops",
         "layout": "rail",
         "limit": 10,
         "view_all": true,
@@ -516,7 +500,6 @@
     "budget",
     "journal",
     "help",
-    "signup",
     "recent"
   ]
 }

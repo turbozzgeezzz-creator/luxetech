@@ -1,0 +1,7 @@
+{
+  "sections": {
+    "hero": { "type": "page-hero", "settings": { "eyebrow": "Legal", "heading": "Cookie policy", "text": "How we use cookies, and how to change your choice at any time.", "art": "diamond" } },
+    "main": { "type": "cookie-policy", "settings": {} }
+  },
+  "order": ["hero", "main"]
+}

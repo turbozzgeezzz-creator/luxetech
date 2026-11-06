@@ -2383,10 +2383,31 @@ html[data-theme="dark"] .trk__stages li.is-done, html[data-theme="dark"] .trk__l
 @media (max-width: 480px) { .trk__stages li { font-size: 12px; } }
 
 /* ---------- Tech.LuxeDealers logo (image instead of the LUXEDEALERS wordmark) ---------- */
-.logo-img, .header__logo img.logo-img { display: block; height: 44px; width: auto; max-width: 200px; object-fit: contain; }
+.logo-img, .header__logo img.logo-img { display: block; height: 44px; width: auto; max-width: 260px; object-fit: contain; }
 .header-wrapper.is-scrolled .header__logo img.logo-img { height: 38px; }
 .header__logo img.logo-img--dark, img.logo-img--dark { display: none; }
 html[data-theme="dark"] .header__logo img.logo-img--light, html[data-theme="dark"] img.logo-img--light { display: none; }
 html[data-theme="dark"] .header__logo img.logo-img--dark, html[data-theme="dark"] img.logo-img--dark { display: block; }
 .footer__logo-img { display: block; width: 190px; height: auto; margin-bottom: 4px; }
 @media (max-width: 749px) { .logo-img, .header__logo img.logo-img { height: 34px; } }
+
+/* Chat bubble sits above the sticky add-to-cart bar on every screen size (it covered the button on desktop and tablet) */
+shopify-chat, #shopify-chat { transition: transform .3s var(--ease-out); }
+html.atc-on shopify-chat, html.atc-on #shopify-chat { transform: translateY(-96px); }
+@media (max-width: 989px) { html.atc-on shopify-chat, html.atc-on #shopify-chat { transform: translateY(-80px); } }
+
+/* Complete your setup: cards keep a sensible size, and the box hides when there is nothing to pair with */
+.bset__grid { grid-auto-columns: minmax(170px, 210px); }
+.pdp__set:not(:has(.bset__item:not(.is-main))) { display: none; }
+
+/* ---------- Buttons: never blue on blue ---------- */
+.btn:not(.btn--outline):not(.btn--light):not(.btn--ghost-light):not(.btn--gold):hover { --btn-bg: #0B1F4D; --btn-line: #0B1F4D; --btn-fg: #fff; }
+.btn--gold:hover { --btn-bg: #0B1F4D; --btn-fg: #fff; background: #0B1F4D !important; color: #fff !important; }
+/* On blue tiles every button is solid white with blue text, and turns navy on hover */
+:is(.tile--noir, .tile--onyx, .tile--sapphire, .offers, .signup) .btn:not(.btn--outline) { --btn-bg: #fff; --btn-fg: #0052D6; --btn-line: #fff; background: #fff !important; color: #0052D6 !important; backdrop-filter: none; }
+:is(.tile--noir, .tile--onyx, .tile--sapphire, .offers, .signup) .btn:not(.btn--outline):hover { --btn-bg: #0B1F4D; --btn-fg: #fff; --btn-line: #0B1F4D; background: #0B1F4D !important; color: #fff !important; }
+/* On light tiles buttons are solid blue */
+:is(.tile--ivory, .tile--gold) .btn:not(.btn--outline) { --btn-bg: #0066FF; --btn-fg: #fff; --btn-line: #0066FF; background: #0066FF !important; color: #fff !important; }
+:is(.tile--ivory, .tile--gold) .btn:not(.btn--outline):hover { --btn-bg: #0B1F4D; --btn-line: #0B1F4D; background: #0B1F4D !important; }
+/* Bigger artwork on the tiles */
+.tile__art img, .tile__img { transform: scale(1.12); transform-origin: 70% 70%; }

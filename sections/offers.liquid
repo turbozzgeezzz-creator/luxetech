@@ -50,13 +50,6 @@
             </li>
           {%- endif -%}
         {%- endif -%}
-        {%- if has_welcome -%}
-          <li class="offer-item">
-            <span class="offer-item__when">{{ 'sections.offers_first' | t }}</span>
-            <span class="offer-item__fig">10% <small>{{ 'sections.offers_off' | t }}</small></span>
-            <button type="button" class="offer-item__link" data-open-popup>{{ 'sections.offers_join' | t }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</button>
-          </li>
-        {%- endif -%}
       </ul>
       {%- if s.button != blank -%}<a class="btn btn--gold btn--sm offers__cta" href="{{ s.link | default: routes.all_products_collection_url }}">{{ s.button }} {% render 'icon', name: 'arrow-right', class: 'icon--sm' %}</a>{%- endif -%}
     </div>

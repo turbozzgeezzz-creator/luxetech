@@ -971,7 +971,16 @@
   /* ---------- Cookie banner (Shopify Customer Privacy API) ---------- */
   (function () {
     var box = $('[data-cookie-banner]');
-    if (!box) return;
+    if (!box) {
+      // Our banner is off (Shopify's own privacy banner is used): "Cookie preferences" opens Shopify's.
+      on(doc, 'click', function (e) {
+        if (!e.target.closest('[data-cookie-prefs]')) return;
+        e.preventDefault();
+        if (window.privacyBanner && window.privacyBanner.showPreferences) window.privacyBanner.showPreferences();
+        else window.location.href = '/pages/cookie-policy';
+      });
+      return;
+    }
     var panel = $('[data-cookie-panel]', box), more = $('[data-cookie-more]', box), cp = null;
     function otherApp() { return !!(window.Pandectes || doc.querySelector('#pandectes-banner, [id^="pandectes"], .pd-cookie-banner-window')); }
     function show(withPrefs) {

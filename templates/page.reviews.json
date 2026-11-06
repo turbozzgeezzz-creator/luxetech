@@ -12,7 +12,7 @@
     "wall": {
       "type": "reviews-wall",
       "settings": {
-        "collection": "shop-all",
+        "collection": "best-sellers",
         "limit": 36
       }
     }

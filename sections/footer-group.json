@@ -54,8 +54,8 @@
       "settings": {
         "show_promises": true,
         "p_icon_1": "truck",
-        "p_title_1": "Tracked shipping",
-        "p_text_1": "Dispatched in 3-4 business days",
+        "p_title_1": "Free shipping",
+        "p_text_1": "On orders over A$50, tracked",
         "p_icon_2": "return",
         "p_title_2": "Refund or replacement",
         "p_text_2": "If something's not right",

@@ -6,6 +6,6 @@
   {%- assign h2x = settings.logo_height | times: 2 -%}
   {{ settings.logo | image_url: height: h2x | image_tag: height: settings.logo_height, alt: shop.name, loading: 'eager', fetchpriority: 'high' }}
 {%- else -%}
-  <img src="{{ 'logo-tech-luxedealers-purple.png' | asset_url }}" width="440" height="120" alt="{{ shop.name | escape }}" class="logo-img logo-img--light" loading="eager" fetchpriority="high">
-  <img src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="440" height="120" alt="" aria-hidden="true" class="logo-img logo-img--dark" loading="lazy">
+  <img src="{{ 'logo-tech-luxedealers-purple.png' | asset_url }}" width="1008" height="200" alt="{{ shop.name | escape }}" class="logo-img logo-img--light" loading="eager" fetchpriority="high">
+  <img src="{{ 'logo-tech-luxedealers-light.png' | asset_url }}" width="1008" height="200" alt="" aria-hidden="true" class="logo-img logo-img--dark" loading="lazy">
 {%- endif -%}
