@@ -93,8 +93,7 @@
     {%- endif -%}
 
     <div class="card__meta">
-      {%- capture rating -%}{%- render 'rating', product: product -%}{%- endcapture -%}
-      {%- if rating != blank -%}{{ rating }}{%- endif -%}
+      {%- comment -%} Star ratings show on each product's own page, not on product cards (Tech.LuxeDealers). {%- endcomment -%}
       {%- if settings.card_button and product.available -%}<span class="card__stock"><span class="dot"></span>{{ 'products.in_stock_short' | t }}</span>{%- endif -%}
     </div>
 
