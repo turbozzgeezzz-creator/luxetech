@@ -2441,7 +2441,8 @@ body .pdp__trust > .pdp__trust-item > span { white-space: normal !important; ove
 /* Small phones (320-359px): header icons and search fit without being cut off */
 @media (max-width: 359px) {
   .header__right { gap: 0 !important; margin-right: 0 !important; }
-  .header__right .icon-btn, .header__right .header__action { min-width: 34px; padding-left: 4px !important; padding-right: 4px !important; }
+  .header__right .icon-btn, .header__right .header__action { min-width: 32px; padding-left: 2px !important; padding-right: 2px !important; }
+  .header__right .header__cart { margin-right: 2px; }
   .header__search { min-width: 0; max-width: 100%; }
   .header__search input { min-width: 0; }
 }
