@@ -2446,3 +2446,14 @@ body .pdp__trust > .pdp__trust-item > span { white-space: normal !important; ove
   .header__search { min-width: 0; max-width: 100%; }
   .header__search input { min-width: 0; }
 }
+
+/* ---------- Dark mode: readable badges, pills and stock lines ---------- */
+html[data-theme="dark"] .header__pill { background: #0066FF !important; color: #fff !important; border-color: #0066FF !important; }
+html[data-theme="dark"] .header__pill .icon { color: #fff !important; }
+html[data-theme="dark"] .price__save, html[data-theme="dark"] [class*="__save"]:not(.qtyb__save) { background: #0066FF !important; color: #fff !important; }
+html[data-theme="dark"] .stock, html[data-theme="dark"] .card__stock { color: #5BE38C !important; }
+html[data-theme="dark"] .stock__dot, html[data-theme="dark"] .card__stock::before { background: #5BE38C !important; }
+html[data-theme="dark"] .qtyb__save { background: rgba(255,255,255,.16) !important; color: #fff !important; }
+html[data-theme="dark"] .bundle__plus { background: #0066FF !important; color: #fff !important; }
+html[data-theme="dark"] .bset__bar .btn { background: #E6F1FF !important; color: #0B1F4D !important; }
+html[data-theme="dark"] .bset__bar .btn[disabled] { opacity: .7; }
