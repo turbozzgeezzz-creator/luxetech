@@ -18,7 +18,7 @@
           "settings": {
             "icon": "truck",
             "title": "Free shipping",
-            "text": "<p>On orders over A$50, with tracking. Dispatched within 3-4 business days.</p>",
+            "text": "<p>On orders over US$50, with tracking. Dispatched within 3-4 business days.</p>",
             "link": "/pages/shipping-delivery",
             "link_label": "Shipping and delivery"
           }
@@ -141,7 +141,7 @@
           "settings": {
             "icon": "truck",
             "title": "Free tracked shipping",
-            "text": "Free on orders over A$50, dispatched within 3-4 business days with tracking."
+            "text": "Free on orders over US$50, dispatched within 3-4 business days with tracking."
           }
         },
         "s4": {

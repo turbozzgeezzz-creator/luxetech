@@ -69,7 +69,7 @@
           "type": "message",
           "settings": {
             "icon": "truck",
-            "text": "FREE tracked shipping on orders over A$50",
+            "text": "FREE tracked shipping on orders over US$50",
             "link": "/pages/shipping-delivery",
             "opens_popup": false,
             "needs_code": false

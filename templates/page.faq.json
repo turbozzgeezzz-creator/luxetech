@@ -58,7 +58,7 @@
           "settings": {
             "topic": "shipping",
             "question": "How much is shipping?",
-            "answer": "<p>Shipping is free on orders over A$50. Below that it is A$5.95. Options for your address are shown at checkout before you pay.</p>"
+            "answer": "<p>Shipping is free on orders over US$50. Below that it is US$5.95. Options for your address are shown at checkout before you pay.</p>"
           }
         },
         "q6": {

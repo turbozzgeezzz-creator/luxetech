@@ -267,7 +267,7 @@
       "settings": {
         "eyebrow": "Departments",
         "heading": "Shop by department",
-        "text": "Every department, hand-picked, with free tracked shipping over A$50.",
+        "text": "Every department, hand-picked, with free tracked shipping over US$50.",
         "link_label": "Shop all",
         "link": "/collections/all"
       }
@@ -384,7 +384,7 @@
           "type": "q",
           "settings": {
             "question": "When will my order ship?",
-            "answer": "<p>Orders are dispatched within 3–4 business days with tracking. Shipping is free on orders over A$50 (A$5.95 below that).</p>",
+            "answer": "<p>Orders are dispatched within 3–4 business days with tracking. Shipping is free on orders over US$50 (US$5.95 below that).</p>",
             "link": "/policies/shipping-policy",
             "link_label": "Shipping policy"
           }

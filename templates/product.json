@@ -14,7 +14,7 @@
           "type": "trust",
           "settings": {
             "icon_1": "truck",
-            "text_1": "Free shipping over A$50",
+            "text_1": "Free shipping over US$50",
             "icon_2": "return",
             "text_2": "Refund or replacement",
             "icon_3": "lock",
@@ -40,7 +40,7 @@
           "type": "accordions",
           "settings": {
             "open_first": true,
-            "shipping_text": "<p><strong>Free shipping on orders over A$50.</strong> Orders under A$50 ship for A$5.95. Every order is dispatched within 3-4 business days with tracking, and you'll get your tracking number by email as soon as it ships.</p><p>Damaged, faulty or the wrong item? Send us a photo or video and we'll refund or replace it. See our <a href=\"/pages/returns-warranty\">refund policy</a>.</p>",
+            "shipping_text": "<p><strong>Free shipping on orders over US$50.</strong> Orders under US$50 ship for US$5.95. Every order is dispatched within 3-4 business days with tracking, and you'll get your tracking number by email as soon as it ships.</p><p>Damaged, faulty or the wrong item? Send us a photo or video and we'll refund or replace it. See our <a href=\"/pages/returns-warranty\">refund policy</a>.</p>",
             "care_text": ""
           }
         }
