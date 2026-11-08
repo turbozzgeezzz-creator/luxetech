@@ -2430,3 +2430,18 @@ html[data-theme="dark"] .plug-note { background: rgba(255,255,255,.06); border-c
 .ship-bar__fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #3D8BFF, #0066FF) !important; width: var(--pct, 0%); transition: width .5s ease; }
 html[data-theme="dark"] .ship-bar { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
 html[data-theme="dark"] .ship-bar > span { color: #F2F7FF; }
+
+/* Product page trust tiles: text wraps inside the tile on phones (it was one long line spilling out) */
+body .pdp__trust > .pdp__trust-item > span { white-space: normal !important; overflow-wrap: break-word; text-wrap: balance; max-width: 100%; }
+@media (max-width: 480px) { body .pdp__trust > .pdp__trust-item { padding: 12px 6px 10px !important; font-size: 12px !important; } }
+
+/* Help centre on phones: one column that fits the screen; topic tabs scroll sideways inside it */
+@media (max-width: 989px) { .faqc__grid { grid-template-columns: minmax(0, 1fr); } .faqc__side, .faqc__main { min-width: 0; } }
+
+/* Small phones (320-359px): header icons and search fit without being cut off */
+@media (max-width: 359px) {
+  .header__right { gap: 0 !important; }
+  .header__right .icon-btn, .header__right .header__action { min-width: 34px; padding-left: 4px !important; padding-right: 4px !important; }
+  .header__search { min-width: 0; max-width: 100%; }
+  .header__search input { min-width: 0; }
+}
